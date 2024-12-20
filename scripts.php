@@ -26,7 +26,7 @@ $pag = basename($_SERVER['REQUEST_URI']);
 if($pag !== 'cadastro.php' && $pag !== 'login.php' && $pag !== 'recupera_senha.php' ){
 
    if( !isset($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'] ) ){
-        header('Location: /advogado/login.php');
+        header('Location: /adv/login.php');
         exit;
    }
 
