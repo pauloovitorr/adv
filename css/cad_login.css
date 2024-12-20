@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+*{
+    font-family: "Poppins", serif;
+    margin: 0px;
+    padding: 0px;
+    font-display: swap;
+}
+
+
+
+.container{
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    /* border: 1px solid red; */
+}
+
+.form{
+    width: 35%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border: 1px solid rgb(0, 255, 251); */
+}
+
+.arte_img{
+    width: 65%;
+    height: 100%;
+    /* border: 1px solid rgb(48, 22, 245); */
+    background-image: url('../img/arte_cadastro.jpg');
+    background-size: cover;
+    background-position: right;
+    display: flex;
+    align-items: center;
+}
+
+.conteudo_form{
+    width: 100%;
+    height: auto;
+    padding: 0px 30px;
+    /* border: 1px solid rgb(0, 0, 0); */
+}
+
+.conteudo_form h2{
+    font-size: 28px;
+    line-height: 28px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #121212;
+}
+
+.container_conteudo_form{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    /* border: 1px solid red; */
+    margin-bottom: 8px;
+    height: 100px;
+}
+
+.container_conteudo_form span{
+    font-size: 18px;
+    font-weight: 400;
+    color: #121212;
+}
+
+.container_conteudo_form p{
+    font-size: 12px;
+    color: red;
+    display: none;
+}
+
+.container_conteudo_form input{
+    padding: 8px;
+    border: 1px solid #C7C7C7;
+    height: 30px;
+    border-radius: 8px;
+    outline-color: #061124;
+}
+
+.container_conteudo_form input::placeholder{
+    font-weight: 400;
+}
+
+.container_senhas{
+    display: flex;
+    justify-content: space-between;
+}
+
+.container_senhas .container_conteudo_form{
+    width: 45%;
+}
+
+.container_btn{
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.container_btn button {
+    width: 100%;
+    height: 45px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(90deg, #1C6FCB, #1C6FCB); 
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.4s, transform 0.2s, box-shadow 0.4s;
+}
+
+.container_btn button:hover {
+    background: linear-gradient(90deg, #1C6FCB, #154378); 
+    box-shadow: 0 0 15px rgba(28, 111, 203, 0.6);
+    transform: scale(1.05); 
+}
+
+.container_link_login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+}
+
+.container_link_login a{
+    color: #121212;
+    font-size: 14px;
+    text-decoration: none;
+    transition: .4s;
+}
+
+.container_link_login a:hover{
+    color: #1C6FCB;
+}
+
+.input-error{
+    border: 1px solid red !important;
+}
+
+.container_texto_chamada{
+    width: 60%;
+    height: 40%;
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.texto_chamada {
+    /* border: 1px solid red; */
+    width: 75%;
+}
+
+.texto_chamada h1 {
+    font-size: 64px;
+    line-height: 70px;
+    font-weight: 500;
+    background: linear-gradient(90deg, #F5D298, #05131f); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+
+.texto_chamada p{
+    color: white;
+    font-size: 24px;
+}
+
+@media (max-width:1200px) {
+    .form,
+    .arte_img{
+        width: 50%;
+    }
+    .container_texto_chamada{
+        width: 100%;
+    }
+    .texto_chamada{
+        width: 88%;
+    }
+}
+
+
+@media (max-width:860px) {
+    .texto_chamada h1{
+        font-size: 50px;
+        line-height: 50px;
+    }
+
+    .texto_chamada p{
+        font-size: 20px;
+    }
+}
+
+@media (max-width:760px) {
+    .arte_img{
+        display: none;
+    }
+    .container{
+        justify-content: center;
+    }
+
+    .form{
+        width: 70%;
+    }
+}
+
+
+@media (max-width:500px) {
+    .form{
+        width: 90%;
+    }
+}
+
+@media (max-width:388px) {
+    .container_conteudo_form span{
+        font-size: 16px;
+    }
+}
+
+@media (max-width:345px) {
+    .container_conteudo_form span{
+        font-size: 14px;
+    }
+}
