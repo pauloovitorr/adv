@@ -1,9 +1,5 @@
 <?php 
 
-
-
-
-
 include_once('./menu_lat.php');
 include_once('./topo.php');
 
