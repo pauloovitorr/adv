@@ -3,8 +3,6 @@
 include_once('./menu_lat.php');
 include_once('./topo.php');
 
-
-
 ?>
 
 <!DOCTYPE html>
@@ -14,10 +12,6 @@ include_once('./topo.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-
-    <link rel="stylesheet" href="./css/geral.css">
-    <link rel="stylesheet" href="./css/topo_funcoes.css">
-
 
     <style>
         .container_lista_pessoas {
@@ -52,9 +46,9 @@ include_once('./topo.php');
             width: 20%;
         }
 
-        
+
         .container_dt,
-        .container_lista_pessoas table thead td:nth-child(4){
+        .container_lista_pessoas table thead td:nth-child(4) {
             width: 15%;
         }
 
@@ -74,14 +68,25 @@ include_once('./topo.php');
             box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
             display: flex;
             position: relative;
+            cursor: pointer;
         }
 
-        .dados_pessoa::before {
+        .cliente::before {
             content: '';
             position: absolute;
             width: 5px;
             height: 100%;
             background-color: #1C6FCB;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .contrario::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 100%;
+            background-color: #CD0909;
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
         }
@@ -132,7 +137,7 @@ include_once('./topo.php');
         .container_contato,
         .container_cidade,
         .container_dt,
-        .container_acao{
+        .container_acao {
             /* border: 1px solid red; */
             display: flex;
             align-items: center;
@@ -159,7 +164,7 @@ include_once('./topo.php');
         }
 
 
-        .opcoes_acao{
+        .opcoes_acao {
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -171,8 +176,64 @@ include_once('./topo.php');
             color: rgb(94, 94, 94);
             font-size: 18px;
             font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: .3s;
+
         }
 
+        .opcoes_acao:hover {
+            background-color: var(--hover-opcoes);
+        }
+
+        .opcoes_pessoa {
+            min-width: 150px;
+            height: auto;
+            position: absolute;
+            top: 40px;
+            border: 1px solid #c3c3c3;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            /* opacity: 0;
+            pointer-events: none; */
+            transition: .4s;
+            z-index: 2;
+            display: none;
+        }
+
+        .show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .opcoes_pessoa ul {
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .opcoes_pessoa ul a {
+            text-decoration: none;
+            gap: 4px;
+            color: rgb(94, 94, 94);
+            font-size: 14px;
+
+        }
+
+        .opcoes_pessoa ul a li {
+            width: 100%;
+            padding: 8px;
+            transition: .3s;
+        }
+
+        .opcoes_pessoa ul a li i {
+            margin-right: 4px;
+        }
+
+        .opcoes_pessoa ul a li:hover {
+            background-color: var(--hover-opcoes);
+        }
     </style>
 
 </head>
@@ -246,8 +307,10 @@ include_once('./topo.php');
 
                     <tbody>
                         <tr>
+
                             <td colspan="5">
-                                <div class="dados_pessoa">
+
+                                <div class="dados_pessoa cliente">
                                     <div class="conteudo_pessoa container_nome">
                                         <div class="icone">LA</div>
                                         <div class="nome_pessoa">
@@ -257,7 +320,7 @@ include_once('./topo.php');
                                     </div>
 
                                     <div class="conteudo_pessoa container_contato">
-                                        <a href="https://web.whatsapp.com/send?phone=+55" title="Abrir Whatsapp Web"><img src="../img/whatsapp.png" alt="whatsapp"> (18) 99987-5566 </a>
+                                        <a href="https://web.whatsapp.com/send?phone=+55" class="whatsapp"><img src="../img/whatsapp.png" alt="whatsapp"> (18) 99987-5566 </a>
                                     </div>
 
                                     <div class="conteudo_pessoa container_cidade">
@@ -269,14 +332,43 @@ include_once('./topo.php');
                                     </div>
 
                                     <div class="conteudo_pessoa container_acao">
-                                            <div class="opcoes_acao">
-                                                <i class="fa fa-ellipsis-h"></i>
+                                        <div class="opcoes_acao">
+                                            <i class="fa fa-ellipsis-h"></i>
+
+                                            <div class="opcoes_pessoa">
+                                                <ul>
+                                                    <a href="">
+                                                        <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
+                                                    </a>
+
+                                                    <a href="javascript:void(0)">
+                                                        <li><i class="fa-regular fa-id-card"></i> Documentos</li>
+                                                    </a>
+
+                                                    <a href="">
+                                                        <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
+                                                    </a>
+
+                                                    <a href="">
+                                                        <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
+                                                    </a>
+
+                                                    <a href="">
+                                                        <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
+                                                    </a>
+                                                </ul>
                                             </div>
+                                        </div>
+
                                     </div>
 
                                 </div>
                             </td>
                         </tr>
+
+                    
+
+                     
                     </tbody>
 
                 </table>
@@ -289,8 +381,29 @@ include_once('./topo.php');
     </main>
 
 
+    
 
+    <script>
+        $(document).ready(function() {
+            $('.opcoes_acao').on('click', function(e) {
+                e.stopPropagation(); // Impede o clique no elemento de propagar para o documento
 
+                var opcoesPessoa = $(this).find('.opcoes_pessoa');
+
+                // Verifica se o menu está visível e alterna
+                if (opcoesPessoa.is(':visible')) {
+                    opcoesPessoa.hide(); // Esconde o menu
+                } else {
+                    opcoesPessoa.show(); // Exibe o menu
+                }
+            });
+
+            $(document).on('click', function() {
+                // Esconde qualquer menu aberto ao clicar fora
+                $('.opcoes_pessoa').hide();
+            });
+        });
+    </script>
 
 </body>
 

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 date_default_timezone_set('America/Sao_Paulo');
 
@@ -23,27 +23,33 @@ session_start();
 // Verifica se usuário tá logado
 $pag = basename($_SERVER['REQUEST_URI']);
 
-if($pag !== 'cadastro.php' && $pag !== 'login.php' && $pag !== 'recupera_senha.php' ){
+if ($pag !== 'cadastro.php' && $pag !== 'login.php' && $pag !== 'recupera_senha.php') {
 
-   if( !isset($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'] ) ){
+    if (!isset($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'])) {
+        session_unset();
+        session_destroy();
         header('Location: /adv/login.php');
         exit;
-   }
-
-} 
-
-
-// // Verifica se a sessão expirou
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 2 * 60 * 60)) {
-    // Se passou 2 horas sem atividade, encerra a sessão
-    session_unset();
-    session_destroy();
-    header('Location: /advogado/login.php'); // Redireciona para o login
-    exit();
-} else {
-    // Renova a última atividade
-    $_SESSION['LAST_ACTIVITY'] = time();
+    }
 }
 
 
-?>
+$timeout = 2 * 60 * 60; // 2 horas
+
+// Verifica se LAST_ACTIVITY está configurado
+if (isset($_SESSION['LAST_ACTIVITY'])) {
+    $inactive = time() - $_SESSION['LAST_ACTIVITY'];
+
+    // Se ultrapassou o tempo limite, encerra a sessão
+    if ($inactive > $timeout) {
+        session_unset();
+        session_destroy();
+        header('Location: /advogado/login.php'); // Redireciona para o login
+        exit();
+    }
+}
+
+// Renova a última atividade apenas se houver interação
+if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') { // Ignorar requisições automáticas como preflight
+    $_SESSION['LAST_ACTIVITY'] = time();
+}

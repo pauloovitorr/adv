@@ -67,57 +67,67 @@
 </style>
 
 
+
+<!-- Inclusão das bibliotecas -->
+<script src="https://unpkg.com/popper.js@1"></script>
+<script src="https://unpkg.com/tippy.js@5"></script>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
+
 <nav class="menu_lateral">
     <ul>
-        <li title="PAINEL"><a href="./home.php">
+        <li id="painel"><a href="./home.php">
                 <div class="div_opcao_menu_lat"><img src="../img/painel.png" alt="">
                     <p>PAINEL</p>
                 </div>
             </a></li>
-        <li title="CRM"><a href="">
+        <li id="crm"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/crm.png" alt="">
                     <p>CRM</p>
                 </div>
             </a></li>
-        <li title="PESSOAS"><a href="./pessoas.php">
+        <li id="pessoas"><a href="./pessoas.php">
                 <div class="div_opcao_menu_lat"><img src="../img/pessoas.png" alt="">
                     <p>PESSOAS</p>
                 </div>
             </a></li>
-        <li title="PROCESSOS"><a href="">
+        <li id="processos"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/processos.png" alt="">
                     <p>PROCESSOS</p>
                 </div>
             </a></li>
-        <li title="ATIVIDADES"><a href="">
+        <li id="atividades"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/atividades.png" alt="">
                     <p>ATIVIDADES</p>
                 </div>
             </a></li>
-        <li title="SITE"><a href="">
+        <li id="site"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/site.png" alt="">
                     <p>SITE</p>
                 </div>
             </a></li>
-        <li title="LEADS"><a href="">
+        <li id="leads"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/leads.png" alt="">
                     <p>LEADS</p>
                 </div>
             </a></li>
-        <li title="FINANCEIRO"><a href="">
+        <li id="financeiro"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/financeiro.png" alt="">
                     <p>FINANCEIRO</p>
                 </div>
             </a></li>
-        <li title="RELATÓRIOS"><a href="">
+        <li id="relatorios"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/relatorios.png" alt="">
                     <p>RELATÓRIOS</p>
                 </div>
             </a></li>
-        <li title="CONFIGURAÇÕES"><a href="">
+        <li id="configuracoes"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/config.png" alt="">
                     <p>CONFIGURAÇÕES</p>
                 </div>
             </a></li>
     </ul>
+
+    
 </nav>
+
+

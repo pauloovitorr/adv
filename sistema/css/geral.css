@@ -9,13 +9,17 @@
   
 }
 
+:root {
+  --hover-opcoes: rgb(235, 235, 235);
+}
+
 body{
   overflow-x: hidden;
 }
 
 .container_principal {
   width: calc(100% - 80px);
-  min-height: calc(100vh - 92px);
+  min-height: calc(100vh - 90px);
   margin-left: 80px;
   background-color: #f2f2f2;
   border: 1px solid transparent;
