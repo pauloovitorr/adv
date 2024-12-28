@@ -16,120 +16,164 @@ include_once('./topo.php');
     <title>Home</title>
 
     <link rel="stylesheet" href="./css/geral.css">
+    <link rel="stylesheet" href="./css/topo_funcoes.css">
+
 
     <style>
-        .infos_pagina {
+        .container_lista_pessoas {
             /* border: 1px solid red; */
+            margin-top: 48px;
+        }
+
+        .container_lista_pessoas table {
+            border-collapse: collapse;
             width: 100%;
-            /* height: 50px; */
-            margin-top: 24px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+        }
+
+        .container_lista_pessoas table thead td {
+            /* border: 1px solid red; */
+            height: 50px;
+            padding-left: 16px;
+            /* text-align: center; */
+            font-size: 14px;
+            color: rgb(19, 19, 19);
+        }
+
+        .container_lista_pessoas table thead td:nth-child(1),
+        .container_nome {
+            width: 35%;
+
+        }
+
+        .container_lista_pessoas table thead td:nth-child(2),
+        .container_lista_pessoas table thead td:nth-child(3),
+        .container_contato,
+        .container_cidade {
+            width: 20%;
+        }
+
+        
+        .container_dt,
+        .container_lista_pessoas table thead td:nth-child(4){
+            width: 15%;
+        }
+
+        .container_lista_pessoas table thead td:nth-child(5),
+        .container_acao {
+            width: 10%;
         }
 
 
-        .opcoes_funcoes {
-            /* border: 1px solid red; */
-            width: 100%;
-            /* height: 50px; */
-            margin-top: 24px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .infos_pagina button {
-            width: auto;
-            height: 40px;
-            background-color: #FCFCFC;
-            border: 1px solid rgb(232, 232, 232);
-            padding: 10px 8px;
+        .dados_pessoa {
             border-radius: 8px;
-            color: #7D7D7D;
+            background-color: white;
+            margin-left: -1px;
+            margin-top: 24px;
+            width: 100%;
+            height: 90px;
+            box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
+            display: flex;
+            position: relative;
+        }
+
+        .dados_pessoa::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 100%;
+            background-color: #1C6FCB;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+
+        .conteudo_pessoa {
+            height: 100%;
+            /* border: 1px solid #1C6FCB; */
+        }
+
+        .container_nome {
+            display: flex;
+            align-items: center;
+            /* border: 1px solid #1C6FCB; */
+        }
+
+        .icone {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-image: linear-gradient(180deg, rgb(216, 216, 216), #c3c3c3);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-            line-height: 14px;
-        }
-
-        .btn_adicionar {
-            width: auto;
-            height: 40px;
-            background-color: #2F81F7;
-            border: 1px solid rgb(232, 232, 232);
-            padding: 10px 8px;
-            border-radius: 8px;
+            position: relative;
             color: white;
+            font-size: 22px;
+            font-weight: 500;
+            margin-left: 16px;
+            margin-right: 16px;
+        }
+
+        .nome_pessoa {
+            width: 75%;
+            /* border: 1px solid red; */
+        }
+
+        .nome_pessoa p {
+            color: #141414;
+            font-size: 18px;
+        }
+
+        .nome_pessoa span {
+            color: #909090;
+            font-size: 12px;
+        }
+
+        .container_contato,
+        .container_cidade,
+        .container_dt,
+        .container_acao{
+            /* border: 1px solid red; */
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+        }
+
+        .container_contato a img {
+            width: 20px;
+        }
+
+        .container_contato a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: rgb(94, 94, 94);
+            font-size: 14px;
+        }
+
+        .container_cidade p,
+        .container_dt p {
+            color: rgb(94, 94, 94);
+            font-size: 14px;
+        }
+
+
+        .opcoes_acao{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid rgb(94, 94, 94);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-            line-height: 14px;
-            cursor: pointer;
+            position: relative;
+            color: rgb(94, 94, 94);
+            font-size: 18px;
+            font-weight: 500;
         }
 
-        .div_buscar {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            color: #7D7D7D;
-            padding: 0px 8px;
-            border-radius: 8px;
-            transition: .3s;
-            background-color: #FCFCFC;
-            border: 1px solid rgb(232, 232, 232);
-        }
-
-
-
-        .div_buscar input {
-            height: 100%;
-            width: 100px;
-            padding: 10px 8px;
-            border-radius: 8px;
-            border: none;
-            background-color: transparent;
-            color: #7D7D7D;
-            outline: none;
-            transition: .3s;
-            font-size: 14px;
-        }
-
-        .div_buscar input:focus,
-        .div_buscar input:not(:placeholder-shown) {
-            width: 200px;
-        }
-
-
-        .div_buscar img {
-            width: 12px;
-        }
-
-
-        .div_buscar select {
-            height: 100%;
-            width: 150px;
-            border-radius: 8px;
-            border: none;
-            background-color: transparent;
-            color: #7D7D7D;
-            outline: none;
-            transition: .3s;
-        }
-
-        .div_buscar i {
-            color: #7D7D7D;
-            font-size: 14px;
-        }
     </style>
-
-
 
 </head>
 
@@ -146,12 +190,12 @@ include_once('./topo.php');
             <div class="opcoes_funcoes">
                 <button class="btn_adicionar"> <i class="fa-solid fa-plus"></i> Novo Contato </button>
 
-                <div class="div_buscar">
+                <div class="div_pai_funcoes">
                     <label for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label>
                     <input type="text" id="buscar_pessoas" name="buscar_pessoas" placeholder="Buscar">
                 </div>
 
-                <div class="div_buscar">
+                <div class="div_pai_funcoes">
                     <img src="../img/funil.png" alt="">
                     <select name="" id="a">
                         <option value="">Filtrar</option>
@@ -163,8 +207,8 @@ include_once('./topo.php');
                 </div>
 
 
-                <div class="div_buscar">
-                    <img src="../img/funil.png" alt="">
+                <div class="div_pai_funcoes">
+                    <i class="fa-solid fa-arrow-up-wide-short"></i>
                     <select name="" id="a">
                         <option value="">ordenar</option>
                         <option value="aaa">Nome da Pessoa</option>
@@ -173,8 +217,8 @@ include_once('./topo.php');
                     </select>
                 </div>
 
-                <div class="div_buscar">
-                    <img src="../img/funil.png" alt="">
+                <div class="div_pai_funcoes">
+                    <i class="fa-solid fa-file-arrow-down"></i>
                     <select name="" id="a">
                         <option value="">Exportar</option>
                         <option value="aaa">Excel (.xlsx)</option>
@@ -182,8 +226,64 @@ include_once('./topo.php');
                     </select>
                 </div>
 
-              
+
             </div>
+
+
+            <section class="container_lista_pessoas">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <td>Nome</td>
+                            <td>Contato</td>
+                            <td>Cidade/UF</td>
+                            <td>Data de Cadastro</td>
+                            <td>Ações</td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <div class="dados_pessoa">
+                                    <div class="conteudo_pessoa container_nome">
+                                        <div class="icone">LA</div>
+                                        <div class="nome_pessoa">
+                                            <p>Laisla Maria Candido</p>
+                                            <span>Cliente</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="conteudo_pessoa container_contato">
+                                        <a href="https://web.whatsapp.com/send?phone=+55" title="Abrir Whatsapp Web"><img src="../img/whatsapp.png" alt="whatsapp"> (18) 99987-5566 </a>
+                                    </div>
+
+                                    <div class="conteudo_pessoa container_cidade">
+                                        <p>Presidente Prudente/SP</p>
+                                    </div>
+
+                                    <div class="conteudo_pessoa container_dt">
+                                        <p>28/12/2024</p>
+                                    </div>
+
+                                    <div class="conteudo_pessoa container_acao">
+                                            <div class="opcoes_acao">
+                                                <i class="fa fa-ellipsis-h"></i>
+                                            </div>
+                                    </div>
+
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </section>
+
+
 
         </div>
     </main>

@@ -9,9 +9,9 @@
         z-index: 10;
     }
 
-    .menu_lateral:hover {
+    /* .menu_lateral:hover {
         width: 200px;
-    }
+    } */
 
     .menu_lateral ul {
         list-style: none;
@@ -30,10 +30,10 @@
         /* Transição suave */
     }
 
-    .menu_lateral:hover ul li {
+    /* .menu_lateral:hover ul li {
         justify-content: flex-start;
-        /* Alinhado à esquerda no hover */
-    }
+       
+    } */
 
     .menu_lateral ul li a {
         color: white;
@@ -51,10 +51,10 @@
         transition: opacity 0.3s, max-width 0.3s;
     }
 
-    .menu_lateral:hover ul li a p {
+    /* .menu_lateral:hover ul li a p {
         opacity: 1;
         max-width: 150px;
-    }
+    } */
 
     .div_opcao_menu_lat {
         display: flex;
@@ -69,56 +69,55 @@
 
 <nav class="menu_lateral">
     <ul>
-        <li><a href="./home.php">
+        <li title="PAINEL"><a href="./home.php">
                 <div class="div_opcao_menu_lat"><img src="../img/painel.png" alt="">
                     <p>PAINEL</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="CRM"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/crm.png" alt="">
                     <p>CRM</p>
                 </div>
             </a></li>
-        <li><a href="./pessoas.php">
+        <li title="PESSOAS"><a href="./pessoas.php">
                 <div class="div_opcao_menu_lat"><img src="../img/pessoas.png" alt="">
                     <p>PESSOAS</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="PROCESSOS"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/processos.png" alt="">
                     <p>PROCESSOS</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="ATIVIDADES"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/atividades.png" alt="">
                     <p>ATIVIDADES</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="SITE"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/site.png" alt="">
                     <p>SITE</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="LEADS"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/leads.png" alt="">
                     <p>LEADS</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="FINANCEIRO"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/financeiro.png" alt="">
                     <p>FINANCEIRO</p>
                 </div>
             </a></li>
-            <li><a href="">
+        <li title="RELATÓRIOS"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/relatorios.png" alt="">
                     <p>RELATÓRIOS</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li title="CONFIGURAÇÕES"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../img/config.png" alt="">
                     <p>CONFIGURAÇÕES</p>
                 </div>
             </a></li>
-
     </ul>
 </nav>
