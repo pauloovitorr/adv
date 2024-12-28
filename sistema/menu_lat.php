@@ -6,6 +6,7 @@
         background-color: #061124;
         color: white;
         transition: width .5s;
+        z-index: 10;
     }
 
     .menu_lateral:hover {
@@ -68,7 +69,7 @@
 
 <nav class="menu_lateral">
     <ul>
-        <li><a href="">
+        <li><a href="./home.php">
                 <div class="div_opcao_menu_lat"><img src="../img/painel.png" alt="">
                     <p>PAINEL</p>
                 </div>
@@ -78,7 +79,7 @@
                     <p>CRM</p>
                 </div>
             </a></li>
-        <li><a href="">
+        <li><a href="./pessoas.php">
                 <div class="div_opcao_menu_lat"><img src="../img/pessoas.png" alt="">
                     <p>PESSOAS</p>
                 </div>

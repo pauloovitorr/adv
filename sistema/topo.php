@@ -169,6 +169,15 @@ include_once('../scripts.php');
     font-size: 14px;
 }
 
+.opcoes_perfil ul li a{
+    text-decoration: none;
+    color:rgb(58, 58, 58);
+    width: 100%;
+    height: 100%;
+    display: block;
+    padding: 10px 0px;
+}
+
 .opcoes_perfil ul li:hover {
     background-color: #c3c3c3;
 }
@@ -307,7 +316,7 @@ include_once('../scripts.php');
                     <ul>
                         <li>Perfil</li>
                         <li>Configurações</li>
-                        <li>Sair</li>
+                        <li><a href="./logout.php">Sair</a></li>
                     </ul>
                 </div>
             </div>
