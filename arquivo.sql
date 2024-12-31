@@ -26,6 +26,7 @@ CREATE TABLE tipo_pessoa (
 -- Tabela para cadastro de pessoa
 CREATE TABLE pessoas (
     id_pessoa INT NULL AUTO_INCREMENT,
+    tk varchar(32) NOT NULL,
     nome varchar(220) NOT NULL,
     origem varchar(100) NOT NULL,
     dt_cadastro_pessoa DATETIME NOT NULL,

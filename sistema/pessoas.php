@@ -3,6 +3,8 @@
 include_once('./menu_lat.php');
 include_once('./topo.php');
 
+
+
 ?>
 
 <!DOCTYPE html>
@@ -11,7 +13,7 @@ include_once('./topo.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Pessoas</title>
 
     <style>
         .container_lista_pessoas {
@@ -249,7 +251,7 @@ include_once('./topo.php');
             </div>
 
             <div class="opcoes_funcoes">
-                <button class="btn_adicionar"> <i class="fa-solid fa-plus"></i> Novo Contato </button>
+                <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Novo Contato </button>
 
                 <div class="div_pai_funcoes">
                     <label for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label>
@@ -376,13 +378,12 @@ include_once('./topo.php');
             </section>
 
 
-
         </div>
     </main>
 
 
     
-
+<!-- Script para exibir as opções quando os 3 prontinhos da ação são clicados -->
     <script>
         $(document).ready(function() {
             $('.opcoes_acao').on('click', function(e) {
@@ -403,6 +404,14 @@ include_once('./topo.php');
                 $('.opcoes_pessoa').hide();
             });
         });
+    </script>
+
+    <script>
+        $(document).ready(function(){
+            $('#add_pessoa').click(function(){
+                window.open('./cadastro_pessoa.php', '_self');
+            })
+        })
     </script>
 
 </body>

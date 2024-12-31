@@ -11,6 +11,8 @@
 
 :root {
   --hover-opcoes: rgb(235, 235, 235);
+  --preto-primario: #141414;
+  --azul-fundo: #061124;
 }
 
 body{

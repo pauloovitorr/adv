@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
     $senha  = $conexao->escape_string(htmlspecialchars($_POST['senha']));
     $confirma_senha  = $conexao->escape_string(htmlspecialchars($_POST['confirmasenha']));
     $ip = $_SERVER['REMOTE_ADDR'];
+    $token = bin2hex(random_bytes(32 / 2));
+
 
 
     if ($senha !== $confirma_senha) {
@@ -58,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                 exit;
             }
     
-            $sql_insert_usuario = 'INSERT INTO usuario_config (nome, email,tell, senha, dt_cadastro_usuario, dt_atualizacao_usuario ) VALUES (?,?,?,?, NOW(), NOW()) ';
+            $sql_insert_usuario = 'INSERT INTO usuario_config (tk,nome, email,tell, senha, dt_cadastro_usuario, dt_atualizacao_usuario ) VALUES (?,?,?,?,?, NOW(), NOW()) ';
     
             $stmt = $conexao->prepare($sql_insert_usuario);
-            $stmt->bind_param('ssss', $nome, $email, $tell, $senha,);
+            $stmt->bind_param('sssss', $token, $nome, $email, $tell, $senha,);
     
             if ($stmt->execute()) {
 
