@@ -118,7 +118,7 @@ include_once('./topo.php');
             padding: 16px 50px;
             border-radius: 8px;
             border: 1px solid #F1F1F1;
-            ;
+            margin-bottom: 24px;
         }
 
         .bloco-formulario {
@@ -261,12 +261,13 @@ include_once('./topo.php');
                 <hr>
 
                 <div class="container_field_form">
-                    <fieldset>
-                        <legend>Dados Pessoais</legend>
+                    <form action="" method="POST">
+                        <fieldset>
+                            <legend>Dados Pessoais</legend>
 
-                        <div class="bloco-formulario">
+                            <div class="bloco-formulario">
 
-                            <form action="" method="POST">
+
 
                                 <div class="container_inputs">
                                     <div class="container_input">
@@ -370,11 +371,120 @@ include_once('./topo.php');
 
                                 </div>
 
-                            </form>
 
-                        </div>
+                            </div>
 
-                    </fieldset>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Contato</legend>
+
+                            <div class="bloco-formulario">
+
+                                <div class="container_inputs">
+                                    <div class="container_input">
+                                        <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
+                                        <select name="pessoa" id="pessoa">
+                                            <option value="pf">Pessoa Física</option>
+                                            <option value="pf">Pessoa Jurídica</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="container_input" id="nome">
+                                        <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
+                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="num_doc">CPF/CNPJ</label>
+                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="rg">RG</label>
+                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </fieldset>
+
+
+
+                        <fieldset>
+                            <legend>Endereço</legend>
+
+                            <div class="bloco-formulario">
+
+                                <div class="container_inputs">
+                                    <div class="container_input">
+                                        <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
+                                        <select name="pessoa" id="pessoa">
+                                            <option value="pf">Pessoa Física</option>
+                                            <option value="pf">Pessoa Jurídica</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="container_input" id="nome">
+                                        <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
+                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="num_doc">CPF/CNPJ</label>
+                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="rg">RG</label>
+                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                            <div class="bloco-formulario">
+
+                                <div class="container_inputs">
+                                    <div class="container_input">
+                                        <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
+                                        <select name="pessoa" id="pessoa">
+                                            <option value="pf">Pessoa Física</option>
+                                            <option value="pf">Pessoa Jurídica</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="container_input" id="nome">
+                                        <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
+                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="num_doc">CPF/CNPJ</label>
+                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="rg">RG</label>
+                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </fieldset>
+
+
+                    </form>
+
+
                 </div>
 
 
