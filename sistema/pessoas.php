@@ -251,7 +251,7 @@ include_once('./topo.php');
             </div>
 
             <div class="opcoes_funcoes">
-                <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Novo Contato </button>
+                <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Nova Pessoa </button>
 
                 <div class="div_pai_funcoes">
                     <label for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label>

@@ -3,6 +3,14 @@
 include_once('./menu_lat.php');
 include_once('./topo.php');
 
+
+// if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) ){
+//     var_dump( $_POST);
+//     die();
+// }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -188,7 +196,9 @@ include_once('./topo.php');
 
 
         #nome,
-        #nome_mae {
+        #nome_mae,
+        #logradouro_container,
+        #observacao_container{
             grid-column: span 2;
             min-width: auto;
         }
@@ -199,6 +209,14 @@ include_once('./topo.php');
             display: none;
         }
 
+        .container_btn_submit{
+            /* border: 1px solid red; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            margin-bottom: 24px;
+        }
 
 
 
@@ -272,7 +290,7 @@ include_once('./topo.php');
                                 <div class="container_inputs">
                                     <div class="container_input">
                                         <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
-                                        <select name="pessoa" id="pessoa">
+                                        <select name="pessoa" id="pessoa" required>
                                             <option value="pf">Pessoa Física</option>
                                             <option value="pf">Pessoa Jurídica</option>
                                         </select>
@@ -280,7 +298,7 @@ include_once('./topo.php');
 
                                     <div class="container_input" id="nome">
                                         <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
-                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor" required>
                                     </div>
 
                                     <div class="container_input">
@@ -319,7 +337,7 @@ include_once('./topo.php');
 
                                     <div class="container_input">
                                         <label for="origem">Origem <span style="color: red;">*</span></label>
-                                        <select name="pessoa" name="origem" id="origem">
+                                        <select name="pessoa" name="origem" id="origem" required>
                                             <option value="">Selecione a origem</option>
                                             <option value="">Escritório</option>
                                             <option value="">Indicação</option>
@@ -382,27 +400,30 @@ include_once('./topo.php');
                             <div class="bloco-formulario">
 
                                 <div class="container_inputs">
-                                    <div class="container_input">
-                                        <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
-                                        <select name="pessoa" id="pessoa">
-                                            <option value="pf">Pessoa Física</option>
-                                            <option value="pf">Pessoa Jurídica</option>
-                                        </select>
-                                    </div>
 
-                                    <div class="container_input" id="nome">
-                                        <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
-                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                    <div class="container_input">
+                                        <label for="tell_principal">Telefone principal</label>
+                                        <input type="tell" name="tell_principal" id="tell_principal" placeholder="(99) 99999-9999">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="num_doc">CPF/CNPJ</label>
-                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
+                                        <label for="tell_secundario">Telefone secundário</label>
+                                        <input type="tell" name="tell_secundario" id="tell_secundario" placeholder="(99) 99999-9999">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="rg">RG</label>
-                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                        <label for="celular">Celular</label>
+                                        <input type="tell" name="celular" id="celular" placeholder="(99) 9999-9999">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="e-mail">E-mail principal</label>
+                                        <input type="email" name="e-mail" id="e-mail" placeholder="Ex: paulo@gmail.com">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="e-mail_secundario">E-mail secundário</label>
+                                        <input type="email" name="e-mail_secundario" id="e-mail_secundario" placeholder="Ex: paulo@gmail.com">
                                     </div>
 
 
@@ -421,27 +442,26 @@ include_once('./topo.php');
 
                                 <div class="container_inputs">
                                     <div class="container_input">
-                                        <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
-                                        <select name="pessoa" id="pessoa">
-                                            <option value="pf">Pessoa Física</option>
-                                            <option value="pf">Pessoa Jurídica</option>
-                                        </select>
+                                        <label for="cep">CEP</label>
+                                        <input type="text" name="cep" id="cep" placeholder="99999-999">
                                     </div>
 
-                                    <div class="container_input" id="nome">
-                                        <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
-                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                    <div class="container_input" id="logradouro_container">
+                                        <label for="logradouro">Logradouro</label>
+                                        <input type="text" name="logradouro" id="logradouro" placeholder="EX: Rua João Goulart">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="num_doc">CPF/CNPJ</label>
-                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
+                                        <label for="num">Número</label>
+                                        <input type="text" name="num" id="num" placeholder="99">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="rg">RG</label>
-                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                        <label for="bairro">Bairro</label>
+                                        <input type="text" name="bairro" id="bairro" placeholder="Ex: Centro">
                                     </div>
+
+
 
 
                                 </div>
@@ -451,27 +471,54 @@ include_once('./topo.php');
                             <div class="bloco-formulario">
 
                                 <div class="container_inputs">
+
                                     <div class="container_input">
-                                        <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
-                                        <select name="pessoa" id="pessoa">
-                                            <option value="pf">Pessoa Física</option>
-                                            <option value="pf">Pessoa Jurídica</option>
+                                        <label for="cidade">Cidade</label>
+                                        <input type="text" name="cidade" id="cidade" placeholder="Ex: São Paulo">
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="estado">Estado</label>
+                                        <select id="estado" name="estado">
+                                            <option value="">Selecione um estado</option>
+                                            <option value="AC">Acre</option>
+                                            <option value="AL">Alagoas</option>
+                                            <option value="AM">Amazonas</option>
+                                            <option value="AP">Amapá</option>
+                                            <option value="BA">Bahia</option>
+                                            <option value="CE">Ceará</option>
+                                            <option value="DF">Distrito Federal</option>
+                                            <option value="ES">Espírito Santo</option>
+                                            <option value="GO">Goiás</option>
+                                            <option value="MA">Maranhão</option>
+                                            <option value="MG">Minas Gerais</option>
+                                            <option value="MS">Mato Grosso do Sul</option>
+                                            <option value="MT">Mato Grosso</option>
+                                            <option value="PA">Pará</option>
+                                            <option value="PB">Paraíba</option>
+                                            <option value="PE">Pernambuco</option>
+                                            <option value="PI">Piauí</option>
+                                            <option value="PR">Paraná</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                            <option value="RN">Rio Grande do Norte</option>
+                                            <option value="RO">Rondônia</option>
+                                            <option value="RR">Roraima</option>
+                                            <option value="RS">Rio Grande do Sul</option>
+                                            <option value="SC">Santa Catarina</option>
+                                            <option value="SE">Sergipe</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="TO">Tocantins</option>
                                         </select>
                                     </div>
 
-                                    <div class="container_input" id="nome">
-                                        <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
-                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor">
+                                    <div class="container_input">
+                                        <label for="complemento">Complemento</label>
+                                        <input type="text" name="complemento" id="complemento" placeholder="Ex: Próximo ao mercado">
                                     </div>
 
-                                    <div class="container_input">
-                                        <label for="num_doc">CPF/CNPJ</label>
-                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
-                                    </div>
-
-                                    <div class="container_input">
-                                        <label for="rg">RG</label>
-                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                    <div class="container_input" id="observacao_container">
+                                        <label for="observacao">Observação</label>
+                                        <input type="text" name="observacao" id="observacao" placeholder="EX: Visitas apenas pela manhã">
                                     </div>
 
 
@@ -480,6 +527,11 @@ include_once('./topo.php');
                             </div>
 
                         </fieldset>
+
+
+                        <div class="container_btn_submit">
+                                <button type="submit" class="btn_cadastrar"> Cadastrar Pessoa </button>
+                        </div>
 
 
                     </form>
