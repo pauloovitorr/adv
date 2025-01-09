@@ -196,9 +196,9 @@ include_once('./topo.php');
 
 
         #nome,
-        #nome_mae,
+        #container_nome_mae,
         #logradouro_container,
-        #observacao_container{
+        #observacao_container {
             grid-column: span 2;
             min-width: auto;
         }
@@ -209,7 +209,7 @@ include_once('./topo.php');
             display: none;
         }
 
-        .container_btn_submit{
+        .container_btn_submit {
             /* border: 1px solid red; */
             display: flex;
             align-items: center;
@@ -291,24 +291,24 @@ include_once('./topo.php');
                                     <div class="container_input">
                                         <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
                                         <select name="pessoa" id="pessoa" required>
-                                            <option value="pf">Pessoa Física</option>
-                                            <option value="pf">Pessoa Jurídica</option>
+                                            <option value="1">Pessoa Física</option>
+                                            <option value="2">Pessoa Jurídica</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input" id="nome">
                                         <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
-                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor" required>
+                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor" minlength="4" maxlength="150" required>
                                     </div>
 
                                     <div class="container_input">
                                         <label for="num_doc">CPF/CNPJ</label>
-                                        <input type="text" name="num_doc" id="num_doc" placeholder="999.999.99-99">
+                                        <input type="text" name="num_doc" id="num_doc" minlength="11" maxlength="20" placeholder="999.999.99-99">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="rg">RG</label>
-                                        <input type="text" name="rg" id="rg" placeholder="Número do RG">
+                                        <input type="text" name="rg" id="rg" placeholder="Número do RG" minlength="5" maxlength="25">
                                     </div>
 
 
@@ -322,27 +322,27 @@ include_once('./topo.php');
 
                                     <div class="container_input">
                                         <label for="profissao">Profissão</label>
-                                        <input type="text" name="profissao" id="profissao" placeholder="EX: Autônomo">
+                                        <input type="text" name="profissao" id="profissao" minlength="4" maxlength="40" placeholder="EX: Autônomo">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="ctps">CTPS</label>
-                                        <input type="text" name="ctps" id="ctps" placeholder="Carteira de trabalho">
+                                        <input type="text" name="ctps" id="ctps" minlength="4" maxlength="40" placeholder="Carteira de trabalho">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="pis">PIS/PASEP</label>
-                                        <input type="text" name="pis" id="pis" placeholder="999.9999.999-9">
+                                        <input type="text" name="pis" id="pis" minlength="11" maxlength="14" placeholder="999.9999.999-9">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="origem">Origem <span style="color: red;">*</span></label>
                                         <select name="pessoa" name="origem" id="origem" required>
                                             <option value="">Selecione a origem</option>
-                                            <option value="">Escritório</option>
-                                            <option value="">Indicação</option>
-                                            <option value="">Anúncio</option>
-                                            <option value="">Facebook</option>
+                                            <option value="Escritório">Escritório</option>
+                                            <option value="Indicação">Indicação</option>
+                                            <option value="Anúncio">Anúncio</option>
+                                            <option value="Facebook">Facebook</option>
                                         </select>
                                     </div>
 
@@ -354,8 +354,8 @@ include_once('./topo.php');
                                         <label for="sexo">Sexo</label>
                                         <select name="sexo" id="sexo">
                                             <option value="">Selecione o sexo</option>
-                                            <option value="">Masculino</option>
-                                            <option value="">Feminino</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Feminino">Feminino</option>
                                         </select>
                                     </div>
 
@@ -363,22 +363,22 @@ include_once('./topo.php');
                                         <label for="estado_civil">Estado civil</label>
                                         <select name="estado_civil" id="estado_civil">
                                             <option value="">Selecione o estado civil</option>
-                                            <option value="">Casado(a)</option>
-                                            <option value="">Divorciado(a)</option>
-                                            <option value="">Separado(a)</option>
-                                            <option value="">Solteiro(a)</option>
-                                            <option value="">União Estável</option>
+                                            <option value="Casado(a">Casado(a)</option>
+                                            <option value="Divorciado(a)">Divorciado(a)</option>
+                                            <option value="Separado(a)">Separado(a)</option>
+                                            <option value="Solteiro(a)">Solteiro(a)</option>
+                                            <option value="União Estável">União Estável</option>
                                         </select>
                                     </div>
 
-                                    <div class="container_input" id="nome_mae">
+                                    <div class="container_input" id="container_nome_mae">
                                         <label for="nome_mae">Nome da mãe</label>
-                                        <input type="text" name="nome_mae" id="nome_mae" placeholder="EX: Eliete de Sousa">
+                                        <input type="text" name="nome_mae" id="nome_mae" minlength="4" maxlength="150" placeholder="EX: Eliete de Sousa">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="foto">Foto</label>
-                                        <input type="file" name="foto" id="foto" class="custom-file-input">
+                                        <input type="file" name="foto" accept="image/*" id="foto" class="custom-file-input">
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto').click()">
                                             <p>Selecione o arquivo</p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
@@ -403,27 +403,27 @@ include_once('./topo.php');
 
                                     <div class="container_input">
                                         <label for="tell_principal">Telefone principal</label>
-                                        <input type="tell" name="tell_principal" id="tell_principal" placeholder="(99) 99999-9999">
+                                        <input type="tell" name="tell_principal" id="tell_principal" minlength="13" maxlength="14" placeholder="(99) 99999-9999">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="tell_secundario">Telefone secundário</label>
-                                        <input type="tell" name="tell_secundario" id="tell_secundario" placeholder="(99) 99999-9999">
+                                        <input type="tell" name="tell_secundario" id="tell_secundario" minlength="13" maxlength="14" placeholder="(99) 99999-9999">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="celular">Celular</label>
-                                        <input type="tell" name="celular" id="celular" placeholder="(99) 9999-9999">
+                                        <input type="tell" name="celular" id="celular" minlength="13" maxlength="14" placeholder="(99) 9999-9999">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="e-mail">E-mail principal</label>
-                                        <input type="email" name="e-mail" id="e-mail" placeholder="Ex: paulo@gmail.com">
+                                        <input type="email" name="e-mail" id="e-mail" minlength="7" maxlength="100" placeholder="Ex: paulo@gmail.com">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="e-mail_secundario">E-mail secundário</label>
-                                        <input type="email" name="e-mail_secundario" id="e-mail_secundario" placeholder="Ex: paulo@gmail.com">
+                                        <input type="email" name="e-mail_secundario" id="e-mail_secundario" minlength="7" maxlength="100" placeholder="Ex: paulo@gmail.com">
                                     </div>
 
 
@@ -443,22 +443,22 @@ include_once('./topo.php');
                                 <div class="container_inputs">
                                     <div class="container_input">
                                         <label for="cep">CEP</label>
-                                        <input type="text" name="cep" id="cep" placeholder="99999-999">
+                                        <input type="text" name="cep" id="cep" minlength="8" maxlength="9" placeholder="99999-999">
                                     </div>
 
                                     <div class="container_input" id="logradouro_container">
                                         <label for="logradouro">Logradouro</label>
-                                        <input type="text" name="logradouro" id="logradouro" placeholder="EX: Rua João Goulart">
+                                        <input type="text" name="logradouro" id="logradouro" minlength="4" maxlength="150" placeholder="EX: Rua João Goulart">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="num">Número</label>
-                                        <input type="text" name="num" id="num" placeholder="99">
+                                        <input type="text" name="num" id="num" minlength="1" maxlength="6" placeholder="99">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="bairro">Bairro</label>
-                                        <input type="text" name="bairro" id="bairro" placeholder="Ex: Centro">
+                                        <input type="text" name="bairro" id="bairro" minlength="3" maxlength="100" placeholder="Ex: Centro">
                                     </div>
 
 
@@ -474,7 +474,7 @@ include_once('./topo.php');
 
                                     <div class="container_input">
                                         <label for="cidade">Cidade</label>
-                                        <input type="text" name="cidade" id="cidade" placeholder="Ex: São Paulo">
+                                        <input type="text" name="cidade" id="cidade" minlength="3" maxlength="150" placeholder="Ex: São Paulo">
                                     </div>
 
                                     <div class="container_input">
@@ -513,12 +513,12 @@ include_once('./topo.php');
 
                                     <div class="container_input">
                                         <label for="complemento">Complemento</label>
-                                        <input type="text" name="complemento" id="complemento" placeholder="Ex: Próximo ao mercado">
+                                        <input type="text" name="complemento" id="complemento" minlength="3" maxlength="150" placeholder="Ex: Próximo ao mercado">
                                     </div>
 
                                     <div class="container_input" id="observacao_container">
                                         <label for="observacao">Observação</label>
-                                        <input type="text" name="observacao" id="observacao" placeholder="EX: Visitas apenas pela manhã">
+                                        <input type="text" name="observacao" id="observacao" minlength="3" maxlength="150" placeholder="EX: Visitas apenas pela manhã">
                                     </div>
 
 
@@ -530,7 +530,7 @@ include_once('./topo.php');
 
 
                         <div class="container_btn_submit">
-                                <button type="submit" class="btn_cadastrar"> Cadastrar Pessoa </button>
+                            <button type="submit" class="btn_cadastrar"> Cadastrar Pessoa </button>
                         </div>
 
 
@@ -549,6 +549,114 @@ include_once('./topo.php');
 
 
 
+    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            // mascaras campos
+
+            // mascara nome e nome mae
+            $('#nome_pessoa').on('input', function() {
+                const valor = $(this).val();
+                // Filtrar apenas letras e acentos
+                const valorFiltrado = valor.replace(/[^a-zA-ZÀ-ÖÙ-öù-ÿ\s]/g, '');
+                $(this).val(valorFiltrado);
+            });
+
+            $('#nome_mae').on('input', function() {
+                const valor = $(this).val();
+                // Filtrar apenas letras e acentos
+                const valor_digitado = valor.replace(/[^a-zA-ZÀ-ÖÙ-öù-ÿ\s]/g, '');
+                $(this).val(valor_digitado);
+            });
+
+            $('#cidade').on('input', function() {
+                const valor = $(this).val();
+                // Filtrar apenas letras e acentos
+                const valor_digitado = valor.replace(/[^a-zA-ZÀ-ÖÙ-öù-ÿ\s]/g, '');
+                $(this).val(valor_digitado);
+            });
+
+            var CpfCnpjMaskBehavior = function(val) {
+                var len = val.replace(/\D/g, '').length;
+                if (len <= 11) {
+                    return '000.000.000-009';
+                }
+                return '00.000.000/0000-00';
+            };
+
+            // CPF/CNPJ
+            var cpfCnpjpOptions = {
+                onKeyPress: function(val, e, field, options) {
+                    field.mask(CpfCnpjMaskBehavior.apply({}, arguments), options);
+                },
+                onComplete: function(val, e, field, options) {
+                    var len = val.replace(/\D/g, '').length;
+                    if (len === 11) {
+                        $(field).mask('000.000.000-00');
+                    } else if (len === 14) {
+                        $(field).mask('00.000.000/0000-00');
+                    }
+                }
+            };
+
+            $('#num_doc').mask(CpfCnpjMaskBehavior, cpfCnpjpOptions);
+
+            // Remove a máscara antes de enviar o formulário (opcional)
+            $('form').on('submit', function() {
+                var documento = $('#num_doc').val();
+                $('#num_doc').val(documento.replace(/[^\d]+/g, ''));
+            });
+
+
+            // data de nascimento
+            const hoje = new Date(); // Data atual
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0'); // Mês atual (ajustado para 0-11)
+            const dia = String(hoje.getDate()).padStart(2, '0'); // Dia atual
+
+            const dataMaxima = `${ano}-${mes}-${dia}`;
+
+            // Define o atributo 'max' no campo de data
+            $('#dt_nascimento').attr('max', dataMaxima);
+
+            // pis
+            $('#pis').mask('999.9999.999-9');
+
+            // valida foto
+            $('#foto').on('change', function() {
+                const file = this.files[0]; // Obtém o primeiro arquivo selecionado
+                const fileName = file.name.toLowerCase(); // Nome do arquivo em minúsculas
+                const allowedExtensions = ['.jpg', '.jpeg', '.png']; // Extensões permitidas
+
+                // Verifica se a extensão do arquivo não está na lista permitida
+                const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+
+                if (!isValid) {
+                    alert('Por favor, selecione um arquivo de imagem válido (JPG, PNG, GIF).');
+                    $(this).val(''); // Reseta o campo de input
+                }
+            });
+
+            // telefones
+            $('#tell_principal').mask('(99) 99999-9999')
+            $('#tell_secundario').mask('(99) 99999-9999')
+            $('#celular').mask('(99) 9999-9999')
+            $('#cep').mask('99999-999')
+
+            // num casa
+            $('#num').on('input', function() {
+                // Permite apenas números
+                this.value = this.value.replace(/\D/g, '');
+
+                // Limita a 6 caracteres
+                if (this.value.length > 6) {
+                    this.value = this.value.slice(0, 6);
+                }
+            });
+
+        });
+    </script>
 
 </body>
 
