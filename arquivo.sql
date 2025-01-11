@@ -60,3 +60,16 @@ CREATE TABLE pessoas (
     CONSTRAINT fk_tipo_pessoa FOREIGN KEY (tipo_pessoa_id_tipo_pessoa) REFERENCES tipo_pessoa(id_tipo_pessoa),
     CONSTRAINT fk_usuario_config FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
 )
+
+
+CREATE TABLE tipo_parte (
+
+	id_tipo_parte INT NULL AUTO_INCREMENT,
+	tipo varchar(10) NOT NULL,
+    
+    CONSTRAINT pk_tipo_parte PRIMARY KEY (id_tipo_parte)
+)
+
+
+-- insert into tipo_parte (tipo) value ('Cliente');
+-- insert into tipo_parte (tipo) value ('Contrário');

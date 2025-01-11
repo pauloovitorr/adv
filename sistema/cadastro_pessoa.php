@@ -4,8 +4,8 @@ include_once('./menu_lat.php');
 include_once('./topo.php');
 
 
-// if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) ){
-//     var_dump( $_POST);
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
+//     var_dump($_POST);
 //     die();
 // }
 
@@ -218,7 +218,24 @@ include_once('./topo.php');
             margin-bottom: 24px;
         }
 
+        .container_tipo_parte {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+        }
 
+        .container_tipo_parte_inputs {
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .container_tipo_parte_inputs div {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         @media (max-width: 1024px) {
             .container_inputs {
@@ -279,7 +296,7 @@ include_once('./topo.php');
                 <hr>
 
                 <div class="container_field_form">
-                    <form action="" method="POST">
+                    <form action="" method="POST" enctype="multipart/form-data">
                         <fieldset>
                             <legend>Dados Pessoais</legend>
 
@@ -306,7 +323,7 @@ include_once('./topo.php');
                                         <input type="text" name="num_doc" id="num_doc" minlength="11" maxlength="20" placeholder="999.999.99-99">
                                     </div>
 
-                                    <div class="container_input">
+                                    <div class="container_input" id="container_rg">
                                         <label for="rg">RG</label>
                                         <input type="text" name="rg" id="rg" placeholder="Número do RG" minlength="5" maxlength="25">
                                     </div>
@@ -315,7 +332,7 @@ include_once('./topo.php');
                                 </div>
 
                                 <div class="container_inputs">
-                                    <div class="container_input">
+                                    <div class="container_input" id="container_dt_nascimento">
                                         <label for="dt_nascimento">Data de nascimento</label>
                                         <input type="date" name="dt_nascimento" id="dt_nascimento">
                                     </div>
@@ -325,12 +342,12 @@ include_once('./topo.php');
                                         <input type="text" name="profissao" id="profissao" minlength="4" maxlength="40" placeholder="EX: Autônomo">
                                     </div>
 
-                                    <div class="container_input">
+                                    <div class="container_input" id="container_ctps">
                                         <label for="ctps">CTPS</label>
                                         <input type="text" name="ctps" id="ctps" minlength="4" maxlength="40" placeholder="Carteira de trabalho">
                                     </div>
 
-                                    <div class="container_input">
+                                    <div class="container_input" id="container_pis">
                                         <label for="pis">PIS/PASEP</label>
                                         <input type="text" name="pis" id="pis" minlength="11" maxlength="14" placeholder="999.9999.999-9">
                                     </div>
@@ -350,7 +367,7 @@ include_once('./topo.php');
                                 </div>
 
                                 <div class="container_inputs">
-                                    <div class="container_input">
+                                    <div class="container_input" id="container_sexo">
                                         <label for="sexo">Sexo</label>
                                         <select name="sexo" id="sexo">
                                             <option value="">Selecione o sexo</option>
@@ -359,7 +376,7 @@ include_once('./topo.php');
                                         </select>
                                     </div>
 
-                                    <div class="container_input">
+                                    <div class="container_input" id="container_estado_civil">
                                         <label for="estado_civil">Estado civil</label>
                                         <select name="estado_civil" id="estado_civil">
                                             <option value="">Selecione o estado civil</option>
@@ -380,12 +397,30 @@ include_once('./topo.php');
                                         <label for="foto">Foto</label>
                                         <input type="file" name="foto" accept="image/*" id="foto" class="custom-file-input">
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto').click()">
-                                            <p>Selecione o arquivo</p>
+                                            <p id="nome-arquivo">Selecione o arquivo</p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                         </div>
                                     </div>
 
 
+
+                                </div>
+
+                                <div class="container_tipo_parte">
+
+                                    <div class="container_tipo_parte_inputs">
+
+                                        <div>
+                                            <label for="tipo_parte_cliente">Cliente</label>
+                                            <input type="radio" id="tipo_parte_cliente" value="1" name="tipo_parte" checked>
+                                        </div>
+
+                                        <div>
+                                            <label for="tipo_parte_contrario">Contrário</label>
+                                            <input type="radio" id="tipo_parte_contrario" value="2" name="tipo_parte">
+                                        </div>
+
+                                    </div>
 
                                 </div>
 
@@ -624,19 +659,31 @@ include_once('./topo.php');
             $('#pis').mask('999.9999.999-9');
 
             // valida foto
+            // Valida foto
             $('#foto').on('change', function() {
                 const file = this.files[0]; // Obtém o primeiro arquivo selecionado
                 const fileName = file.name.toLowerCase(); // Nome do arquivo em minúsculas
                 const allowedExtensions = ['.jpg', '.jpeg', '.png']; // Extensões permitidas
 
-                // Verifica se a extensão do arquivo não está na lista permitida
+                // Verifica se a extensão do arquivo está na lista permitida
                 const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
 
                 if (!isValid) {
-                    alert('Por favor, selecione um arquivo de imagem válido (JPG, PNG, GIF).');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Arquivo Inválido",
+                        text: "Por favor, selecione um arquivo de imagem válido (JPG, JPEG, PNG).",
+                    });
                     $(this).val(''); // Reseta o campo de input
+                    $('#nome-arquivo').text('Selecione o arquivo'); // Volta para o texto padrão
+                    $('.custo_add_arquivo').css('color', 'rgb(153, 153, 153)')
+                } else {
+                    // Atualiza o texto com o nome do arquivo selecionado
+                    $('#nome-arquivo').text(file.name);
+                    $('.custo_add_arquivo').css('color', '#141414')
                 }
             });
+
 
             // telefones
             $('#tell_principal').mask('(99) 99999-9999')
@@ -656,6 +703,99 @@ include_once('./topo.php');
             });
 
         });
+    </script>
+
+
+    <!-- Js para quando for PJ -->
+    <script>
+        $(document).ready(function() {
+
+            $('#pessoa').on('change', function() {
+                // PJ
+                if (this.value === '2') {
+                    $('#container_rg').hide()
+                    $('#container_dt_nascimento').hide()
+                    $('#container_ctps').hide()
+                    $('#container_pis').hide()
+                    $('#container_sexo').hide()
+                    $('#container_estado_civil').hide()
+                    $('#container_nome_mae').hide()
+                } else {
+                    $('#container_rg').show()
+                    $('#container_dt_nascimento').show()
+                    $('#container_ctps').show()
+                    $('#container_pis').show()
+                    $('#container_sexo').show()
+                    $('#container_estado_civil').show()
+                    $('#container_nome_mae').show()
+                }
+
+
+            })
+
+        })
+    </script>
+
+
+
+
+
+
+    <!-- Busca do cep -->
+    <script>
+        $(document).ready(function() {
+            let cep = document.querySelector('#cep')
+            let pai = document.querySelector('.pai')
+
+            cep.addEventListener('blur', function() {
+                let pesquisar = cep.value
+
+                if (pesquisar !== '') {
+
+                    if (pesquisar.length === 9) {
+                        fetch(`https://viacep.com.br/ws/${pesquisar}/json/`)
+
+                            .then((res) => {
+                                return res.json()
+                            })
+
+                            .then((dados) => {
+
+
+                                if (dados.hasOwnProperty('erro')) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "CEP Não Encontrado",
+                                        text: "Adicione o CEP novamente!",
+
+                                    });
+                                } else {
+                                    console.log(dados)
+                                    $('#logradouro').val(dados.logradouro)
+                                    $('#bairro').val(dados.bairro)
+                                    $('#cidade').val(dados.localidade)
+                                    $('#estado').val(dados.uf)
+                                    $('#complemento').val(dados.complemento)
+                                }
+
+
+                            })
+
+                            .catch((e) => {
+                                console.log('Deu erro: ' + e, message)
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "CEP Inválido",
+                            text: "Digite o CEP Completo",
+
+                        });
+                    }
+                }
+
+            })
+        })
     </script>
 
 </body>
