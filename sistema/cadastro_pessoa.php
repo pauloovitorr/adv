@@ -4,14 +4,126 @@ include_once('./menu_lat.php');
 include_once('./topo.php');
 
 
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST)) {
-//     var_dump($_POST);
-//     die();
-// }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
+
+
+
+
+    $token          = bin2hex(random_bytes(64 / 2));
+    $nome           = $conexao->escape_string(htmlspecialchars($_POST['nome']));
+    $origem         = $conexao->escape_string(htmlspecialchars($_POST['origem']));
+    $foto_pessoa    = '';
+    $num_doc        = $conexao->escape_string(htmlspecialchars($_POST['num_doc']));
+    $rg             = $conexao->escape_string(htmlspecialchars($_POST['rg']));
+    $dt_nascimento  = $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento']));
+    $estado_civil   = $conexao->escape_string(htmlspecialchars($_POST['estado_civil']));
+    $profissao      = $conexao->escape_string(htmlspecialchars($_POST['profissao']));
+    $pis            = $conexao->escape_string(htmlspecialchars($_POST['pis']));
+    $ctps           = $conexao->escape_string(htmlspecialchars($_POST['ctps']));
+    $sexo           = $conexao->escape_string(htmlspecialchars($_POST['sexo']));
+    $tell_principal = $conexao->escape_string(htmlspecialchars($_POST['tell_principal']));
+    $tell_secundario = $conexao->escape_string(htmlspecialchars($_POST['tell_secundario']));
+    $celular        = $conexao->escape_string(htmlspecialchars($_POST['celular']));
+    $email          = $conexao->escape_string(htmlspecialchars($_POST['e-mail']));
+    $email_secundario = $conexao->escape_string(htmlspecialchars($_POST['e-mail_secundario']));
+    $cep            = $conexao->escape_string(htmlspecialchars($_POST['cep']));
+    $estado         = $conexao->escape_string(htmlspecialchars($_POST['estado']));
+    $cidade         = $conexao->escape_string(htmlspecialchars($_POST['cidade']));
+    $bairro         = $conexao->escape_string(htmlspecialchars($_POST['bairro']));
+    $logradouro     = $conexao->escape_string(htmlspecialchars($_POST['logradouro']));
+    $num            = (int)$conexao->escape_string(htmlspecialchars($_POST['num']));
+    $complemento    = $conexao->escape_string(htmlspecialchars($_POST['complemento']));
+    $observacao     = $conexao->escape_string(htmlspecialchars($_POST['observacao']));
+    $nome_mae       = $conexao->escape_string(htmlspecialchars($_POST['nome_mae']));
+
+    $tipo_pessoa    = $conexao->escape_string(htmlspecialchars($_POST['pessoa']));
+    $tipo_parte     = (int)$conexao->escape_string(htmlspecialchars($_POST['tipo_parte']));
+    $usuario        = $_SESSION['cod'];
+
+
+
+    try {
+
+        $conexao->begin_transaction();
+
+        $foto = $_FILES['foto'];
+
+        $nomeArquivo = $foto['name'];
+        $tmpArquivo = $foto['tmp_name'];
+        $tamanhoArquivo = $foto['size'];
+
+        $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+        $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+
+        if ($tamanhoArquivo > 1 * 1024 * 1024) {
+            echo '
+        <script>
+        Swal.fire({
+            icon: "error",
+            title: "Erro",
+            text: "Arquivo muito grande! Tamanho máximo permitido de 1MB"
+        });
+    </script>
+        ';
+
+            $conexao->rollback();
+        } elseif ($foto['error'] !== 0) {
+            echo '
+            <script>
+            Swal.fire({
+                icon: "error",
+                title: "Erro",
+                text: "Imagem com erro!"
+            });
+        </script>
+            ';
+            $conexao->rollback();
+        } else {
+            $caminho = '../img_clientes';
+
+            $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+            // var_dump($novo_caminho, $novo_caminho);
+            $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+
+            if ($retorno_img_movida) {
+                $foto_pessoa = $novo_caminho;
+            }
+        }
+
+
+        $sql = 'INSERT INTO pessoas (
+        tk, nome, origem, dt_cadastro_pessoa, dt_atualizacao_pessoa, foto_pessoa, num_documento, rg, dt_nascimento, 
+        estado_civil, profissao, pis, ctps, sexo, telefone_principal, telefone_secundario, celular, email, 
+        email_secundario, cep, estado, cidade, bairro, logradouro, numero_casa, complemento, observacao, 
+        nome_mae, tipo_pessoa_id_tipo_pessoa, tipo_parte ,usuario_config_id_usuario_config
+    ) VALUES (
+        ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )';
+
+        $stmt = $conexao->prepare($sql);
+        $stmt->bind_param('ssssssssssssssssssssssisssiii', $token, $nome, $origem, $foto_pessoa, $num_doc, $rg, $dt_nascimento, $estado_civil, $profissao, $pis, $ctps, $sexo, $tell_principal, $tell_secundario, $celular, $email, $email_secundario, $cep, $estado, $cidade, $bairro, $logradouro, $num, $complemento, $observacao, $nome_mae, $tipo_pessoa , $tipo_parte ,$usuario);
+
+        if ($stmt->execute()) {
+
+            $conexao->commit();
+
+            echo '
+            <script> window.location.href = "./docs_pessoa.php";</script>
+            ';
+            exit;
+        }
+    } catch (Exception $err) {
+        echo "Erro: " . $err->getMessage();
+        $conexao->rollback();
+    }
+}
 
 
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -20,6 +132,7 @@ include_once('./topo.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro</title>
+
 
 
     <style>
@@ -354,7 +467,7 @@ include_once('./topo.php');
 
                                     <div class="container_input">
                                         <label for="origem">Origem <span style="color: red;">*</span></label>
-                                        <select name="pessoa" name="origem" id="origem" required>
+                                        <select name="origem" name="origem" id="origem" required>
                                             <option value="">Selecione a origem</option>
                                             <option value="Escritório">Escritório</option>
                                             <option value="Indicação">Indicação</option>
@@ -380,7 +493,7 @@ include_once('./topo.php');
                                         <label for="estado_civil">Estado civil</label>
                                         <select name="estado_civil" id="estado_civil">
                                             <option value="">Selecione o estado civil</option>
-                                            <option value="Casado(a">Casado(a)</option>
+                                            <option value="Casado(a)">Casado(a)</option>
                                             <option value="Divorciado(a)">Divorciado(a)</option>
                                             <option value="Separado(a)">Separado(a)</option>
                                             <option value="Solteiro(a)">Solteiro(a)</option>
@@ -638,10 +751,10 @@ include_once('./topo.php');
             $('#num_doc').mask(CpfCnpjMaskBehavior, cpfCnpjpOptions);
 
             // Remove a máscara antes de enviar o formulário (opcional)
-            $('form').on('submit', function() {
-                var documento = $('#num_doc').val();
-                $('#num_doc').val(documento.replace(/[^\d]+/g, ''));
-            });
+            // $('form').on('submit', function() {
+            //     var documento = $('#num_doc').val();
+            //     $('#num_doc').val(documento.replace(/[^\d]+/g, ''));
+            // });
 
 
             // data de nascimento

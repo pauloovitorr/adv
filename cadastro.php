@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
     $senha  = $conexao->escape_string(htmlspecialchars($_POST['senha']));
     $confirma_senha  = $conexao->escape_string(htmlspecialchars($_POST['confirmasenha']));
     $ip = $_SERVER['REMOTE_ADDR'];
-    $token = bin2hex(random_bytes(32 / 2));
+    $token = bin2hex(random_bytes(64 / 2));
 
 
 
