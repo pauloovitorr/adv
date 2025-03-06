@@ -35,7 +35,7 @@ function dados_acesso($nome_cliente,$remetente, $usuario, $senha){
         $mail->Subject = 'Dados de acesso';
         $mail->Body = "<h1>Olá, $nome_cliente!</h1><p>Segue os dados de acesso ao sistema: </p><br><p>Tela de login: <a href='http://localhost/advogado/login.php'>Clique aqui!</a></p> <p>Usuário: <strong>$usuario</strong> </p><p>Senha: <strong>$senha</strong> </p>";
         $mail->AltBody = "Olá, $nome_cliente! 
-        Segue os dados de acesso ao sistema: Tela de login: http://localhost/advogado/login.php 
+        Segue os dados de acesso ao sistema: Tela de login: http://localhost/adv/login.php 
         Usuário: $usuario 
         Senha: $senha";
     

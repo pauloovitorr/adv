@@ -6,9 +6,6 @@ include_once('./topo.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
 
-
-
-
     $token          = bin2hex(random_bytes(64 / 2));
     $nome           = $conexao->escape_string(htmlspecialchars($_POST['nome']));
     $origem         = $conexao->escape_string(htmlspecialchars($_POST['origem']));
