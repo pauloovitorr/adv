@@ -38,15 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
     $usuario        = $_SESSION['cod'];
 
 
-
     try {
 
         $conexao->begin_transaction();
 
         $foto = $_FILES['foto'];
 
-        if($foto){
-            $nomeArquivo = $foto['name'];
+        if($foto['name'] != '' ){
+        $nomeArquivo = $foto['name'];
         $tmpArquivo = $foto['tmp_name'];
         $tamanhoArquivo = $foto['size'];
 
