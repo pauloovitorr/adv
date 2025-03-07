@@ -7,12 +7,12 @@ require 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-echo $_ENV['DB_HOST']; 
 
-$host = '149.56.31.239';
-$user = 'comtest_projetoadv';
-$password = 'pn=v.#qnMoy_';
-$data_base = 'comtest_adv';
+
+$host =  $_ENV['DB_HOST']; 
+$user = $_ENV['DB_USER']; 
+$password = $_ENV['DB_PASS']; 
+$data_base = $_ENV['DB_BASE']; 
 
 $conexao = new mysqli($host, $user, $password, $data_base);
 $conexao->set_charset("utf8");
