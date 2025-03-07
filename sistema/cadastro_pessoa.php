@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
         $foto = $_FILES['foto'];
 
-        $nomeArquivo = $foto['name'];
+        if($foto){
+            $nomeArquivo = $foto['name'];
         $tmpArquivo = $foto['tmp_name'];
         $tamanhoArquivo = $foto['size'];
 
@@ -87,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
             if ($retorno_img_movida) {
                 $foto_pessoa = $novo_caminho;
             }
+        }
         }
 
 

@@ -19,12 +19,7 @@ include_once('./topo.php');
 </head>
 <body>
     <main class="container_principal">
-        <h1>ascascascascas</h1>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure qui repellat temporibus, soluta ea libero voluptate cupiditate maxime nulla commodi repellendus aperiam magni modi ducimus aspernatur saepe quasi ullam quia?</p>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure qui repellat temporibus, soluta ea libero voluptate cupiditate maxime nulla commodi repellendus aperiam magni modi ducimus aspernatur saepe quasi ullam quia?</p>
-   
-   
-   
+        <h1>Desenvolvimento</h1>   
     </main>
 </body>
 </html>

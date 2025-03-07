@@ -2,6 +2,13 @@
 
 date_default_timezone_set('America/Sao_Paulo');
 
+require 'vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+echo $_ENV['DB_HOST']; 
+
 $host = '149.56.31.239';
 $user = 'comtest_projetoadv';
 $password = 'pn=v.#qnMoy_';
