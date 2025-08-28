@@ -1,13 +1,4 @@
-<?php 
-
-include_once('./menu_lat.php');
-include_once('./topo.php');
-
-// echo "logado " . $_SESSION['nome'] . " " . $_SESSION['email'] ;
-
-// session_destroy();
-
-?>
+<?php include_once('../scripts.php');?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -17,6 +8,12 @@ include_once('./topo.php');
     <title>Home</title>
     <link rel="stylesheet" href="./css/geral.css">
 </head>
+
+<?php
+include_once('./menu_lat.php');
+include_once('./topo.php');
+?>
+
 <body>
     <main class="container_principal">
         <h1>Desenvolvimento</h1>   

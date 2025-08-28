@@ -85,7 +85,7 @@
                     <p>CRM</p>
                 </div>
             </a></li>
-        <li id="pessoas"><a href="./pessoas.php">
+        <li id="pessoas"><a href="./pessoa/pessoas.php">
                 <div class="div_opcao_menu_lat"><img src="../img/pessoas.png" alt="">
                     <p>PESSOAS</p>
                 </div>

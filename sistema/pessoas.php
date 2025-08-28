@@ -1,11 +1,4 @@
-<?php
-
-include_once('./menu_lat.php');
-include_once('./topo.php');
-
-
-
-?>
+<?php include_once('../scripts.php');?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -239,6 +232,11 @@ include_once('./topo.php');
     </style>
 
 </head>
+
+<?php
+include_once('./menu_lat.php');
+include_once('./topo.php');
+?>
 
 <body>
     <main class="container_principal">

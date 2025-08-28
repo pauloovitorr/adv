@@ -22,7 +22,7 @@ function dados_acesso($nome_cliente,$remetente, $usuario, $senha){
         $mail->Username = 'paulov.pv50@gmail.com'; // Seu e-mail do Gmail
         $mail->Password = 'okjw dhmk bbjv sjst'; // Sua senha ou senha de aplicativo
         // $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Usar SSL
-        $mail->Port = 587; // Porta SMTP para SSL calma
+        $mail->Port = 587; // Porta SMTP para SSL 
     
         // Configuração do remetente e destinatário
         $mail->setFrom('paulov.pv50@gmail.com'); // Remetente

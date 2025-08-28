@@ -1,7 +1,6 @@
 <?php
 
-include_once('./menu_lat.php');
-include_once('./topo.php');
+include_once('../scripts.php');
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
@@ -42,52 +41,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
         $conexao->begin_transaction();
 
-        $foto = $_FILES['foto'];
+        $foto = isset($_FILES['foto']) ? $_FILES['foto'] : '';
 
-        if($foto['name'] != '' ){
-        $nomeArquivo = $foto['name'];
-        $tmpArquivo = $foto['tmp_name'];
-        $tamanhoArquivo = $foto['size'];
+        if ($foto['name'] != '') {
+            $nomeArquivo = $foto['name'];
+            $tmpArquivo = $foto['tmp_name'];
+            $tamanhoArquivo = $foto['size'];
 
-        $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+            $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
 
-        $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+            $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
 
-        if ($tamanhoArquivo > 1 * 1024 * 1024) {
-            echo '
-        <script>
-        Swal.fire({
-            icon: "error",
-            title: "Erro",
-            text: "Arquivo muito grande! Tamanho máximo permitido de 1MB"
-        });
-    </script>
-        ';
+            if ($tamanhoArquivo > 3 * 1024 * 1024) {
 
-            $conexao->rollback();
-        } elseif ($foto['error'] !== 0) {
-            echo '
-            <script>
-            Swal.fire({
-                icon: "error",
-                title: "Erro",
-                text: "Imagem com erro!"
-            });
-        </script>
-            ';
-            $conexao->rollback();
-        } else {
-            $caminho = '../img_clientes';
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Arquivo muito grande! Tamanho máximo permitido de 2MB'
+                ];
 
-            $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
 
-            // var_dump($novo_caminho, $novo_caminho);
-            $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+                exit;
+            } elseif ($foto['error'] !== 0) {
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Imagem com erro'
+                ];
 
-            if ($retorno_img_movida) {
-                $foto_pessoa = $novo_caminho;
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+
+                exit;
+            } else {
+                $caminho = '../img_clientes';
+
+                $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+                // var_dump($novo_caminho, $novo_caminho);
+                $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+
+                if ($retorno_img_movida) {
+                    $foto_pessoa = $novo_caminho;
+                }
             }
-        }
         }
 
 
@@ -101,15 +98,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
     )';
 
         $stmt = $conexao->prepare($sql);
-        $stmt->bind_param('ssssssssssssssssssssssisssiii', $token, $nome, $origem, $foto_pessoa, $num_doc, $rg, $dt_nascimento, $estado_civil, $profissao, $pis, $ctps, $sexo, $tell_principal, $tell_secundario, $celular, $email, $email_secundario, $cep, $estado, $cidade, $bairro, $logradouro, $num, $complemento, $observacao, $nome_mae, $tipo_pessoa , $tipo_parte ,$usuario);
+        $stmt->bind_param('ssssssssssssssssssssssisssiii', $token, $nome, $origem, $foto_pessoa, $num_doc, $rg, $dt_nascimento, $estado_civil, $profissao, $pis, $ctps, $sexo, $tell_principal, $tell_secundario, $celular, $email, $email_secundario, $cep, $estado, $cidade, $bairro, $logradouro, $num, $complemento, $observacao, $nome_mae, $tipo_pessoa, $tipo_parte, $usuario);
 
         if ($stmt->execute()) {
 
+            $res = [
+                'status' => 'success',
+                'message' => 'Pessoa cadastrada com sucesso!'
+            ];
+
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
             $conexao->commit();
 
-            echo '
-            <script> window.location.href = "./docs_pessoa.php";</script>
-            ';
             exit;
         }
     } catch (Exception $err) {
@@ -372,6 +372,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
 </head>
 
+<?php
+
+include_once('./menu_lat.php');
+include_once('./topo.php');
+
+?>
+
 <body>
     <main class="container_principal">
         <div class="pai_conteudo">
@@ -506,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
                                     <div class="container_input">
                                         <label for="foto">Foto</label>
-                                        <input type="file" name="foto" accept="image/*" id="foto" class="custom-file-input">
+                                        <input type="file" name="foto" accept=".jpg,.jpeg,.png" id="foto" class="custom-file-input">
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto').click()">
                                             <p id="nome-arquivo">Selecione o arquivo</p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
@@ -849,7 +856,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
 
 
+    <!-- Ajax para cadastro de pessoa -->
+    <script>
+        $(document).ready(function() {
+            // Validação ao submeter o formulário
+            $('form').on('submit', function(e) {
 
+                $('.btn_cadastrar').attr('disabled', true)
+
+                Swal.fire({
+                    title: "Carregando...",
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                e.preventDefault();
+
+
+                // Ajax para realizar o cadastro
+                let dados_form = new FormData(this);
+                $.ajax({
+                    url: 'cadastro_pessoa.php',
+                    type: 'POST',
+                    data: dados_form,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.status === 'erro') {
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Erro",
+                                text: res.message
+                            });
+
+
+                        } else if (res.status === 'success') {
+                            Swal.close();
+
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: "Sucesso!",
+                                    text: res.message,
+                                    icon: "success"
+                                }).then((result) => {
+                                    window.location.href = "./docs_pessoa.php";
+                                });
+                            }, 300);
+                        }
+
+
+                    },
+                    error: function(err) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro",
+                            text: err.message,
+                        });
+                    }
+                })
+
+
+
+            });
+        })
+    </script>
 
 
     <!-- Busca do cep -->

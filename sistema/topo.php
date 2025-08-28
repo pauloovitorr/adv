@@ -1,9 +1,3 @@
-<?php
-
-include_once('../scripts.php');
-
-
-?>
 
 <!-- Css Geral e topo das páginas internas como btn add, buscar, filtrar etc... -->
 <link rel="stylesheet" href="./css/geral.css">

@@ -1,9 +1,5 @@
-<?php
+<?php include_once('../scripts.php');?>
 
-include_once('./menu_lat.php');
-include_once('./topo.php');
-
-?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -76,43 +72,49 @@ include_once('./topo.php');
 
 </head>
 
+<?php
 
-<main class="container_principal">
+include_once('./menu_lat.php');
+include_once('./topo.php');
 
-    <div class="pai_conteudo">
+?>
 
-        <section class="container_etapa_cadastro">
-            <div class="etapa">
-                <div class="num bg_selecionado">1º</div>
-                <div class="descricao color_selecionado">Cadastro</div>
-            </div>
+<body>
+    
+    <main class="container_principal">
 
-            <div class="separador bg_selecionado"></div>
+        <div class="pai_conteudo">
 
-            <div class="etapa">
-                <div class="num bg_selecionado">2º</div>
-                <div class="descricao color_selecionado">Documentos</div>
-            </div>
+            <section class="container_etapa_cadastro">
+                <div class="etapa">
+                    <div class="num bg_selecionado">1º</div>
+                    <div class="descricao color_selecionado">Cadastro</div>
+                </div>
 
-            <div class="separador bg_selecionado"></div>
+                <div class="separador bg_selecionado"></div>
 
-            <div class="etapa">
-                <div class="num">3º</div>
-                <div class="descricao">Finalização</div>
-            </div>
+                <div class="etapa">
+                    <div class="num bg_selecionado">2º</div>
+                    <div class="descricao color_selecionado">Documentos</div>
+                </div>
 
-        </section>
+                <div class="separador bg_selecionado"></div>
 
+                <div class="etapa">
+                    <div class="num">3º</div>
+                    <div class="descricao">Finalização</div>
+                </div>
 
-        <section class="container_cadastro"> 
-            <h1>Desenvolvimento</h1>
-        </section>
-
-    </div>
-
-</main>
+            </section>
 
 
+            <section class="container_cadastro"> 
+                <h1>Desenvolvimento</h1>
+            </section>
+
+        </div>
+
+    </main>
 
 </body>
 

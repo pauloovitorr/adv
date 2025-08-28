@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
 
                 if (isValid) {
                     // Ajax para realizar o cadastro
-                    const dados_form = $(this).serialize()
+                    let dados_form = $(this).serialize()
                     $.ajax({
                         url: $(this).attr('action'),
                         method: $(this).attr('method'),
