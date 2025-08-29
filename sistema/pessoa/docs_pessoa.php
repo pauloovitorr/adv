@@ -1,4 +1,7 @@
-<?php include_once('../scripts.php');?>
+<?php 
+include_once('../../scripts.php');
+
+?>
 
 
 <!DOCTYPE html>
@@ -73,10 +76,8 @@
 </head>
 
 <?php
-
-include_once('./menu_lat.php');
-include_once('./topo.php');
-
+include_once('../geral/menu_lat.php');
+include_once('../geral/topo.php');
 ?>
 
 <body>

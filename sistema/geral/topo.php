@@ -1,7 +1,7 @@
 
 <!-- Css Geral e topo das páginas internas como btn add, buscar, filtrar etc... -->
-<link rel="stylesheet" href="./css/geral.css">
-<link rel="stylesheet" href="./css/topo_funcoes.css">
+<link rel="stylesheet" href="../css/geral.css">
+<link rel="stylesheet" href="../css/topo_funcoes.css">
 
 <!-- Font awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
 
 <!-- Js geral, exemplo balão do menu lateral -->
-<script src="./js/geral.js" defer></script>
+<script src="../js/geral.js" defer></script>
 
 <style>
     .container_topo {
@@ -295,20 +295,20 @@
 
     <div class="pai_topo">
         <div class="logo_pesquisa">
-            <img src="../img/logo.png" alt="logo">
+            <img src="../../img/logo.png" alt="logo">
 
             <div class="container_pesquisa">
                 <input type="text" placeholder="Pesquisar">
-                <div class="icone_pesquisa"><img src="../img/icone_pesquisa.png" alt="logo"></div>
+                <div class="icone_pesquisa"><img src="../../img/icone_pesquisa.png" alt="logo"></div>
             </div>
         </div>
 
         <div class="infos_menu">
             <div class="visu_site"><a href="">Visualizar site</a></div>
-            <div class="icone_notificacao"><img src="../img/notificacao.png" alt="icone de notificação"></div>
+            <div class="icone_notificacao"><img src="../../img/notificacao.png" alt="icone de notificação"></div>
 
             <div class="btn_add">
-                <button>Adicionar <img src="../img/seta_down.png" alt="seta para baixo"> </button>
+                <button>Adicionar <img src="../../img/seta_down.png" alt="seta para baixo"> </button>
 
                 <div class="opcoes_add">
                     <ul>

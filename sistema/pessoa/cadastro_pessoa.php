@@ -1,6 +1,6 @@
 <?php
 
-include_once('../scripts.php');
+include_once('../../scripts.php');
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
         $foto = isset($_FILES['foto']) ? $_FILES['foto'] : '';
 
-        if ($foto['name'] != '') {
+        if ($foto['name']) {
             $nomeArquivo = $foto['name'];
             $tmpArquivo = $foto['tmp_name'];
             $tamanhoArquivo = $foto['size'];
@@ -74,15 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
                 exit;
             } else {
-                $caminho = '../img_clientes';
+                $caminho = '../../img/img_clientes';
 
                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
 
-                // var_dump($novo_caminho, $novo_caminho);
                 $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
 
                 if ($retorno_img_movida) {
-                    $foto_pessoa = $novo_caminho;
+                    $foto_pessoa = '/img/img_clientes/' . $novo_nome_arquivo;
                 }
             }
         }
@@ -373,10 +372,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 </head>
 
 <?php
-
-include_once('./menu_lat.php');
-include_once('./topo.php');
-
+include_once('../geral/menu_lat.php');
+include_once('../geral/topo.php');
 ?>
 
 <body>
@@ -891,6 +888,8 @@ include_once('./topo.php');
                                 title: "Erro",
                                 text: res.message
                             });
+
+                            $('.btn_cadastrar').attr('disabled', false)
 
 
                         } else if (res.status === 'success') {

@@ -1,4 +1,4 @@
-<?php include_once('../scripts.php');?>
+<?php include_once('../../scripts.php');?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -234,8 +234,8 @@
 </head>
 
 <?php
-include_once('./menu_lat.php');
-include_once('./topo.php');
+include_once('../geral/menu_lat.php');
+include_once('../geral/topo.php');
 ?>
 
 <body>
@@ -320,7 +320,7 @@ include_once('./topo.php');
                                     </div>
 
                                     <div class="conteudo_pessoa container_contato">
-                                        <a href="https://web.whatsapp.com/send?phone=+55" class="whatsapp"><img src="../img/whatsapp.png" alt="whatsapp"> (18) 99987-5566 </a>
+                                        <a href="https://web.whatsapp.com/send?phone=+55" class="whatsapp"><img src="../../img/whatsapp.png" alt="whatsapp"> (18) 99987-5566 </a>
                                     </div>
 
                                     <div class="conteudo_pessoa container_cidade">

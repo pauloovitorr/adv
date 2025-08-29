@@ -75,53 +75,53 @@
 
 <nav class="menu_lateral">
     <ul>
-        <li id="painel"><a href="./home.php">
-                <div class="div_opcao_menu_lat"><img src="../img/painel.png" alt="">
+        <li id="painel"><a href="/adv/sistema/geral/home.php">
+                <div class="div_opcao_menu_lat"><img src="../../img/painel.png" alt="">
                     <p>PAINEL</p>
                 </div>
             </a></li>
         <li id="crm"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/crm.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/crm.png" alt="">
                     <p>CRM</p>
                 </div>
             </a></li>
-        <li id="pessoas"><a href="./pessoa/pessoas.php">
-                <div class="div_opcao_menu_lat"><img src="../img/pessoas.png" alt="">
+        <li id="pessoas"><a href="/adv/sistema/pessoa/pessoas.php">
+                <div class="div_opcao_menu_lat"><img src="../../img/pessoas.png" alt="">
                     <p>PESSOAS</p>
                 </div>
             </a></li>
         <li id="processos"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/processos.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/processos.png" alt="">
                     <p>PROCESSOS</p>
                 </div>
             </a></li>
         <li id="atividades"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/atividades.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/atividades.png" alt="">
                     <p>ATIVIDADES</p>
                 </div>
             </a></li>
         <li id="site"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/site.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/site.png" alt="">
                     <p>SITE</p>
                 </div>
             </a></li>
         <li id="leads"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/leads.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/leads.png" alt="">
                     <p>LEADS</p>
                 </div>
             </a></li>
         <li id="financeiro"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/financeiro.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/financeiro.png" alt="">
                     <p>FINANCEIRO</p>
                 </div>
             </a></li>
         <li id="relatorios"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/relatorios.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/relatorios.png" alt="">
                     <p>RELATÓRIOS</p>
                 </div>
             </a></li>
         <li id="configuracoes"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../img/config.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/config.png" alt="">
                     <p>CONFIGURAÇÕES</p>
                 </div>
             </a></li>
