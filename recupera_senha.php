@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email'])) {
                         </div>
 
                         <div class="container_link_login">
-                            <a href="./login.php">Lembrou a senha? Faça o login</a>
+                            <a href="./index.php">Lembrou a senha? Faça o login</a>
                         </div>
 
 

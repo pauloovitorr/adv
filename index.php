@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email']) &&  !empty
         ];
 
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
+         $conexao->close();
         exit;
     } else {
         $res = [
@@ -39,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email']) &&  !empty
         ];
 
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
+         $conexao->close();
         exit;
     }
 
-    $conexao->close();
 }
 
 
@@ -80,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email']) &&  !empty
                 <div class="conteudo_form">
                     <h2>Bem-vindo de volta!</h2>
 
-                    <form action="./login.php" method="post" id="form_login">
+                    <form action="#" method="post" id="form_login">
 
 
                         <div class="container_conteudo_form">
@@ -245,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email']) &&  !empty
                                 });
                             } else if (res.status == 'success' && res.message == 'login realizado') {
                                 Swal.close();
-                                window.location.href = "./sistema/home.php";
+                                window.location.href = "./sistema/geral/home.php";
                             }
                         },
                         error: function(err) {

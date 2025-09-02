@@ -101,19 +101,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
         if ($stmt->execute()) {
 
-            $res = [
-                'status' => 'success',
-                'message' => 'Pessoa cadastrada com sucesso!'
-            ];
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $id = $_SESSION['cod'];
 
-            echo json_encode($res, JSON_UNESCAPED_UNICODE);
-            $conexao->commit();
+            $sql_insert_log = "INSERT INTO log (acao_log, ip_log, dt_acao_log, usuario_config_id_usuario_config) VALUES ('Cadastrou Pessoa', ?, NOW(), ? ) ";
 
-            exit;
+            $stmt = $conexao->prepare($sql_insert_log);
+            $stmt->bind_param('ss', $ip, $id);
+
+            if ($stmt->execute()) {
+
+                $conexao->commit();
+                $conexao->close();
+
+                $res = [
+                    'status' => 'success',
+                    'message' => 'Pessoa cadastrada com sucesso!',
+                    'token' => $token
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
+            } else {
+                $conexao->rollback();
+                $conexao->close();
+
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Erro ao cadastrar pessoa!'
+                ];
+            }
         }
     } catch (Exception $err) {
         echo "Erro: " . $err->getMessage();
         $conexao->rollback();
+        $conexao->close();
     }
 }
 
@@ -128,247 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/pessoas/cadastro_pessoa.css">
     <title>Cadastro</title>
-
-
-
-    <style>
-        .container_etapa_cadastro {
-            width: 100%;
-            height: 80px;
-            margin-top: 24px;
-            border-radius: 8px;
-            background-color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            /* border: 1px solid red; */
-        }
-
-        .etapa {
-            /* border: 1px solid red; */
-            width: auto;
-            display: flex;
-            align-items: center;
-            padding-left: 16px;
-            padding-right: 16px;
-            gap: 16px;
-        }
-
-        .num {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #D9D9D9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            color: white;
-            font-size: 20px;
-            font-weight: 500;
-        }
-
-
-        .descricao {
-            color: #D9D9D9;
-            font-size: 18px;
-        }
-
-        .separador {
-            width: 20%;
-            height: 1px;
-            background-color: #D9D9D9;
-
-        }
-
-
-        .bg_selecionado {
-            background-color: var(--azul-fundo);
-        }
-
-        .color_selecionado {
-            color: var(--preto-primario);
-        }
-
-        .container_cadastro {
-            width: 100%;
-            height: auto;
-            /* padding: 16px; */
-            /* border: 1px solid red; */
-            margin-top: 24px;
-            border-radius: 8px;
-            background-color: white;
-        }
-
-        .topo_sessao {
-            width: 100%;
-            height: 80px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .topo_sessao i {
-            color: var(--azul-fundo);
-            font-size: 32px;
-        }
-
-        .topo_sessao p {
-            color: var(--azul-fundo);
-            font-size: 24px;
-        }
-
-        hr {
-            height: 1px;
-            background-color: #F1F1F1;
-            border: none;
-        }
-
-        .container_field_form {
-            height: auto;
-            width: 100%;
-            padding: 16px;
-        }
-
-        fieldset {
-            padding: 16px 50px;
-            border-radius: 8px;
-            border: 1px solid #F1F1F1;
-            margin-bottom: 24px;
-        }
-
-        .bloco-formulario {
-            padding: 0px 8px;
-
-        }
-
-        fieldset legend {
-            width: auto;
-            padding: 0px 8px;
-            color: var(--azul-fundo);
-            font-size: 20px;
-        }
-
-
-        .container_inputs {
-            width: 100%;
-            min-height: 90px;
-            display: grid;
-            grid-template-columns: repeat(5, minmax(150px, 1fr));
-            gap: 16px;
-            /* border: 1px solid red; */
-        }
-
-        .container_input {
-            min-width: auto;
-            height: auto;
-            /* border: 1px solid red; */
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .container_input select {
-            height: 35px;
-            border-radius: 5px;
-            font-size: 14px;
-            color: var(--preto-primario);
-            border: 1px solid var(--branco-secundario)
-        }
-
-        .container_input input,
-        .custo_add_arquivo {
-            height: 35px;
-            border-radius: 5px;
-            border: 1px solid var(--branco-secundario);
-            padding-left: 4px;
-            font-size: 14px;
-            color: var(--preto-primario);
-        }
-
-        .container_input input::placeholder,
-        .custo_add_arquivo {
-            color: rgb(153, 153, 153);
-            font-size: 13px;
-            font-weight: 400;
-        }
-
-
-        .custo_add_arquivo {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 4px;
-            cursor: pointer;
-        }
-
-
-        #nome,
-        #container_nome_mae,
-        #logradouro_container,
-        #observacao_container {
-            grid-column: span 2;
-            min-width: auto;
-        }
-
-
-        /* Estilizando o input file */
-        .custom-file-input {
-            display: none;
-        }
-
-        .container_btn_submit {
-            /* border: 1px solid red; */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100px;
-            margin-bottom: 24px;
-        }
-
-        .container_tipo_parte {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-        }
-
-        .container_tipo_parte_inputs {
-
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .container_tipo_parte_inputs div {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        @media (max-width: 1024px) {
-            .container_inputs {
-                grid-template-columns: repeat(3, 1fr);
-                /* Reduz para 3 colunas em telas médias */
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container_inputs {
-                grid-template-columns: repeat(2, 1fr);
-                /* Reduz para 2 colunas em telas pequenas */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container_inputs {
-                grid-template-columns: 1fr;
-                /* Uma coluna em telas muito pequenas */
-            }
-        }
-    </style>
-
 </head>
 
 <?php
@@ -901,7 +683,7 @@ include_once('../geral/topo.php');
                                     text: res.message,
                                     icon: "success"
                                 }).then((result) => {
-                                    window.location.href = "./docs_pessoa.php";
+                                    window.location.href = "./docs_pessoa.php?token=" + res.token;
                                 });
                             }, 300);
                         }

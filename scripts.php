@@ -30,12 +30,12 @@ session_start();
 // Verifica se usuário tá logado
 $pag = basename($_SERVER['REQUEST_URI']);
 
-if ($pag !== 'cadastro.php' && $pag !== 'login.php' && $pag !== 'recupera_senha.php') {
+if ($pag !== 'cadastro.php' && $pag !== 'index.php' && $pag !== 'recupera_senha.php') {
 
     if (!isset($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'])) {
         session_unset();
         session_destroy();
-        header('Location: /adv/login.php');
+        header('Location: /adv/index.php');
         exit;
     }
 }

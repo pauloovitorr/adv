@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                         </div>
 
                         <div class="container_link_login">
-                            <a href="./login.php">Já possui um conta? faça o login</a>
+                            <a href="./index.php">Já possui um conta? faça o login</a>
                         </div>
 
 
