@@ -52,3 +52,39 @@
 .color_selecionado {
   color: var(--preto-primario);
 }
+
+.container_cadastro {
+  width: 100%;
+  height: auto;
+  /* padding: 16px; */
+  /* border: 1px solid red; */
+  margin-top: 24px;
+  border-radius: 8px;
+  background-color: white;
+}
+
+/* Estilos gerais para o Dropzone */
+.dropzone {
+  border: 2px dashed #007bff;
+  /* Borda azul tracejada para destaque */
+  border-radius: 10px;
+  /* Bordas arredondadas */
+  background-color: #f8f9fa;
+  /* Fundo cinza claro */
+  padding: 40px;
+  /* Espaçamento interno */
+  text-align: center;
+  /* Centraliza o texto */
+  font-family: Arial, sans-serif;
+  /* Fonte limpa */
+  color: #333;
+  /* Cor do texto */
+  min-height: 200px;
+  /* Altura mínima para visibilidade */
+  transition: border 0.3s ease-in-out;
+  /* Efeito suave ao hover */
+}
+
+.dropzone:hover {
+  border-color: #28a745;
+}
