@@ -60,3 +60,4 @@ if (isset($_SESSION['LAST_ACTIVITY'])) {
 if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') { // Ignorar requisições automáticas como preflight
     $_SESSION['LAST_ACTIVITY'] = time();
 }
+

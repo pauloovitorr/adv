@@ -65,7 +65,7 @@
 
 /* Estilos gerais para o Dropzone */
 .dropzone {
-  border: 2px dashed #007bff;
+  border: 2px dashed #d3d3d3 !important;
   /* Borda azul tracejada para destaque */
   border-radius: 10px;
   /* Bordas arredondadas */
@@ -83,8 +83,79 @@
   /* Altura mínima para visibilidade */
   transition: border 0.3s ease-in-out;
   /* Efeito suave ao hover */
+  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .dropzone:hover {
-  border-color: #28a745;
+  border-color: #007bff !important;
+}
+
+
+
+
+.dz-remove {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  right: 0px !important;
+  top: 0px !important;
+  width: 31px !important;
+  height: 31px !important;
+  font-size: 19px !important;
+  border-radius: 50% !important;
+  background-color: #fff !important;
+  z-index: 999 !important;
+  cursor: pointer !important;
+  box-shadow: 1px 1px 0px 0px rgba(0, 0, 0, 0.1) !important;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 15px;
+  text-decoration: none !important;
+  color: #333;
+  transition: .3s;
+}
+
+.dz-remove:hover{
+  color: rgb(172, 49, 49);
+}
+
+
+.docs{
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.container_btns{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn_cadastrar{
+  height: 40px !important;
+  font-size: 16px !important;
+}
+
+
+.btn_finalizar {
+    width: auto;
+    height: 40px;
+    background-color: #2a7a45;
+    border: 1px solid rgb(232, 232, 232);
+    padding: 10px 24px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    line-height: 14px;
+    cursor: pointer;
+    transition: .3s;
 }

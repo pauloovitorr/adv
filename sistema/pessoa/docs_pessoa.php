@@ -2,6 +2,10 @@
 
 include_once('../../scripts.php');
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+    var_dump($_FILES);
+}
+
 ?>
 
 
@@ -55,7 +59,28 @@ include_once('../geral/topo.php');
 
 
             <section class="container_cadastro">
-                <form action="./docs_pessoa.php" enctype="multipart/form-data" class="dropzone" id="my-awesome-dropzone"></form>
+
+                <div class="docs">
+                    <div class="arquivos">
+                        <p>Nenhum arquivo cadastrado</p>
+                        <img src="../../img/file.png" alt="Clique para enviar" style="width:80px;" alt="">
+                    </div>
+
+                    <div class="upload">
+                        <form action="./docs_pessoa.php" enctype="multipart/form-data" class="dropzone" id="my-awesome-dropzone"></form>
+            
+                        <div class="container_btns">
+                            <button class="btn_cadastrar" id="enviar_arquivos" role="button"><i class="fa-solid fa-arrow-up-from-bracket" style="color: white;"></i> Enviar Arquivos</button>
+
+                            <button class="btn_finalizar" role="button"><i class="fa-solid fa-check"></i> Apenas Finalizar </button>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
 
             </section>
 
@@ -66,24 +91,29 @@ include_once('../geral/topo.php');
     <script>
         // Inicialize o Dropzone
         Dropzone.options.myAwesomeDropzone = {
-            url: "/file-upload", // URL do seu backend
+            url: "./docs_pessoa.php", // URL do seu backend
             maxFilesize: 3, // Limite de 3 MB
             addRemoveLinks: true, // Ativa links de remoção
             autoProcessQueue: false, // Desativa upload automático
-            dictDefaultMessage: "Arraste arquivos aqui ou clique para selecionar",
             dictFileTooBig: "O arquivo é muito grande ({{filesize}} MB). Limite: {{maxFilesize}} MB.",
-            dictRemoveFile: "Remover", // Texto do link (ou '' se usar só ícone)
+            dictRemoveFile: "X", // Texto do link (ou '' se usar só ícone)
             dictCancelUpload: "Cancelar upload",
             dictInvalidFileType: "Tipo de arquivo não permitido",
             dictResponseError: "Erro no servidor: {{statusCode}}",
             dictMaxFilesExceeded: "Você excedeu o limite de arquivos",
+            dictDefaultMessage: `
+                    <div style="text-align:center">
+                        <img src="../../img/add_arquivo.png" alt="Clique para enviar" style="width:80px;">
+                        <p>Clique ou arraste seus documentos aqui</p>
+                    </div>
+                `,
 
             // Evento de inicialização para configurar o botão de envio
             init: function() {
                 var myDropzone = this; // Referência ao Dropzone
 
                 // Adicione um listener ao seu botão de envio
-                document.getElementById("enviar-arquivos").addEventListener("click", function() {
+                document.getElementById("enviar_arquivos").addEventListener("click", function() {
                     myDropzone.processQueue(); // Envia todos os arquivos na fila
                 });
             }
