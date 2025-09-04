@@ -1,3 +1,22 @@
+-- Usuário usuario_config
+CREATE TABLE usuario_config (
+    id_usuario_config INT NOT NULL AUTO_INCREMENT,
+    tk VARCHAR(32) NOT NULL,
+    nome VARCHAR(150) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    tell VARCHAR(14) NOT NULL,
+    senha VARCHAR(250) NOT NULL,
+    primeiro_acesso VARCHAR(3) NOT NULL DEFAULT 'sim',
+    cpf VARCHAR(14) NULL,
+    rg VARCHAR(14) NULL,
+    oab_uf VARCHAR(45) NULL,
+    dt_nascimento DATE NULL,
+    dt_cadastro_usuario DATETIME NOT NULL,
+    dt_atualizacao_usuario DATETIME NOT NULL,
+
+    CONSTRAINT pk_usuario_config PRIMARY KEY (id_usuario_config)
+) 
+
 
 -- Criação da tabela de log
 CREATE TABLE log (
@@ -71,5 +90,13 @@ CREATE TABLE tipo_parte (
 )
 
 
--- insert into tipo_parte (tipo) value ('Cliente');
--- insert into tipo_parte (tipo) value ('Contrário');
+CREATE TABLE documento (
+    id_documento INT NOT NULL AUTO_INCREMENT,
+    nome_original VARCHAR(255) NOT NULL,
+    caminho_arquivo VARCHAR(500) NOT NULL,
+    dt_criacao DATETIME NOT NULL,
+    usuario_config_id_usuario_config INT NOT NULL,
+    
+    CONSTRAINT pk_documento PRIMARY KEY (id_documento),
+    CONSTRAINT fk_documento_usuario FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config (id_usuario_config)
+);

@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
                 $conexao->rollback();
+                $conexao->close();
 
                 exit;
             } elseif ($foto['error'] !== 0) {
@@ -71,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
 
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
                 $conexao->rollback();
+                $conexao->close();
 
                 exit;
             } else {
