@@ -3,7 +3,8 @@
 include_once('../../scripts.php');
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
+
 
     $token          = bin2hex(random_bytes(64 / 2));
     $nome           = $conexao->escape_string(htmlspecialchars($_POST['nome']));
@@ -11,7 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
     $foto_pessoa    = '';
     $num_doc        = $conexao->escape_string(htmlspecialchars($_POST['num_doc']));
     $rg             = $conexao->escape_string(htmlspecialchars($_POST['rg']));
-    $dt_nascimento  = $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento']));
+    $dt_nascimento  = $dt_nascimento = !empty($_POST['dt_nascimento']) ? 
+    $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
     $estado_civil   = $conexao->escape_string(htmlspecialchars($_POST['estado_civil']));
     $profissao      = $conexao->escape_string(htmlspecialchars($_POST['profissao']));
     $pis            = $conexao->escape_string(htmlspecialchars($_POST['pis']));
@@ -27,13 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
     $cidade         = $conexao->escape_string(htmlspecialchars($_POST['cidade']));
     $bairro         = $conexao->escape_string(htmlspecialchars($_POST['bairro']));
     $logradouro     = $conexao->escape_string(htmlspecialchars($_POST['logradouro']));
-    $num            = (int)$conexao->escape_string(htmlspecialchars($_POST['num']));
+    $num            = $_POST['num'] ? $conexao->escape_string(htmlspecialchars($_POST['num'])) : null;
     $complemento    = $conexao->escape_string(htmlspecialchars($_POST['complemento']));
     $observacao     = $conexao->escape_string(htmlspecialchars($_POST['observacao']));
     $nome_mae       = $conexao->escape_string(htmlspecialchars($_POST['nome_mae']));
 
-    $tipo_pessoa    = $conexao->escape_string(htmlspecialchars($_POST['pessoa']));
-    $tipo_parte     = (int)$conexao->escape_string(htmlspecialchars($_POST['tipo_parte']));
+    $tipo_pessoa    = $conexao->escape_string(htmlspecialchars($_POST['tipo_pessoa']));
+    $tipo_parte     = $conexao->escape_string(htmlspecialchars($_POST['tipo_parte']));
     $usuario        = $_SESSION['cod'];
 
 
@@ -93,25 +95,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
         tk, nome, origem, dt_cadastro_pessoa, dt_atualizacao_pessoa, foto_pessoa, num_documento, rg, dt_nascimento, 
         estado_civil, profissao, pis, ctps, sexo, telefone_principal, telefone_secundario, celular, email, 
         email_secundario, cep, estado, cidade, bairro, logradouro, numero_casa, complemento, observacao, 
-        nome_mae, tipo_pessoa_id_tipo_pessoa, tipo_parte ,usuario_config_id_usuario_config
+        nome_mae, tipo_pessoa, tipo_parte ,usuario_config_id_usuario_config
     ) VALUES (
         ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )';
 
         $stmt = $conexao->prepare($sql);
-        $stmt->bind_param('ssssssssssssssssssssssisssiii', $token, $nome, $origem, $foto_pessoa, $num_doc, $rg, $dt_nascimento, $estado_civil, $profissao, $pis, $ctps, $sexo, $tell_principal, $tell_secundario, $celular, $email, $email_secundario, $cep, $estado, $cidade, $bairro, $logradouro, $num, $complemento, $observacao, $nome_mae, $tipo_pessoa, $tipo_parte, $usuario);
+        $stmt->bind_param('ssssssssssssssssssssssisssssi', $token, $nome, $origem, $foto_pessoa, $num_doc, $rg, $dt_nascimento, $estado_civil, $profissao, $pis, $ctps, $sexo, $tell_principal, $tell_secundario, $celular, $email, $email_secundario, $cep, $estado, $cidade, $bairro, $logradouro, $num, $complemento, $observacao, $nome_mae, $tipo_pessoa, $tipo_parte, $usuario);
 
         if ($stmt->execute()) {
 
             $ip = $_SERVER['REMOTE_ADDR'];
-            $id = $_SESSION['cod'];
+            $id_user = $_SESSION['cod'];
 
-            $sql_insert_log = "INSERT INTO log (acao_log, ip_log, dt_acao_log, usuario_config_id_usuario_config) VALUES ('Cadastrou Pessoa', ?, NOW(), ? ) ";
+            // $sql_insert_log = "INSERT INTO log (acao_log, ip_log, dt_acao_log, usuario_config_id_usuario_config) VALUES ('Cadastrou Pessoa', ?, NOW(), ? ) ";
 
-            $stmt = $conexao->prepare($sql_insert_log);
-            $stmt->bind_param('ss', $ip, $id);
+            // $stmt = $conexao->prepare($sql_insert_log);
+            // $stmt->bind_param('si', $ip, $id);
 
-            if ($stmt->execute()) {
+            if (cadastro_log('Cadastrou Pessoa', $nome, $ip, $id_user)) {
 
                 $conexao->commit();
                 $conexao->close();
@@ -139,8 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['pessoa']) && !empty(
         $conexao->close();
     }
 }
-
-
 
 ?>
 
@@ -206,9 +206,9 @@ include_once('../geral/topo.php');
                                 <div class="container_inputs">
                                     <div class="container_input">
                                         <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
-                                        <select name="pessoa" id="pessoa" required>
-                                            <option value="1">Pessoa Física</option>
-                                            <option value="2">Pessoa Jurídica</option>
+                                        <select name="tipo_pessoa" id="pessoa" required>
+                                            <option value="PF">Pessoa Física</option>
+                                            <option value="PJ">Pessoa Jurídica</option>
                                         </select>
                                     </div>
 
@@ -311,12 +311,12 @@ include_once('../geral/topo.php');
 
                                         <div>
                                             <label for="tipo_parte_cliente">Cliente</label>
-                                            <input type="radio" id="tipo_parte_cliente" value="1" name="tipo_parte" checked>
+                                            <input type="radio" id="tipo_parte_cliente" value="cliente" name="tipo_parte" checked>
                                         </div>
 
                                         <div>
                                             <label for="tipo_parte_contrario">Contrário</label>
-                                            <input type="radio" id="tipo_parte_contrario" value="2" name="tipo_parte">
+                                            <input type="radio" id="tipo_parte_contrario" value="contrário" name="tipo_parte">
                                         </div>
 
                                     </div>

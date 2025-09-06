@@ -32,15 +32,6 @@ CREATE TABLE log (
 
 )
 
--- Tabela para pessoa PF ou PJ
-CREATE TABLE tipo_pessoa (
-
-	id_tipo_pessoa INT NULL AUTO_INCREMENT,
-	tipo varchar(2) NOT NULL,
-    
-    CONSTRAINT pk_tipo_pessoa PRIMARY KEY (id_tipo_pessoa)
-)
-
 
 -- Tabela para cadastro de pessoa
 CREATE TABLE pessoas (
@@ -72,22 +63,15 @@ CREATE TABLE pessoas (
     numero int,
     complemento varchar(150),
     nome_mae varchar(220),
-    tipo_pessoa_id_tipo_pessoa INT NOT NULL,
+    tipo_pessoa varchar(50) NOT NULL,
+    tipo_parte varchar(50) NOT NULL,
     usuario_config_id_usuario_config INT NOT NULL,
     
     CONSTRAINT pk_id_pessoa PRIMARY KEY (id_pessoa),
-    CONSTRAINT fk_tipo_pessoa FOREIGN KEY (tipo_pessoa_id_tipo_pessoa) REFERENCES tipo_pessoa(id_tipo_pessoa),
+
     CONSTRAINT fk_usuario_config FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
 )
 
-
-CREATE TABLE tipo_parte (
-
-	id_tipo_parte INT NULL AUTO_INCREMENT,
-	tipo varchar(10) NOT NULL,
-    
-    CONSTRAINT pk_tipo_parte PRIMARY KEY (id_tipo_parte)
-)
 
 
 CREATE TABLE documento (

@@ -1,5 +1,17 @@
 <?php 
 include_once('../../scripts.php');
+
+if($_SERVER['REQUEST_METHOD'] == 'GET' && count($_GET) === 0){
+
+    $id_user = $_SESSION['cod'];
+
+    $sql_busca_pessoas = "SELECT id_pessoa,tk,nome,dt_cadastro_pessoa, telefone_principal,cidade, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
+
+    $res = $conexao->query($sql_busca_pessoas);
+
+    var_dump($res->num_rows);
+}
+
 ?>
 
 <!DOCTYPE html>

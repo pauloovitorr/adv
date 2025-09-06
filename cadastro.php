@@ -67,11 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
     
             if ($stmt->execute()) {
 
-                $id_ultimo_cadastro = $conexao->insert_id;
+                $id_ultimo_cadastro = $conexao->insert_id;                
 
-                $sql_insert_log = "INSERT INTO log (acao_log, ip_log, dt_acao_log, usuario_config_id_usuario_config) values ('Criar Conta', '$ip', NOW(), $id_ultimo_cadastro ) ";
-
-                if($conexao->query($sql_insert_log)){
+                if(cadastro_log('Criou Conta', $nome ,$ip,$id_ultimo_cadastro )){
                     $conexao->commit();
                     $conexao->close();
         
@@ -275,7 +273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                                         icon: "error",
                                         title: "Erro",
                                         text: res.message,
-                                        footer: '<a href="./login.php">Realizar Login!</a>'
+                                        footer: '<a href="./index.php">Realizar Login!</a>'
                                     });
                                 } else {
                                     Swal.fire({
@@ -294,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                                         text: res.message,
                                         icon: "success"
                                     }).then((result) => {
-                                            window.location.href = "./login.php";
+                                            window.location.href = "./index.php";
                                     });
                                 }, 300);
                             }

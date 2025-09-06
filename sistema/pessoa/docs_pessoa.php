@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
             if (move_uploaded_file($temp_name, $caminho)) {
 
                 $id_user = $_SESSION['cod'];
+                $ip = $_SERVER['REMOTE_ADDR'];
 
                 $sql_docs = "INSERT INTO documento (nome_original, caminho_arquivo, dt_criacao, usuario_config_id_usuario_config) VALUES (?, ?, NOW(), ?)";
 
@@ -52,17 +53,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
                 $stmt->bind_param("ssi", $nome_arquivo, $caminho, $id_user);
 
                 if ($stmt->execute()) {
-                    $res = [
-                        'status' => 'success',
-                        'message' => 'Documento cadastrado com sucesso!',
-                    ];
 
-                    http_response_code(200);
-                    echo json_encode($res, JSON_UNESCAPED_UNICODE);
-                    $conexao->commit();
-                    $conexao->close();
-                    exit;
+                    if (cadastro_log('Cadastrou Documento', $nome_arquivo, $ip, $id_user)) {
+
+                        $res = [
+                            'status' => 'success',
+                            'message' => 'Documento cadastrado com sucesso!',
+                        ];
+
+                        http_response_code(200);
+                        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                        $conexao->commit();
+                        $conexao->close();
+                        exit;
+                    } else {
+
+                        unlink($caminho);
+
+                        $res = [
+                            'status' => 'erro',
+                            'message' => 'Erro ao cadastrar imagem, tente novamente em alguns minutos!'
+                        ];
+
+                        http_response_code(500);
+                        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                        $conexao->rollback();
+                        $conexao->close();
+                        exit;
+                    }
                 }
+            } else {
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Erro ao cadastrar imagem!'
+                ];
+
+                http_response_code(500);
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
             }
         }
 
