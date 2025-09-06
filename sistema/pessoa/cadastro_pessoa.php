@@ -346,7 +346,7 @@ include_once('../geral/topo.php');
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="celular">Celular</label>
+                                        <label for="celular">Telefone Fixo</label>
                                         <input type="tell" name="celular" id="celular" minlength="13" maxlength="14" placeholder="(99) 9999-9999">
                                     </div>
 
@@ -611,7 +611,7 @@ include_once('../geral/topo.php');
 
             $('#pessoa').on('change', function() {
                 // PJ
-                if (this.value === '2') {
+                if (this.value === 'PJ') {
                     $('#container_rg').hide()
                     $('#container_dt_nascimento').hide()
                     $('#container_ctps').hide()

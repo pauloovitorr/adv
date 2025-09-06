@@ -69,7 +69,5 @@ function cadastro_log( string $acao, string $identificador ,string $ip, int $id_
     $sql_insert_log = "INSERT INTO log (acao_log, identificador, ip_log, dt_acao_log, usuario_config_id_usuario_config) VALUES (?, ?,?,  NOW(), ? ) ";
     $stmt = $conexao->prepare($sql_insert_log);
     $stmt->bind_param('sssi',$acao, $identificador, $ip, $id_user);
-
     return $stmt->execute();
-    
 }

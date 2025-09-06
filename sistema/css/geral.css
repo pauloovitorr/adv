@@ -32,6 +32,7 @@ body{
   width: 96%;
   max-width: 1260px;
   margin: 0 auto;
+  padding-bottom: 32px;
 }
 
 .btn_cadastrar{

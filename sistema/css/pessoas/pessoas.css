@@ -211,3 +211,12 @@
 .opcoes_pessoa ul a li:hover {
   background-color: var(--hover-opcoes);
 }
+
+.sem_pessoas{
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32px;
+}
