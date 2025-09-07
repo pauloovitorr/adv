@@ -16,13 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Adicionando tippy para cada ID
   ids.forEach((id) => {
     tippy(`#${id}`, {
-      content: id.toUpperCase(), // Texto em maiúsculas
+      content: id.toUpperCase(), 
       placement: "right",
     });
   });
 
   tippy(`.whatsapp`, {
-    content: "Abrir Whatsapp Web", // Texto em maiúsculas
+    content: "Abrir Whatsapp Web", 
     placement: "right",
   });
 });

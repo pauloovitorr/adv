@@ -2,7 +2,56 @@
 
 include_once('../../scripts.php');
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['tkn'])) {
+    header('location:' . './pessoas.php');
+}
+
+$id_user = $_SESSION['cod'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['tkn'])) {
+    $token_pessoa = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
+    $sql_busca_pessoa_tkn = 'SELECT id_pessoa FROM pessoas where tk = ? and usuario_config_id_usuario_config = ?';
+    $stmt = $conexao->prepare($sql_busca_pessoa_tkn);
+    $stmt->bind_param('si', $token_pessoa, $id_user);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+        $res_pessoa_tkn = $result->fetch_assoc();
+        $id_pessoa = $res_pessoa_tkn['id_pessoa'];
+        $sql_busca_docs = "SELECT * FROM documento where id_pessoa = $id_pessoa and usuario_config_id_usuario_config = $id_user";
+
+        $lista_docs = $conexao->query($sql_busca_docs);
+        $conexao->close();
+    } else {
+        header('location: ./pessoas.php');
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+
+    $token_pessoa = $conexao->escape_string(htmlspecialchars($_POST['tkn']));
+    $sql_busca_pessoa_tkn = 'SELECT id_pessoa FROM pessoas where tk = ? and usuario_config_id_usuario_config = ?';
+    $stmt = $conexao->prepare($sql_busca_pessoa_tkn);
+    $stmt->bind_param('si', $token_pessoa, $id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+        $res_pessoa_tkn = $result->fetch_assoc();
+        $id_pessoa = $res_pessoa_tkn['id_pessoa'];
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Pessoa responsável pelo documentato não foi encontrada no sistema!'
+        ];
+        http_response_code(404);
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+    }
+
 
     $arquivo = $_FILES['file'];
 
@@ -44,13 +93,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 
             if (move_uploaded_file($temp_name, $caminho)) {
 
-                $id_user = $_SESSION['cod'];
+
                 $ip = $_SERVER['REMOTE_ADDR'];
 
-                $sql_docs = "INSERT INTO documento (nome_original, caminho_arquivo, dt_criacao, usuario_config_id_usuario_config) VALUES (?, ?, NOW(), ?)";
+                $sql_docs = "INSERT INTO documento (nome_original, caminho_arquivo, dt_criacao, id_pessoa, usuario_config_id_usuario_config) VALUES (?, ?, NOW(),?,?)";
 
                 $stmt = $conexao->prepare($sql_docs);
-                $stmt->bind_param("ssi", $nome_arquivo, $caminho, $id_user);
+                $stmt->bind_param("ssii", $nome_arquivo, $caminho, $id_pessoa, $id_user);
 
                 if ($stmt->execute()) {
 
@@ -68,7 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
                         exit;
                     } else {
 
-                        unlink($caminho);
+                        if (file_exists($caminho)) {
+                            unlink($caminho);
+                        }
 
                         $res = [
                             'status' => 'erro',
@@ -98,13 +149,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 
         exit;
     } catch (Exception $err) {
-        echo "Erro: " . $err->getMessage();
+
+        if (file_exists($caminho)) {
+            unlink($caminho);
+        }
+
+        $res = [
+            'status' => 'erro',
+            'message' => 'Erro:' . $err->getMessage()
+        ];
+
+        http_response_code(500);
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
         $conexao->rollback();
         $conexao->close();
+        exit;
     }
 
     exit;
 }
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $input = file_get_contents("php://input");
+    $data = json_decode($input, true);
+    $id_doc = $data['id'] ?? null;
+
+    if ($id_doc) {
+
+        $sql_busca_dados = "SELECT caminho_arquivo FROM documento WHERE id_documento = ?  AND usuario_config_id_usuario_config = ?";
+
+        $stmt = $conexao->prepare($sql_busca_dados);
+        $stmt->bind_param('ii', $id_doc, $id_user);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $doc = $result->fetch_assoc();
+        $caminho_server = $doc['caminho_arquivo'];
+
+        if (file_exists($caminho_server)) {
+
+            if (unlink($caminho_server)) {
+                $sql_delete_pessoa = 'DELETE from documento where id_documento = ? and usuario_config_id_usuario_config = ? ';
+                $stmt = $conexao->prepare($sql_delete_pessoa);
+                $stmt->bind_param('ii', $id_doc, $id_user);
+
+                if ($stmt->execute()) {
+                    $res = [
+                        'status' => 'success',
+                        'message' => 'Documento excluído com sucesso!',
+                    ];
+                    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                    $conexao->close();
+                    exit;
+                }
+            }
+        }
+    }
+}
+
+
 
 ?>
 
@@ -161,19 +264,52 @@ include_once('../geral/topo.php');
             <section class="container_cadastro">
 
                 <div class="docs">
-                    <div class="arquivos">
-                        <p>Nenhum arquivo cadastrado</p>
-                        <img src="../../img/file.png" alt="Clique para enviar" style="width:80px;" alt="">
-                    </div>
+
+                    <?php if ($lista_docs->num_rows > 0):  ?>
+                        <div class="lista_arquivos">
+
+                            <?php while ($doc = $lista_docs->fetch_assoc()): ?>
+
+                                <?php $ext = strtolower(pathinfo($doc["caminho_arquivo"], PATHINFO_EXTENSION)); ?>
+
+                                <a href="<?php echo $doc["caminho_arquivo"] ?>" target="__blank">
+                                    <div class="doc">
+                                        <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
+                                            <span class="dz-remove remove_documento">X
+                                                <input type="hidden" class="token" value="<?php echo $doc['id_documento'] ?>">
+                                            </span>
+                                            <img class="img_bg_doc" src="<?php echo $doc["caminho_arquivo"] ?>" alt="" srcset="">
+                                            <div class="nome_arquivo"><span><?php echo $doc["nome_original"] ?></span></div>
+
+                                        <?php else: ?>
+                                            <span class="dz-remove remove_documento">X
+                                                <input type="hidden" class="token" value="<?php echo $doc['id_documento'] ?>">
+                                            </span>
+                                            <i class="fa-regular fa-folder" style="font-size: 30px;"></i>
+                                            <div class="nome_arquivo"><span><?php echo $doc["nome_original"] ?></span></div>
+
+                                        <?php endif  ?>
+                                    </div>
+                                </a>
+                            <?php endwhile ?>
+
+                        </div>
+                    <?php else: ?>
+                        <div class="sem_arquivos">
+                            <p>Nenhum arquivo cadastrado</p>
+                            <img src="../../img/file.png" alt="Clique para enviar" style="width:80px;" alt="">
+                        </div>
+
+                    <?php endif  ?>
 
                     <div class="upload">
                         <form action="./docs_pessoa.php" enctype="multipart/form-data" class="dropzone" id="my-awesome-dropzone"></form>
 
                         <div class="container_btns">
 
-                            <button class="btn_cadastrar" id="enviar_arquivos" role="button"><i class="fa-solid fa-arrow-up-from-bracket" style="color: white;"></i> Enviar Arquivos</button>
+                            <button class="btn_cadastrar" id="enviar_arquivos" role="button"><i class="fa-solid fa-arrow-up-from-bracket" style="color: white;"></i> Salvar Arquivos</button>
 
-                            <button class="btn_finalizar" role="button"><i class="fa-solid fa-check"></i> Apenas Finalizar </button>
+                            <button class="btn_finalizar" role="button"><i class="fa-solid fa-check"></i> Finalizar </button>
                         </div>
 
 
@@ -205,12 +341,16 @@ include_once('../geral/topo.php');
             dictInvalidFileType: "Tipo de arquivo não permitido",
             dictResponseError: "Erro no servidor",
             dictMaxFilesExceeded: "Você excedeu o limite de arquivos",
+            acceptedFiles: ".png,.jpg,.jpeg,.txt,.pdf,.doc,.docx,.csv,.xlsx",
             dictDefaultMessage: `
                 <div style="text-align:center">
                     <img src="../../img/add_arquivo.png" alt="Clique para enviar" style="width:80px;">
                     <p>Clique ou arraste seus documentos aqui</p>
                 </div>
             `,
+            params: {
+                tkn: "<?= $_GET['tkn'] ?? '' ?>"
+            },
 
             // Evento de inicialização para configurar o botão de envio
             init: function() {
@@ -258,6 +398,55 @@ include_once('../geral/topo.php');
             }
         };
     </script>
+
+
+    <script>
+        $(function() {
+            $('.remove_documento').on('click', function(event) {
+                // Evita que o clique abra o link
+                event.preventDefault();
+                event.stopPropagation();
+
+                let id_documento = $(this).find('.token').val();
+
+                Swal.fire({
+                    title: "Deseja realmente excluir o documento?",
+                    text: "A ação é irreversível!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Sim, excluir!",
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: './docs_pessoa.php',
+                            type: 'DELETE',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                id: id_documento
+                            }),
+                            dataType: 'json',
+                            success: function(res) {
+                                Swal.fire({
+                                    title: "Exclusão",
+                                    text: "Pessoa excluída com sucesso!",
+                                    icon: "success"
+                                });
+
+                                setTimeout(() => {
+                                    Swal.close();
+                                    window.location.reload();
+                                }, 800);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
 
 </body>
 

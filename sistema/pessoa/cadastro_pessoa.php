@@ -685,7 +685,7 @@ include_once('../geral/topo.php');
                                     text: res.message,
                                     icon: "success"
                                 }).then((result) => {
-                                    window.location.href = "./docs_pessoa.php?token=" + res.token;
+                                    window.location.href = "./docs_pessoa.php?tkn=" + res.token;
                                 });
                             }, 300);
                         }
@@ -737,7 +737,7 @@ include_once('../geral/topo.php');
 
                                     });
                                 } else {
-                                    console.log(dados)
+                                    
                                     $('#logradouro').val(dados.logradouro)
                                     $('#bairro').val(dados.bairro)
                                     $('#cidade').val(dados.localidade)

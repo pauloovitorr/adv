@@ -1,10 +1,8 @@
 <?php
 include_once('../../scripts.php');
-
+$id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
-    $id_user = $_SESSION['cod'];
 
     $sql_quantidade_pessoas = "SELECT 
     COUNT(*) AS total_pessoas,
@@ -81,9 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $token = $data['token'] ?? null;
 
     if ($token) {
-        $sql_delete_pessoa = 'DELETE from pessoas where tk = ?';
+        $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
         $stmt = $conexao->prepare($sql_delete_pessoa);
-        $stmt->bind_param('s', $token);
+        $stmt->bind_param('si', $token, $id_user);
 
         if ($stmt->execute()) {
             $res = [
@@ -121,8 +119,8 @@ include_once('../geral/topo.php');
 
             <div class="infos_pagina">
                 <button> <i class="fa-regular fa-user"></i> <?php echo $total <= 1 ?  "$total Pessoa Cadastrada" : "$total Pessoas Cadastradas" ?> </button>
-                <button> <i class="fa-regular fa-user"></i> <?php echo $cliente <= 1 ?  "$cliente Cliente Cadastrado" : "$cliente Clientes Cadastrados" ?> </button>
-                <button> <i class="fa-regular fa-user"></i> <?php echo $contrario <= 1 ?  "$contrario Contrário Cadastrado" : "$contrario Contrários Cadastrados" ?> </button>
+                <button> <i class="fa-regular fa-user"></i> <?php echo $cliente <= 1 ?  "$cliente Cliente" : "$cliente Clientes " ?> </button>
+                <button> <i class="fa-regular fa-user"></i> <?php echo $contrario <= 1 ?  "$contrario Contrário " : "$contrario Contrários " ?> </button>
             </div>
 
             <div class="opcoes_funcoes">
@@ -159,7 +157,7 @@ include_once('../geral/topo.php');
 
                     <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
 
-                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </a></button>
+                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-broom"></i></label> </a></button>
                 </form>
 
                 <!-- <div class="div_pai_funcoes">
@@ -267,19 +265,19 @@ include_once('../geral/topo.php');
 
                                                     <div class="opcoes_pessoa">
                                                         <ul>
-                                                            <a href="">
+                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                             </a>
 
-                                                            <a href="javascript:void(0)">
+                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                             </a>
 
-                                                            <a href="">
+                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
                                                             </a>
 
-                                                            <a href="">
+                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 
@@ -394,10 +392,10 @@ include_once('../geral/topo.php');
                                     icon: "success"
                                 });
 
-                                setTimeout(() => {
-                                    Swal.close()
-                                    window.location.reload()
-                                }, 800)
+                                // setTimeout(() => {
+                                //     Swal.close()
+                                //     window.location.reload()
+                                // }, 800)
 
                             }
                         })
