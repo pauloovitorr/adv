@@ -1,3 +1,141 @@
+.infos_pagina {
+    /* border: 1px solid red; */
+    width: 100%;
+    /* height: 50px; */
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+
+.opcoes_funcoes {
+    /* border: 1px solid red; */
+    width: 100%;
+    /* height: 50px; */
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.opcoes_funcoes form{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.infos_pagina button {
+    width: auto;
+    height: 40px;
+    background-color: #FCFCFC;
+    border: 1px solid rgb(232, 232, 232);
+    padding: 10px 8px;
+    border-radius: 8px;
+    color: #7D7D7D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+.btn_adicionar {
+    width: auto;
+    height: 40px;
+    background-color: #2F81F7;
+    border: 1px solid rgb(232, 232, 232);
+    padding: 10px 8px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 14px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.btn_adicionar:hover{
+    background-color: #2873de;
+  }
+
+.div_pai_funcoes {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    color: #7D7D7D;
+    padding: 0px 8px;
+    border-radius: 8px;
+    transition: .3s;
+    background-color: #FCFCFC;
+    border: 1px solid rgb(232, 232, 232);
+}
+
+
+.btn_pesquisar{
+      width: auto;
+    height: 40px;
+    background-color: #06112483;
+    border: 1px solid rgb(232, 232, 232);
+    padding: 10px 8px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 14px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.btn_pesquisar:hover{
+  background-color: #061124;
+}
+
+
+.div_pai_funcoes input {
+    height: 100%;
+    width: 200px;
+    /* padding: 10px 8px; */
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    color: #7D7D7D;
+    outline: none;
+    transition: .3s;
+    font-size: 14px;
+}
+
+.div_pai_funcoes img {
+    width: 12px;
+}
+
+
+.div_pai_funcoes select {
+    height: 100%;
+    width: 150px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    color: #7D7D7D;
+    outline: none;
+    transition: .3s;
+}
+
+.div_pai_funcoes i {
+    color: #7D7D7D;
+    font-size: 14px;
+}
+
 .container_lista_pessoas {
   /* border: 1px solid red; */
   margin-top: 48px;

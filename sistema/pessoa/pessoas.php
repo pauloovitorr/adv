@@ -2,12 +2,9 @@
 include_once('../../scripts.php');
 
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET' && count($_GET) === 0) {
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     $id_user = $_SESSION['cod'];
-    $sql_busca_pessoas = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
-    $res = $conexao->query($sql_busca_pessoas);
-
 
     $sql_quantidade_pessoas = "SELECT 
     COUNT(*) AS total_pessoas,
@@ -21,6 +18,58 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
         $total = $res_qtd["total_pessoas"];
         $cliente = $res_qtd["total_clientes"];
         $contrario = $res_qtd["total_contrarias"];
+    }
+
+    if (count($_GET) > 0) {
+        $nome    = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
+        $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
+        $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
+
+        $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
+        $params = [];
+        $types  = "";
+
+        if (!empty($nome)) {
+            $sql_filtros .= " AND nome LIKE ?";
+            $params[] = "%$nome%";
+            $types   .= "s";
+        }
+
+        if (!empty($filtrar)) {
+            if ($filtrar === "cliente" || $filtrar === "contrário") {
+                $sql_filtros .= " AND tipo_parte = ?";
+                $params[] = $filtrar;
+                $types   .= "s";
+            }
+        }
+
+        switch ($ordenar) {
+            case "nome":
+                $sql_filtros .= " ORDER BY nome ASC";
+                break;
+            case "recentes":
+                $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
+                break;
+            case "antigos":
+                $sql_filtros .= " ORDER BY dt_cadastro_pessoa ASC";
+                break;
+            default:
+                $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
+                break;
+        }
+
+        $stmt = $conexao->prepare($sql_filtros);
+
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $stmt->execute();
+        $res = $stmt->get_result();
+    } else {
+
+        $sql_busca_pessoas = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_pessoa DESC";
+        $res = $conexao->query($sql_busca_pessoas);
     }
 }
 
@@ -79,41 +128,48 @@ include_once('../geral/topo.php');
             <div class="opcoes_funcoes">
                 <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Nova Pessoa </button>
 
-                <div class="div_pai_funcoes">
-                    <label for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label>
-                    <input type="text" id="buscar_pessoas" name="buscar_pessoas" placeholder="Buscar">
-                </div>
+                <form action="" method="get">
 
-                <div class="div_pai_funcoes">
-                    <img src="../img/funil.png" alt="">
-                    <select name="" id="a">
-                        <option value="">Filtrar</option>
-                        <option value="aaa">Clientes</option>
-                        <option value="aaa">Partes Contrárias</option>
-                        <option value="aa">Com Processso em Andamento</option>
-                        <option value="aaaa"> Sem Processso em Andamento </option>
-                    </select>
-                </div>
+                    <div class="div_pai_funcoes">
+                        <input type="text" id="buscar_pessoas" name="buscar_pessoas" value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>" placeholder="Buscar Por Nome">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </div>
+
+                    <div class="div_pai_funcoes">
+                        <img src="../img/funil.png" alt="">
+                        <select name="filtrar" id="filtrar">
+                            <option value="">Filtrar</option>
+                            <option value="cliente" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'cliente') ? 'selected' : '' ?>>Clientes</option>
+                            <option value="contrário" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'contrário') ? 'selected' : '' ?>>Partes Contrárias</option>
+                            <option value="com_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'com_andamento') ? 'selected' : '' ?>>Com Processo em Andamento</option>
+                            <option value="sem_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'sem_andamento') ? 'selected' : '' ?>>Sem Processo em Andamento</option>
+                        </select>
+                    </div>
 
 
-                <div class="div_pai_funcoes">
-                    <i class="fa-solid fa-arrow-up-wide-short"></i>
-                    <select name="" id="a">
-                        <option value="">ordenar</option>
-                        <option value="aaa">Nome da Pessoa</option>
-                        <option value="aa">Mais Recentes</option>
-                        <option value="aaaa">Mais Antigos</option>
-                    </select>
-                </div>
+                    <div class="div_pai_funcoes">
+                        <i class="fa-solid fa-arrow-up-wide-short"></i>
+                        <select name="ordenar" id="ordenar">
+                            <option value="">ordenar</option>
+                            <option value="nome" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'nome') ? 'selected' : '' ?>>Nome da Pessoa</option>
+                            <option value="recentes" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'recentes') ? 'selected' : '' ?>>Mais Recentes</option>
+                            <option value="antigos" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'antigos') ? 'selected' : '' ?>>Mais Antigos</option>
+                        </select>
+                    </div>
 
-                <div class="div_pai_funcoes">
+                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
+
+                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </a></button>
+                </form>
+
+                <!-- <div class="div_pai_funcoes">
                     <i class="fa-solid fa-file-arrow-down"></i>
                     <select name="" id="a">
                         <option value="">Exportar</option>
                         <option value="aaa">Excel (.xlsx)</option>
                         <option value="aa">Imprimir (.pdf)</option>
                     </select>
-                </div>
+                </div> -->
 
 
             </div>
