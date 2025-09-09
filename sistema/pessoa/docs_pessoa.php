@@ -170,42 +170,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 }
 
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $input = file_get_contents("php://input");
     $data = json_decode($input, true);
     $id_doc = $data['id'] ?? null;
 
     if ($id_doc) {
+        try {
+            // Inicia a transação
+            $conexao->begin_transaction();
 
-        $sql_busca_dados = "SELECT caminho_arquivo FROM documento WHERE id_documento = ?  AND usuario_config_id_usuario_config = ?";
+            // Busca os dados do documento
+            $sql_busca_dados = "SELECT nome_original, caminho_arquivo 
+                                FROM documento 
+                                WHERE id_documento = ?  
+                                AND usuario_config_id_usuario_config = ?";
 
-        $stmt = $conexao->prepare($sql_busca_dados);
-        $stmt->bind_param('ii', $id_doc, $id_user);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $doc = $result->fetch_assoc();
-        $caminho_server = $doc['caminho_arquivo'];
+            $stmt = $conexao->prepare($sql_busca_dados);
+            $stmt->bind_param('ii', $id_doc, $id_user);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $doc = $result->fetch_assoc();
 
-        if (file_exists($caminho_server)) {
+            if (!$doc) {
+                $res = [
+                    'status' => 'error',
+                    'message' => 'Documento não encontrado.'
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            }
 
-            if (unlink($caminho_server)) {
-                $sql_delete_pessoa = 'DELETE from documento where id_documento = ? and usuario_config_id_usuario_config = ? ';
-                $stmt = $conexao->prepare($sql_delete_pessoa);
-                $stmt->bind_param('ii', $id_doc, $id_user);
+            $nome_original = $doc['nome_original'];
+            $caminho_server = $doc['caminho_arquivo'];
 
-                if ($stmt->execute()) {
+            // Se existir arquivo, tenta excluir
+            if (file_exists($caminho_server)) {
+                if (!unlink($caminho_server)) {
                     $res = [
-                        'status' => 'success',
-                        'message' => 'Documento excluído com sucesso!',
+                        'status' => 'error',
+                        'message' => 'Erro ao excluir o arquivo do servidor.'
                     ];
                     echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                    $conexao->rollback();
                     $conexao->close();
                     exit;
                 }
             }
+
+            // Exclui o registro do banco
+            $sql_delete_doc = 'DELETE FROM documento WHERE id_documento = ? AND usuario_config_id_usuario_config = ?';
+            $stmt = $conexao->prepare($sql_delete_doc);
+            $stmt->bind_param('ii', $id_doc, $id_user);
+
+            if (!$stmt->execute()) {
+                $res = [
+                    'status' => 'error',
+                    'message' => 'Erro ao excluir registro no banco de dados.'
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            }
+
+            // Registra no log
+            $ip = $_SERVER['REMOTE_ADDR'];
+            if (!cadastro_log('Excluiu Documento', $nome_original, $ip, $id_user)) {
+                $res = [
+                    'status' => 'error',
+                    'message' => 'Erro ao registrar log.'
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            }
+
+            // Se tudo deu certo
+            $res = [
+                'status' => 'success',
+                'message' => 'Documento excluído com sucesso!',
+            ];
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->commit();
+            $conexao->close();
+            exit;
+
+        } catch (Exception $err) {
+            // Erro inesperado
+            $res = [
+                'status' => 'error',
+                'message' => 'Erro ao excluir documento, tente mais tarde!'
+            ];
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->rollback();
+            $conexao->close();
+            exit;
         }
     }
 }
+
 
 
 

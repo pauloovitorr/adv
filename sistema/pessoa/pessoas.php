@@ -78,17 +78,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $data = json_decode($input, true);
     $token = $data['token'] ?? null;
 
-    if ($token) {
-        $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
-        $stmt = $conexao->prepare($sql_delete_pessoa);
-        $stmt->bind_param('si', $token, $id_user);
 
-        if ($stmt->execute()) {
+
+    if ($token) {
+
+        try {
+            $conexao->begin_transaction();
+            $sql_busca_pessoas = "SELECT nome FROM pessoas where usuario_config_id_usuario_config = $id_user and tk = '$token'";
+            $res = $conexao->query($sql_busca_pessoas);
+            $nome_pessoa_excluida = $res->fetch_assoc();
+            $nome_pessoa_excluida = $nome_pessoa_excluida['nome'];
+
+            $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
+            $stmt = $conexao->prepare($sql_delete_pessoa);
+            $stmt->bind_param('si', $token, $id_user);
+
+
+            if ($stmt->execute()) {
+
+
+                $ip = $_SERVER['REMOTE_ADDR'];
+
+                if (cadastro_log('Excluiu Pessoa', $nome_pessoa_excluida, $ip, $id_user)) {
+                    $res = [
+                        'status' => 'success',
+                        'message' => 'Pessoa excluída com sucesso!',
+                    ];
+                    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                    $conexao->commit();
+                    $conexao->close();
+                    exit;
+                }
+            }
+        } catch (Exception $err) {
             $res = [
-                'status' => 'success',
-                'message' => 'Pessoa excluída com sucesso!',
+                'status' => 'erro',
+                'message' => 'Erro:' . $err->getMessage()
             ];
             echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->rollback();
             $conexao->close();
             exit;
         }
@@ -386,16 +414,27 @@ include_once('../geral/topo.php');
                             }),
                             dataType: 'json',
                             success: function(res) {
-                                Swal.fire({
-                                    title: "Exclusão",
-                                    text: "Pessoa excluída com sucesso!",
-                                    icon: "success"
-                                });
 
-                                // setTimeout(() => {
-                                //     Swal.close()
-                                //     window.location.reload()
-                                // }, 800)
+                                if (res.status == "success") {
+                                    Swal.fire({
+                                        title: "Exclusão",
+                                        text: "Pessoa excluída com sucesso!",
+                                        icon: "success"
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: res.message
+                                    });
+                                }
+
+
+
+                                setTimeout(() => {
+                                    Swal.close()
+                                    window.location.reload()
+                                }, 1000)
 
                             }
                         })
