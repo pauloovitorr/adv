@@ -305,7 +305,7 @@ include_once('../geral/topo.php');
                                                                 <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
                                                             </a>
 
-                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                            <a href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 

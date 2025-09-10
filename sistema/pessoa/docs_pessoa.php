@@ -259,7 +259,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             $conexao->commit();
             $conexao->close();
             exit;
-
         } catch (Exception $err) {
             // Erro inesperado
             $res = [
@@ -377,7 +376,7 @@ include_once('../geral/topo.php');
 
                             <button class="btn_cadastrar" id="enviar_arquivos" role="button"><i class="fa-solid fa-arrow-up-from-bracket" style="color: white;"></i> Salvar Arquivos</button>
 
-                            <button class="btn_finalizar" role="button"><i class="fa-solid fa-check"></i> Finalizar </button>
+                            <button class="btn_finalizar" role="button"><i class="fa-solid fa-check"></i> <?php echo $lista_docs->num_rows > 0 ? 'Finalizar' : 'Finalizar Sem Documento' ?> </button>
                         </div>
 
 
@@ -442,12 +441,12 @@ include_once('../geral/topo.php');
                     myDropzone.processQueue();
                 });
 
-                // myDropzone.on("queuecomplete", function() {
-                //     // Aguarda 1s para mostrar o check e recarrega
-                //     setTimeout(function() {
-                //         location.reload();
-                //     }, 2000);
-                // });
+                myDropzone.on("queuecomplete", function() {
+                    // Aguarda 1s para mostrar o check e recarrega
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                });
 
                 // Captura resposta de sucesso do backend
                 myDropzone.on("success", function(file, response) {
@@ -506,12 +505,26 @@ include_once('../geral/topo.php');
                                 setTimeout(() => {
                                     Swal.close();
                                     window.location.reload();
-                                }, 800);
+                                }, 500);
                             }
                         });
                     }
                 });
             });
+
+
+            $('.btn_finalizar').on('click', function() {
+
+                Swal.fire({
+                    title: "Finalizado",
+                    text: "Cadastro finalizado com sucesso!",
+                    icon: "success"
+                }).then(() => {
+                    window.location.href = "./pessoas.php";
+                });
+
+
+            })
         });
     </script>
 

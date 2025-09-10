@@ -326,7 +326,7 @@
                     <ul>
                         <li>Perfil</li>
                         <li>Configurações</li>
-                        <a href="./logout.php">
+                        <a href="/adv/sistema/geral/logout.php">
                             <li>Sair</li>
                         </a>
                     </ul>

@@ -2,6 +2,7 @@
 
 include_once('../../scripts.php');
 
+$id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
 
@@ -12,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
     $foto_pessoa    = '';
     $num_doc        = $conexao->escape_string(htmlspecialchars($_POST['num_doc']));
     $rg             = $conexao->escape_string(htmlspecialchars($_POST['rg']));
-    $dt_nascimento  = $dt_nascimento = !empty($_POST['dt_nascimento']) ? 
-    $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
+    $dt_nascimento  = $dt_nascimento = !empty($_POST['dt_nascimento']) ?
+        $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
     $estado_civil   = $conexao->escape_string(htmlspecialchars($_POST['estado_civil']));
     $profissao      = $conexao->escape_string(htmlspecialchars($_POST['profissao']));
     $pis            = $conexao->escape_string(htmlspecialchars($_POST['pis']));
@@ -141,6 +142,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
         $conexao->close();
     }
 }
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['tkn'])) {
+    $acao = $conexao->escape_string(htmlspecialchars($_GET['acao']));
+    $token_pessoa  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
+
+    $sql_busca_pessoa_tkn = 'SELECT * FROM pessoas where tk = ? and usuario_config_id_usuario_config = ?';
+    $stmt = $conexao->prepare($sql_busca_pessoa_tkn);
+    $stmt->bind_param('si', $token_pessoa, $id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if($result->num_rows == 1){
+        $dados_pessoa = $result->fetch_assoc();
+        var_dump($dados_pessoa);
+    }
+    else{
+        header('location: ./pessoas.php');
+    }
+    
+}
+
 
 ?>
 
@@ -737,7 +760,7 @@ include_once('../geral/topo.php');
 
                                     });
                                 } else {
-                                    
+
                                     $('#logradouro').val(dados.logradouro)
                                     $('#bairro').val(dados.bairro)
                                     $('#cidade').val(dados.localidade)
