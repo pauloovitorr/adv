@@ -145,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['tkn'])) {
+
     $acao = $conexao->escape_string(htmlspecialchars($_GET['acao']));
     $token_pessoa  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
 
@@ -154,14 +155,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GE
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if($result->num_rows == 1){
+    if ($result->num_rows == 1) {
         $dados_pessoa = $result->fetch_assoc();
-        var_dump($dados_pessoa);
-    }
-    else{
+        // var_dump($dados_pessoa);
+        $conexao->close();
+    } else {
         header('location: ./pessoas.php');
+        exit;
     }
-    
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $dados_pessoa = [];
 }
 
 
@@ -190,17 +193,22 @@ include_once('../geral/topo.php');
             <section class="container_etapa_cadastro">
                 <div class="etapa">
                     <div class="num bg_selecionado">1º</div>
-                    <div class="descricao color_selecionado">Cadastro</div>
+                    <div class="descricao color_selecionado"><?php echo count($dados_pessoa) > 0 ? 'Edição' : 'Cadastro'  ?></div>
                 </div>
 
-                <div class="separador bg_selecionado"></div>
 
-                <div class="etapa">
-                    <div class="num">2º</div>
-                    <div class="descricao">Documentos</div>
-                </div>
 
-                <div class="separador"></div>
+                <?php if (count($dados_pessoa) > 0): ?>
+                    <div class="separador bg_selecionado" style="width: 50%;"></div>
+                <?php else: ?>
+                    <div class="separador bg_selecionado" ></div>
+                    <div class="etapa">
+                        <div class="num">2º</div>
+                        <div class="descricao">Documentos</div>
+                    </div>
+
+                    <div class="separador"></div>
+                <?php endif ?>
 
                 <div class="etapa">
                     <div class="num">3º</div>
@@ -224,68 +232,109 @@ include_once('../geral/topo.php');
 
                             <div class="bloco-formulario">
 
-
-
                                 <div class="container_inputs">
                                     <div class="container_input">
                                         <label for="pessoa">Pessoa <span style="color: red;">*</span></label>
                                         <select name="tipo_pessoa" id="pessoa" required>
-                                            <option value="PF">Pessoa Física</option>
-                                            <option value="PJ">Pessoa Jurídica</option>
+                                            <option value="PF" <?php echo ($dados_pessoa["tipo_pessoa"] ?? '') == 'PF' ? 'selected' : ''  ?>>Pessoa Física</option>
+                                            <option value="PJ" <?php echo ($dados_pessoa["tipo_pessoa"] ?? '') == 'PJ' ? 'selected' : ''  ?>>Pessoa Jurídica</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input" id="nome">
                                         <label for="nome_pessoa">Nome <span style="color: red;">*</span></label>
-                                        <input type="text" name="nome" id="nome_pessoa" placeholder="EX: Paulo Vitor" minlength="4" maxlength="150" required>
+                                        <input
+                                            type="text"
+                                            name="nome"
+                                            id="nome_pessoa"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['nome'] ?? '') ?>"
+                                            placeholder="EX: Paulo Vitor"
+                                            minlength="4"
+                                            maxlength="150"
+                                            required>
                                     </div>
 
                                     <div class="container_input">
                                         <label for="num_doc">CPF/CNPJ</label>
-                                        <input type="text" name="num_doc" id="num_doc" minlength="11" maxlength="20" placeholder="999.999.99-99">
+                                        <input
+                                            type="text"
+                                            name="num_documento"
+                                            id="num_doc"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['num_documento'] ?? '') ?>"
+                                            minlength="11"
+                                            maxlength="20"
+                                            placeholder="999.999.999-99">
                                     </div>
 
                                     <div class="container_input" id="container_rg">
                                         <label for="rg">RG</label>
-                                        <input type="text" name="rg" id="rg" placeholder="Número do RG" minlength="5" maxlength="25">
+                                        <input
+                                            type="text"
+                                            name="rg"
+                                            id="rg"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['rg'] ?? '') ?>"
+                                            placeholder="Número do RG"
+                                            minlength="5"
+                                            maxlength="25">
                                     </div>
-
-
                                 </div>
 
                                 <div class="container_inputs">
                                     <div class="container_input" id="container_dt_nascimento">
                                         <label for="dt_nascimento">Data de nascimento</label>
-                                        <input type="date" name="dt_nascimento" id="dt_nascimento">
+                                        <input
+                                            type="date"
+                                            name="dt_nascimento"
+                                            id="dt_nascimento"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['dt_nascimento'] ?? '') ?>">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="profissao">Profissão</label>
-                                        <input type="text" name="profissao" id="profissao" minlength="4" maxlength="40" placeholder="EX: Autônomo">
+                                        <input
+                                            type="text"
+                                            name="profissao"
+                                            id="profissao"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['profissao'] ?? '') ?>"
+                                            minlength="4"
+                                            maxlength="40"
+                                            placeholder="EX: Autônomo">
                                     </div>
 
                                     <div class="container_input" id="container_ctps">
                                         <label for="ctps">CTPS</label>
-                                        <input type="text" name="ctps" id="ctps" minlength="4" maxlength="40" placeholder="Carteira de trabalho">
+                                        <input
+                                            type="text"
+                                            name="ctps"
+                                            id="ctps"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['ctps'] ?? '') ?>"
+                                            minlength="4"
+                                            maxlength="40"
+                                            placeholder="Carteira de trabalho">
                                     </div>
 
                                     <div class="container_input" id="container_pis">
                                         <label for="pis">PIS/PASEP</label>
-                                        <input type="text" name="pis" id="pis" minlength="11" maxlength="14" placeholder="999.9999.999-9">
+                                        <input
+                                            type="text"
+                                            name="pis"
+                                            id="pis"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['pis'] ?? '') ?>"
+                                            minlength="11"
+                                            maxlength="14"
+                                            placeholder="999.9999.999-9">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="origem">Origem <span style="color: red;">*</span></label>
-                                        <select name="origem" name="origem" id="origem" required>
+                                        <select name="origem" id="origem" required>
                                             <option value="">Selecione a origem</option>
-                                            <option value="Escritório">Escritório</option>
-                                            <option value="Indicação">Indicação</option>
-                                            <option value="Anúncio">Anúncio</option>
-                                            <option value="Facebook">Facebook</option>
+                                            <option value="Escritório" <?php echo ($dados_pessoa['origem'] ?? '') == 'Escritório' ? 'selected' : '' ?>>Escritório</option>
+                                            <option value="Indicação" <?php echo ($dados_pessoa['origem'] ?? '') == 'Indicação' ? 'selected' : '' ?>>Indicação</option>
+                                            <option value="Anúncio" <?php echo ($dados_pessoa['origem'] ?? '') == 'Anúncio' ? 'selected' : '' ?>>Anúncio</option>
+                                            <option value="Facebook" <?php echo ($dados_pessoa['origem'] ?? '') == 'Facebook' ? 'selected' : '' ?>>Facebook</option>
                                         </select>
                                     </div>
-
-
                                 </div>
 
                                 <div class="container_inputs">
@@ -293,8 +342,8 @@ include_once('../geral/topo.php');
                                         <label for="sexo">Sexo</label>
                                         <select name="sexo" id="sexo">
                                             <option value="">Selecione o sexo</option>
-                                            <option value="Masculino">Masculino</option>
-                                            <option value="Feminino">Feminino</option>
+                                            <option value="Masculino" <?php echo ($dados_pessoa['sexo'] ?? '') == 'Masculino' ? 'selected' : '' ?>>Masculino</option>
+                                            <option value="Feminino" <?php echo ($dados_pessoa['sexo'] ?? '') == 'Feminino' ? 'selected' : '' ?>>Feminino</option>
                                         </select>
                                     </div>
 
@@ -302,50 +351,66 @@ include_once('../geral/topo.php');
                                         <label for="estado_civil">Estado civil</label>
                                         <select name="estado_civil" id="estado_civil">
                                             <option value="">Selecione o estado civil</option>
-                                            <option value="Casado(a)">Casado(a)</option>
-                                            <option value="Divorciado(a)">Divorciado(a)</option>
-                                            <option value="Separado(a)">Separado(a)</option>
-                                            <option value="Solteiro(a)">Solteiro(a)</option>
-                                            <option value="União Estável">União Estável</option>
+                                            <option value="Casado(a)" <?php echo ($dados_pessoa['estado_civil'] ?? '') == 'Casado(a)' ? 'selected' : '' ?>>Casado(a)</option>
+                                            <option value="Divorciado(a)" <?php echo ($dados_pessoa['estado_civil'] ?? '') == 'Divorciado(a)' ? 'selected' : '' ?>>Divorciado(a)</option>
+                                            <option value="Separado(a)" <?php echo ($dados_pessoa['estado_civil'] ?? '') == 'Separado(a)' ? 'selected' : '' ?>>Separado(a)</option>
+                                            <option value="Solteiro(a)" <?php echo ($dados_pessoa['estado_civil'] ?? '') == 'Solteiro(a)' ? 'selected' : '' ?>>Solteiro(a)</option>
+                                            <option value="União Estável" <?php echo ($dados_pessoa['estado_civil'] ?? '') == 'União Estável' ? 'selected' : '' ?>>União Estável</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input" id="container_nome_mae">
                                         <label for="nome_mae">Nome da mãe</label>
-                                        <input type="text" name="nome_mae" id="nome_mae" minlength="4" maxlength="150" placeholder="EX: Eliete de Sousa">
+                                        <input
+                                            type="text"
+                                            name="nome_mae"
+                                            id="nome_mae"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['nome_mae'] ?? '') ?>"
+                                            minlength="4"
+                                            maxlength="150"
+                                            placeholder="EX: Eliete de Sousa">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="foto">Foto</label>
-                                        <input type="file" name="foto" accept=".jpg,.jpeg,.png" id="foto" class="custom-file-input">
+                                        <input
+                                            type="file"
+                                            name="foto"
+                                            id="foto"
+                                            accept=".jpg,.jpeg,.png"
+                                            class="custom-file-input">
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto').click()">
-                                            <p id="nome-arquivo">Selecione o arquivo</p>
+                                            <p id="nome-arquivo">
+                                                <?php echo !empty($dados_pessoa['foto_pessoa'] ?? '') ? basename($dados_pessoa['foto_pessoa']) : 'Selecione o arquivo'; ?>
+                                            </p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                         </div>
                                     </div>
-
-
-
                                 </div>
 
                                 <div class="container_tipo_parte">
-
                                     <div class="container_tipo_parte_inputs">
-
                                         <div>
                                             <label for="tipo_parte_cliente">Cliente</label>
-                                            <input type="radio" id="tipo_parte_cliente" value="cliente" name="tipo_parte" checked>
+                                            <input
+                                                type="radio"
+                                                id="tipo_parte_cliente"
+                                                name="tipo_parte"
+                                                value="cliente"
+                                                <?php echo ($dados_pessoa['tipo_parte'] ?? '') == 'cliente' ? 'checked' : '' ?>>
                                         </div>
 
                                         <div>
                                             <label for="tipo_parte_contrario">Contrário</label>
-                                            <input type="radio" id="tipo_parte_contrario" value="contrário" name="tipo_parte">
+                                            <input
+                                                type="radio"
+                                                id="tipo_parte_contrario"
+                                                name="tipo_parte"
+                                                value="contrário"
+                                                <?php echo ($dados_pessoa['tipo_parte'] ?? '') == 'contrário' ? 'checked' : '' ?>>
                                         </div>
-
                                     </div>
-
                                 </div>
-
 
                             </div>
 
@@ -357,40 +422,70 @@ include_once('../geral/topo.php');
                             <div class="bloco-formulario">
 
                                 <div class="container_inputs">
-
                                     <div class="container_input">
-                                        <label for="tell_principal">Telefone principal</label>
-                                        <input type="tell" name="tell_principal" id="tell_principal" minlength="13" maxlength="14" placeholder="(99) 99999-9999">
+                                        <label for="telefone_principal">Telefone principal</label>
+                                        <input
+                                            type="tel"
+                                            name="telefone_principal"
+                                            id="telefone_principal"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['telefone_principal'] ?? '') ?>"
+                                            minlength="13"
+                                            maxlength="14"
+                                            placeholder="(99) 99999-9999">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="tell_secundario">Telefone secundário</label>
-                                        <input type="tell" name="tell_secundario" id="tell_secundario" minlength="13" maxlength="14" placeholder="(99) 99999-9999">
+                                        <label for="telefone_secundario">Telefone secundário</label>
+                                        <input
+                                            type="tel"
+                                            name="telefone_secundario"
+                                            id="telefone_secundario"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['telefone_secundario'] ?? '') ?>"
+                                            minlength="13"
+                                            maxlength="14"
+                                            placeholder="(99) 99999-9999">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="celular">Telefone Fixo</label>
-                                        <input type="tell" name="celular" id="celular" minlength="13" maxlength="14" placeholder="(99) 9999-9999">
+                                        <input
+                                            type="tel"
+                                            name="celular"
+                                            id="celular"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['celular'] ?? '') ?>"
+                                            minlength="13"
+                                            maxlength="14"
+                                            placeholder="(99) 9999-9999">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="e-mail">E-mail principal</label>
-                                        <input type="email" name="e-mail" id="e-mail" minlength="7" maxlength="100" placeholder="Ex: paulo@gmail.com">
+                                        <label for="email">E-mail principal</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            id="email"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['email'] ?? '') ?>"
+                                            minlength="7"
+                                            maxlength="100"
+                                            placeholder="Ex: paulo@gmail.com">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="e-mail_secundario">E-mail secundário</label>
-                                        <input type="email" name="e-mail_secundario" id="e-mail_secundario" minlength="7" maxlength="100" placeholder="Ex: paulo@gmail.com">
+                                        <label for="email_secundario">E-mail secundário</label>
+                                        <input
+                                            type="email"
+                                            name="email_secundario"
+                                            id="email_secundario"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['email_secundario'] ?? '') ?>"
+                                            minlength="7"
+                                            maxlength="100"
+                                            placeholder="Ex: paulo@gmail.com">
                                     </div>
-
-
                                 </div>
 
                             </div>
 
                         </fieldset>
-
-
 
                         <fieldset>
                             <legend>Endereço</legend>
@@ -400,27 +495,51 @@ include_once('../geral/topo.php');
                                 <div class="container_inputs">
                                     <div class="container_input">
                                         <label for="cep">CEP</label>
-                                        <input type="text" name="cep" id="cep" minlength="8" maxlength="9" placeholder="99999-999">
+                                        <input
+                                            type="text"
+                                            name="cep"
+                                            id="cep"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['cep'] ?? '') ?>"
+                                            minlength="8"
+                                            maxlength="9"
+                                            placeholder="99999-999">
                                     </div>
 
                                     <div class="container_input" id="logradouro_container">
                                         <label for="logradouro">Logradouro</label>
-                                        <input type="text" name="logradouro" id="logradouro" minlength="4" maxlength="150" placeholder="EX: Rua João Goulart">
+                                        <input
+                                            type="text"
+                                            name="logradouro"
+                                            id="logradouro"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['logradouro'] ?? '') ?>"
+                                            minlength="4"
+                                            maxlength="150"
+                                            placeholder="EX: Rua João Goulart">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="num">Número</label>
-                                        <input type="text" name="num" id="num" minlength="1" maxlength="6" placeholder="99">
+                                        <label for="numero_casa">Número</label>
+                                        <input
+                                            type="text"
+                                            name="numero_casa"
+                                            id="numero_casa"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['numero_casa'] ?? '') ?>"
+                                            minlength="1"
+                                            maxlength="6"
+                                            placeholder="99">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="bairro">Bairro</label>
-                                        <input type="text" name="bairro" id="bairro" minlength="3" maxlength="100" placeholder="Ex: Centro">
+                                        <input
+                                            type="text"
+                                            name="bairro"
+                                            id="bairro"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['bairro'] ?? '') ?>"
+                                            minlength="3"
+                                            maxlength="100"
+                                            placeholder="Ex: Centro">
                                     </div>
-
-
-
-
                                 </div>
 
                             </div>
@@ -428,70 +547,87 @@ include_once('../geral/topo.php');
                             <div class="bloco-formulario">
 
                                 <div class="container_inputs">
-
                                     <div class="container_input">
                                         <label for="cidade">Cidade</label>
-                                        <input type="text" name="cidade" id="cidade" minlength="3" maxlength="150" placeholder="Ex: São Paulo">
+                                        <input
+                                            type="text"
+                                            name="cidade"
+                                            id="cidade"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['cidade'] ?? '') ?>"
+                                            minlength="3"
+                                            maxlength="150"
+                                            placeholder="Ex: São Paulo">
                                     </div>
 
                                     <div class="container_input">
                                         <label for="estado">Estado</label>
                                         <select id="estado" name="estado">
                                             <option value="">Selecione um estado</option>
-                                            <option value="AC">Acre</option>
-                                            <option value="AL">Alagoas</option>
-                                            <option value="AM">Amazonas</option>
-                                            <option value="AP">Amapá</option>
-                                            <option value="BA">Bahia</option>
-                                            <option value="CE">Ceará</option>
-                                            <option value="DF">Distrito Federal</option>
-                                            <option value="ES">Espírito Santo</option>
-                                            <option value="GO">Goiás</option>
-                                            <option value="MA">Maranhão</option>
-                                            <option value="MG">Minas Gerais</option>
-                                            <option value="MS">Mato Grosso do Sul</option>
-                                            <option value="MT">Mato Grosso</option>
-                                            <option value="PA">Pará</option>
-                                            <option value="PB">Paraíba</option>
-                                            <option value="PE">Pernambuco</option>
-                                            <option value="PI">Piauí</option>
-                                            <option value="PR">Paraná</option>
-                                            <option value="RJ">Rio de Janeiro</option>
-                                            <option value="RN">Rio Grande do Norte</option>
-                                            <option value="RO">Rondônia</option>
-                                            <option value="RR">Roraima</option>
-                                            <option value="RS">Rio Grande do Sul</option>
-                                            <option value="SC">Santa Catarina</option>
-                                            <option value="SE">Sergipe</option>
-                                            <option value="SP">São Paulo</option>
-                                            <option value="TO">Tocantins</option>
+                                            <option value="AC" <?php echo ($dados_pessoa['estado'] ?? '') == 'AC' ? 'selected' : '' ?>>Acre</option>
+                                            <option value="AL" <?php echo ($dados_pessoa['estado'] ?? '') == 'AL' ? 'selected' : '' ?>>Alagoas</option>
+                                            <option value="AM" <?php echo ($dados_pessoa['estado'] ?? '') == 'AM' ? 'selected' : '' ?>>Amazonas</option>
+                                            <option value="AP" <?php echo ($dados_pessoa['estado'] ?? '') == 'AP' ? 'selected' : '' ?>>Amapá</option>
+                                            <option value="BA" <?php echo ($dados_pessoa['estado'] ?? '') == 'BA' ? 'selected' : '' ?>>Bahia</option>
+                                            <option value="CE" <?php echo ($dados_pessoa['estado'] ?? '') == 'CE' ? 'selected' : '' ?>>Ceará</option>
+                                            <option value="DF" <?php echo ($dados_pessoa['estado'] ?? '') == 'DF' ? 'selected' : '' ?>>Distrito Federal</option>
+                                            <option value="ES" <?php echo ($dados_pessoa['estado'] ?? '') == 'ES' ? 'selected' : '' ?>>Espírito Santo</option>
+                                            <option value="GO" <?php echo ($dados_pessoa['estado'] ?? '') == 'GO' ? 'selected' : '' ?>>Goiás</option>
+                                            <option value="MA" <?php echo ($dados_pessoa['estado'] ?? '') == 'MA' ? 'selected' : '' ?>>Maranhão</option>
+                                            <option value="MG" <?php echo ($dados_pessoa['estado'] ?? '') == 'MG' ? 'selected' : '' ?>>Minas Gerais</option>
+                                            <option value="MS" <?php echo ($dados_pessoa['estado'] ?? '') == 'MS' ? 'selected' : '' ?>>Mato Grosso do Sul</option>
+                                            <option value="MT" <?php echo ($dados_pessoa['estado'] ?? '') == 'MT' ? 'selected' : '' ?>>Mato Grosso</option>
+                                            <option value="PA" <?php echo ($dados_pessoa['estado'] ?? '') == 'PA' ? 'selected' : '' ?>>Pará</option>
+                                            <option value="PB" <?php echo ($dados_pessoa['estado'] ?? '') == 'PB' ? 'selected' : '' ?>>Paraíba</option>
+                                            <option value="PE" <?php echo ($dados_pessoa['estado'] ?? '') == 'PE' ? 'selected' : '' ?>>Pernambuco</option>
+                                            <option value="PI" <?php echo ($dados_pessoa['estado'] ?? '') == 'PI' ? 'selected' : '' ?>>Piauí</option>
+                                            <option value="PR" <?php echo ($dados_pessoa['estado'] ?? '') == 'PR' ? 'selected' : '' ?>>Paraná</option>
+                                            <option value="RJ" <?php echo ($dados_pessoa['estado'] ?? '') == 'RJ' ? 'selected' : '' ?>>Rio de Janeiro</option>
+                                            <option value="RN" <?php echo ($dados_pessoa['estado'] ?? '') == 'RN' ? 'selected' : '' ?>>Rio Grande do Norte</option>
+                                            <option value="RO" <?php echo ($dados_pessoa['estado'] ?? '') == 'RO' ? 'selected' : '' ?>>Rondônia</option>
+                                            <option value="RR" <?php echo ($dados_pessoa['estado'] ?? '') == 'RR' ? 'selected' : '' ?>>Roraima</option>
+                                            <option value="RS" <?php echo ($dados_pessoa['estado'] ?? '') == 'RS' ? 'selected' : '' ?>>Rio Grande do Sul</option>
+                                            <option value="SC" <?php echo ($dados_pessoa['estado'] ?? '') == 'SC' ? 'selected' : '' ?>>Santa Catarina</option>
+                                            <option value="SE" <?php echo ($dados_pessoa['estado'] ?? '') == 'SE' ? 'selected' : '' ?>>Sergipe</option>
+                                            <option value="SP" <?php echo ($dados_pessoa['estado'] ?? '') == 'SP' ? 'selected' : '' ?>>São Paulo</option>
+                                            <option value="TO" <?php echo ($dados_pessoa['estado'] ?? '') == 'TO' ? 'selected' : '' ?>>Tocantins</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input">
                                         <label for="complemento">Complemento</label>
-                                        <input type="text" name="complemento" id="complemento" minlength="3" maxlength="150" placeholder="Ex: Próximo ao mercado">
+                                        <input
+                                            type="text"
+                                            name="complemento"
+                                            id="complemento"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['complemento'] ?? '') ?>"
+                                            minlength="3"
+                                            maxlength="150"
+                                            placeholder="Ex: Próximo ao mercado">
                                     </div>
 
                                     <div class="container_input" id="observacao_container">
                                         <label for="observacao">Observação</label>
-                                        <input type="text" name="observacao" id="observacao" minlength="3" maxlength="150" placeholder="EX: Visitas apenas pela manhã">
+                                        <input
+                                            type="text"
+                                            name="observacao"
+                                            id="observacao"
+                                            value="<?php echo htmlspecialchars($dados_pessoa['observacao'] ?? '') ?>"
+                                            minlength="3"
+                                            maxlength="150"
+                                            placeholder="EX: Visitas apenas pela manhã">
                                     </div>
-
-
                                 </div>
 
                             </div>
 
                         </fieldset>
 
-
                         <div class="container_btn_submit">
                             <button type="submit" class="btn_cadastrar"> Cadastrar Pessoa </button>
                         </div>
 
-
                     </form>
+
 
 
                 </div>
