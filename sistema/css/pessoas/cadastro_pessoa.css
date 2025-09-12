@@ -53,7 +53,7 @@
   color: var(--preto-primario);
 }
 
-.container_cadastro{
+.container_cadastro {
   width: 100%;
   height: auto;
   /* padding: 16px; */
@@ -187,8 +187,9 @@ fieldset legend {
 
 .container_tipo_parte {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 4px;
+  /* margin-top: 4px; */
 }
 
 .container_tipo_parte_inputs {
@@ -203,15 +204,26 @@ fieldset legend {
   gap: 4px;
 }
 
-
-#nome-arquivo {
-  white-space: nowrap;       
-  overflow: hidden;          
-  text-overflow: ellipsis;   
-  width: 200px;              
-  display: block;            
+.exclusao_foto {
+  text-align: end;
+  /* border: 1px solid red; */
+  display: flex;
+  gap: 8px;
+  justify-content: end;
+  align-items: center;
 }
 
+.exclusao_foto label{
+  font-size: 14px;
+}
+
+#nome-arquivo {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 200px;
+  display: block;
+}
 
 @media (max-width: 1024px) {
   .container_inputs {

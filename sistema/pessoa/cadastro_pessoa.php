@@ -201,7 +201,7 @@ include_once('../geral/topo.php');
                 <?php if (count($dados_pessoa) > 0): ?>
                     <div class="separador bg_selecionado" style="width: 50%;"></div>
                 <?php else: ?>
-                    <div class="separador bg_selecionado" ></div>
+                    <div class="separador bg_selecionado"></div>
                     <div class="etapa">
                         <div class="num">2º</div>
                         <div class="descricao">Documentos</div>
@@ -410,6 +410,14 @@ include_once('../geral/topo.php');
                                                 <?php echo ($dados_pessoa['tipo_parte'] ?? '') == 'contrário' ? 'checked' : '' ?>>
                                         </div>
                                     </div>
+
+                                    <?php  if ($dados_pessoa["foto_pessoa"] !== ''): ?>
+                                    <div class="exclusao_foto" >
+                                        <label for="excluir_foto">Marque para excluir a foto</label>
+                                        <input type="checkbox" name="excluir_foto" id="excluir_foto" value="" >
+                                    </div>
+                                    <?php  endif ?>
+
                                 </div>
 
                             </div>
@@ -923,6 +931,8 @@ include_once('../geral/topo.php');
             })
         })
     </script>
+
+
 
 </body>
 
