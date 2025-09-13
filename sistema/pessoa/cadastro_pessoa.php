@@ -6,7 +6,6 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_pessoa']) && $_POST['acao'] == 'cadastrar') {
 
-
     $token          = bin2hex(random_bytes(64 / 2));
     $usuario        = $_SESSION['cod'];
     $nome              = $conexao->escape_string(htmlspecialchars($_POST['nome'] ?? ''));
@@ -107,11 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
             $ip = $_SERVER['REMOTE_ADDR'];
             $id_user = $_SESSION['cod'];
 
-            // $sql_insert_log = "INSERT INTO log (acao_log, ip_log, dt_acao_log, usuario_config_id_usuario_config) VALUES ('Cadastrou Pessoa', ?, NOW(), ? ) ";
-
-            // $stmt = $conexao->prepare($sql_insert_log);
-            // $stmt->bind_param('si', $ip, $id);
-
             if (cadastro_log('Cadastrou Pessoa', $nome, $ip, $id_user)) {
 
                 $conexao->commit();
@@ -167,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GE
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte']) && !empty($_POST['tkn']) && $_POST['acao'] == 'editar') {
 
+
     $token             = $conexao->escape_string(htmlspecialchars($_POST['tkn'] ?? ''));
     $nome              = $conexao->escape_string(htmlspecialchars($_POST['nome'] ?? ''));
     $origem            = $conexao->escape_string(htmlspecialchars($_POST['origem'] ?? ''));
@@ -195,10 +190,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
     $nome_mae          = $conexao->escape_string(htmlspecialchars($_POST['nome_mae'] ?? ''));
     $tipo_pessoa       = $conexao->escape_string(htmlspecialchars($_POST['tipo_pessoa'] ?? ''));
     $tipo_parte        = $conexao->escape_string(htmlspecialchars($_POST['tipo_parte'] ?? ''));
-    $excluir_foto      = !empty($_POST['excluir_foto']) ? true : false; // checkbox
+    $excluir_foto      = !empty($_POST['excluir_foto']) ? true : false;
 
 
-    exit;
+
+    try {
+
+        $conexao->begin_transaction();
+
+        $foto = isset($_FILES['foto']) ? $_FILES['foto'] : '';
+
+        if ($foto['name']) {
+            $nomeArquivo = $foto['name'];
+            $tmpArquivo = $foto['tmp_name'];
+            $tamanhoArquivo = $foto['size'];
+
+            $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+            $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+
+            if ($tamanhoArquivo > 3 * 1024 * 1024) {
+
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Arquivo muito grande! Tamanho máximo permitido de 2MB'
+                ];
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+
+                exit;
+            } elseif ($foto['error'] !== 0) {
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Imagem com erro'
+                ];
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+
+                exit;
+            } else {
+                $caminho = '../../img/img_clientes';
+
+                $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+                $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+
+                if ($retorno_img_movida) {
+                    $foto_pessoa = '/img/img_clientes/' . $novo_nome_arquivo;
+                }
+            }
+        }
+
+
+        $sql = 'INSERT INTO pessoas (
+        tk, nome, origem, dt_cadastro_pessoa, dt_atualizacao_pessoa, foto_pessoa, num_documento, rg, dt_nascimento, 
+        estado_civil, profissao, pis, ctps, sexo, telefone_principal, telefone_secundario, celular, email, 
+        email_secundario, cep, estado, cidade, bairro, logradouro, numero_casa, complemento, observacao, 
+        nome_mae, tipo_pessoa, tipo_parte ,usuario_config_id_usuario_config
+    ) VALUES (
+        ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )';
+
+        $stmt = $conexao->prepare($sql);
+        $stmt->bind_param('ssssssssssssssssssssssisssssi', $token, $nome, $origem, $foto_pessoa, $num_doc, $rg, $dt_nascimento, $estado_civil, $profissao, $pis, $ctps, $sexo, $tell_principal, $tell_secundario, $celular, $email, $email_secundario, $cep, $estado, $cidade, $bairro, $logradouro, $num, $complemento, $observacao, $nome_mae, $tipo_pessoa, $tipo_parte, $usuario);
+
+        if ($stmt->execute()) {
+
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $id_user = $_SESSION['cod'];
+
+            if (cadastro_log('Cadastrou Pessoa', $nome, $ip, $id_user)) {
+
+                $conexao->commit();
+                $conexao->close();
+
+                $res = [
+                    'status' => 'success',
+                    'message' => 'Pessoa cadastrada com sucesso!',
+                    'token' => $token
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
+            } else {
+                $conexao->rollback();
+                $conexao->close();
+
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Erro ao cadastrar pessoa!'
+                ];
+            }
+        }
+    } catch (Exception $err) {
+        echo "Erro: " . $err->getMessage();
+        $conexao->rollback();
+        $conexao->close();
+    }
 }
 
 ?>
@@ -907,6 +998,7 @@ include_once('../geral/topo.php');
                             title: "Erro",
                             text: err.message,
                         });
+                        $('.btn_cadastrar').attr('disabled', false)
                     }
                 })
 
@@ -980,6 +1072,7 @@ include_once('../geral/topo.php');
                             title: "Erro",
                             text: err.message,
                         });
+                        $('.btn_cadastrar').attr('disabled', false)
                     }
                 })
 
