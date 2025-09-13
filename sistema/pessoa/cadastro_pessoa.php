@@ -126,6 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
                     'status' => 'erro',
                     'message' => 'Erro ao cadastrar pessoa!'
                 ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
             }
         }
     } catch (Exception $err) {
@@ -167,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
     $token             = $conexao->escape_string(htmlspecialchars($_POST['tkn'] ?? ''));
     $nome              = $conexao->escape_string(htmlspecialchars($_POST['nome'] ?? ''));
     $origem            = $conexao->escape_string(htmlspecialchars($_POST['origem'] ?? ''));
-    $foto_pessoa       = ''; // caso vá tratar foto separadamente
+    $foto_pessoa       = '';
     $num_doc           = $conexao->escape_string(htmlspecialchars($_POST['num_documento'] ?? ''));
     $rg                = $conexao->escape_string(htmlspecialchars($_POST['rg'] ?? ''));
     $dt_nascimento     = !empty($_POST['dt_nascimento']) ? $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
@@ -192,61 +193,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
     $nome_mae          = $conexao->escape_string(htmlspecialchars($_POST['nome_mae'] ?? ''));
     $tipo_pessoa       = $conexao->escape_string(htmlspecialchars($_POST['tipo_pessoa'] ?? ''));
     $tipo_parte        = $conexao->escape_string(htmlspecialchars($_POST['tipo_parte'] ?? ''));
-    $excluir_foto      = !empty($_POST['excluir_foto']) ? true : false;
+    $excluir_foto      = $conexao->escape_string(htmlspecialchars($_POST['excluir_foto'] ?? ''));
 
+    $excluir_foto      = $excluir_foto != '' ? '../..' . $excluir_foto : '';
 
     try {
 
         $conexao->begin_transaction();
 
-        // $foto = isset($_FILES['foto']) ? $_FILES['foto'] : '';
+        $verifica_img = 'SELECT foto_pessoa FROM pessoas WHERE tk = ? AND usuario_config_id_usuario_config = ?';
+        $stmt_img     = $conexao->prepare($verifica_img);
+        $stmt_img->bind_param('si', $token, $id_user);
 
-        // if ($foto['name']) {
-        //     $nomeArquivo = $foto['name'];
-        //     $tmpArquivo = $foto['tmp_name'];
-        //     $tamanhoArquivo = $foto['size'];
+        $stmt_img->execute();
+        $caminho_img = $stmt_img->get_result();
+        $caminho_img = $caminho_img->fetch_assoc();
 
-        //     $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+        // var_dump($caminho_img);
+        // exit;
 
-        //     $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
 
-        //     if ($tamanhoArquivo > 3 * 1024 * 1024) {
+        $foto = $_FILES['foto'] ?? null;
+        $caminho_base = '../../img/img_clientes';
+        $tamanho_maximo = 3 * 1024 * 1024; // 3MB
 
-        //         $res = [
-        //             'status' => 'erro',
-        //             'message' => 'Arquivo muito grande! Tamanho máximo permitido de 2MB'
-        //         ];
+        function validarFoto($foto, $tamanho_maximo)
+        {
+            if ($foto['error'] !== 0) {
+                return ['status' => false, 'mensagem' => 'Imagem com erro'];
+            }
 
-        //         echo json_encode($res, JSON_UNESCAPED_UNICODE);
-        //         $conexao->rollback();
-        //         $conexao->close();
+            if ($foto['size'] > $tamanho_maximo) {
+                return ['status' => false, 'mensagem' => 'Arquivo muito grande! Tamanho máximo permitido de 3MB'];
+            }
 
-        //         exit;
-        //     } elseif ($foto['error'] !== 0) {
-        //         $res = [
-        //             'status' => 'erro',
-        //             'message' => 'Imagem com erro'
-        //         ];
+            return ['status' => true];
+        }
 
-        //         echo json_encode($res, JSON_UNESCAPED_UNICODE);
-        //         $conexao->rollback();
-        //         $conexao->close();
+        function moverFoto($foto, $caminho_base)
+        {
+            $extensao = strtolower(pathinfo($foto['name'], PATHINFO_EXTENSION));
+            $novo_nome = uniqid() . uniqid() . '.' . $extensao;
+            $novo_caminho = $caminho_base . '/' . $novo_nome;
 
-        //         exit;
-        //     } else {
-        //         $caminho = '../../img/img_clientes';
+            if (move_uploaded_file($foto['tmp_name'], $novo_caminho)) {
+                return '/img/img_clientes/' . $novo_nome;
+            }
+            return false;
+        }
 
-        //         $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+        // Lógica principal
+        if ($foto && $foto['name']) {
 
-        //         $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+            // Caso haja foto antiga
+            if (!empty($caminho_img['foto_pessoa']) && $excluir_foto) {
+                if (file_exists($excluir_foto)) {
+                    unlink($excluir_foto);
+                }
+            } elseif (!empty($caminho_img['foto_pessoa']) && !$excluir_foto) {
+                $conexao->rollback();
+                $conexao->close();
+                echo json_encode([
+                    'status' => 'erro',
+                    'message' => 'Marque a opção de excluir para cadastrar uma nova foto!'
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
+            }
 
-        //         if ($retorno_img_movida) {
-        //             $foto_pessoa = '/img/img_clientes/' . $novo_nome_arquivo;
-        //         }
-        //     }
-        // }
+            // Validação
+            $validacao = validarFoto($foto, $tamanho_maximo);
+            if (!$validacao['status']) {
+                $conexao->rollback();
+                $conexao->close();
+                echo json_encode([
+                    'status' => 'erro',
+                    'message' => $validacao['mensagem']
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
+            }
 
-        // foto_pessoa,$foto_pessoa,
+            // Movendo a foto
+            $nova_foto = moverFoto($foto, $caminho_base);
+            if ($nova_foto) {
+                $foto_pessoa = $nova_foto;
+            }
+        }
+
+        // Caso apenas queira excluir a foto atual sem enviar nova
+        if (!empty($caminho_img['foto_pessoa']) && $excluir_foto) {
+            if (file_exists($excluir_foto)) {
+                unlink($excluir_foto);
+                $foto_pessoa = '';
+            }
+        }
+
+
+
         $numero_casa_sql = !empty($num) ? intval($num) : 'NULL';
 
 
@@ -254,6 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
                 nome = ?,
                 origem = ?,
                 dt_atualizacao_pessoa = NOW(),
+                foto_pessoa = ?,
                 num_documento = ?,
                 rg = ?,
                 dt_nascimento = ?,
@@ -282,9 +325,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
 
         $stmt = $conexao->prepare($sql);
         $stmt->bind_param(
-            "ssssssssssssssssssssssssssi",
+            "sssssssssssssssssssssssssssi",
             $nome,
             $origem,
+            $foto_pessoa,
             $num_doc,
             $rg,
             $dt_nascimento,
@@ -312,10 +356,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
             $id_user
         );
 
-
-
-
-
         if ($stmt->execute()) {
 
             $ip = $_SERVER['REMOTE_ADDR'];
@@ -328,8 +368,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
 
                 $res = [
                     'status' => 'success',
-                    'message' => 'Pessoa editada com sucesso!',
-                    'token' => $token
+                    'message' => 'Pessoa editada com sucesso!'
                 ];
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
                 exit;
@@ -341,6 +380,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
                     'status' => 'erro',
                     'message' => 'Erro ao editar pessoa!'
                 ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
             }
         }
     } catch (Exception $err) {
@@ -562,9 +603,7 @@ include_once('../geral/topo.php');
                                             accept=".jpg,.jpeg,.png"
                                             class="custom-file-input">
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto').click()">
-                                            <p id="nome-arquivo">
-                                                <?php echo !empty($dados_pessoa['foto_pessoa'] ?? '') ? basename($dados_pessoa['foto_pessoa']) : 'Selecione o arquivo'; ?>
-                                            </p>
+                                            <p id="nome-arquivo"> Selecione o arquivo </p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                         </div>
                                     </div>
@@ -597,7 +636,10 @@ include_once('../geral/topo.php');
                                     <?php if (!empty($dados_pessoa["foto_pessoa"])): ?>
                                         <div class="exclusao_foto">
                                             <label for="excluir_foto">Marque para excluir a foto</label>
-                                            <input type="checkbox" name="excluir_foto" id="excluir_foto" value="sim">
+                                            <input type="checkbox"
+                                                name="excluir_foto" id="excluir_foto"
+                                                value="<?php echo $dados_pessoa['foto_pessoa'] ?>">
+                                            <img src="../..<?php echo $dados_pessoa['foto_pessoa'] ?>" alt="" srcset="">
                                         </div>
                                     <?php endif; ?>
 
@@ -1076,12 +1118,12 @@ include_once('../geral/topo.php');
 
                 $('.btn_cadastrar').attr('disabled', true)
 
-                // Swal.fire({
-                //     title: "Carregando...",
-                //     didOpen: () => {
-                //         Swal.showLoading();
-                //     }
-                // });
+                Swal.fire({
+                    title: "Carregando...",
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 e.preventDefault();
 
@@ -1108,18 +1150,18 @@ include_once('../geral/topo.php');
 
 
                         } else if (res.status === 'success') {
-                            console.log('sucesso')
+                            // console.log('sucesso')
                             Swal.close();
 
-                            // setTimeout(() => {
-                            //     Swal.fire({
-                            //         title: "Sucesso!",
-                            //         text: res.message,
-                            //         icon: "success"
-                            //     }).then((result) => {
-                            //         window.location.href = "./docs_pessoa.php?tkn=" + res.token;
-                            //     });
-                            // }, 300);
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: "Sucesso!",
+                                    text: res.message,
+                                    icon: "success"
+                                }).then((result) => {
+                                    window.location.reload()
+                                });
+                            }, 300);
                         }
 
 

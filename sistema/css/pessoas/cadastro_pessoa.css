@@ -217,6 +217,11 @@ fieldset legend {
   font-size: 14px;
 }
 
+.exclusao_foto img{
+  width: 40px;
+  border-radius: 4px;
+}
+
 #nome-arquivo {
   white-space: nowrap;
   overflow: hidden;
