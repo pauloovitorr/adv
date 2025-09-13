@@ -1,7 +1,7 @@
 
 <!-- Css Geral e topo das páginas internas como btn add, buscar, filtrar etc... -->
 <link rel="stylesheet" href="../css/geral.css">
-<link rel="stylesheet" href="../css/topo_funcoes.css">
+<!-- <link rel="stylesheet" href="../css/topo_funcoes.css"> -->
 
 <!-- Font awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />

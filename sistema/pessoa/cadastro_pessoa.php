@@ -4,40 +4,38 @@ include_once('../../scripts.php');
 
 $id_user = $_SESSION['cod'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_pessoa']) && $_POST['acao'] == 'cadastrar') {
 
 
     $token          = bin2hex(random_bytes(64 / 2));
-    $nome           = $conexao->escape_string(htmlspecialchars($_POST['nome']));
-    $origem         = $conexao->escape_string(htmlspecialchars($_POST['origem']));
-    $foto_pessoa    = '';
-    $num_doc        = $conexao->escape_string(htmlspecialchars($_POST['num_doc']));
-    $rg             = $conexao->escape_string(htmlspecialchars($_POST['rg']));
-    $dt_nascimento  = $dt_nascimento = !empty($_POST['dt_nascimento']) ?
-        $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
-    $estado_civil   = $conexao->escape_string(htmlspecialchars($_POST['estado_civil']));
-    $profissao      = $conexao->escape_string(htmlspecialchars($_POST['profissao']));
-    $pis            = $conexao->escape_string(htmlspecialchars($_POST['pis']));
-    $ctps           = $conexao->escape_string(htmlspecialchars($_POST['ctps']));
-    $sexo           = $conexao->escape_string(htmlspecialchars($_POST['sexo']));
-    $tell_principal = $conexao->escape_string(htmlspecialchars($_POST['tell_principal']));
-    $tell_secundario = $conexao->escape_string(htmlspecialchars($_POST['tell_secundario']));
-    $celular        = $conexao->escape_string(htmlspecialchars($_POST['celular']));
-    $email          = $conexao->escape_string(htmlspecialchars($_POST['e-mail']));
-    $email_secundario = $conexao->escape_string(htmlspecialchars($_POST['e-mail_secundario']));
-    $cep            = $conexao->escape_string(htmlspecialchars($_POST['cep']));
-    $estado         = $conexao->escape_string(htmlspecialchars($_POST['estado']));
-    $cidade         = $conexao->escape_string(htmlspecialchars($_POST['cidade']));
-    $bairro         = $conexao->escape_string(htmlspecialchars($_POST['bairro']));
-    $logradouro     = $conexao->escape_string(htmlspecialchars($_POST['logradouro']));
-    $num            = $_POST['num'] ? $conexao->escape_string(htmlspecialchars($_POST['num'])) : null;
-    $complemento    = $conexao->escape_string(htmlspecialchars($_POST['complemento']));
-    $observacao     = $conexao->escape_string(htmlspecialchars($_POST['observacao']));
-    $nome_mae       = $conexao->escape_string(htmlspecialchars($_POST['nome_mae']));
-
-    $tipo_pessoa    = $conexao->escape_string(htmlspecialchars($_POST['tipo_pessoa']));
-    $tipo_parte     = $conexao->escape_string(htmlspecialchars($_POST['tipo_parte']));
     $usuario        = $_SESSION['cod'];
+    $nome              = $conexao->escape_string(htmlspecialchars($_POST['nome'] ?? ''));
+    $origem            = $conexao->escape_string(htmlspecialchars($_POST['origem'] ?? ''));
+    $foto_pessoa       = '';
+    $num_doc           = $conexao->escape_string(htmlspecialchars($_POST['num_documento'] ?? ''));
+    $rg                = $conexao->escape_string(htmlspecialchars($_POST['rg'] ?? ''));
+    $dt_nascimento     = !empty($_POST['dt_nascimento']) ? $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
+    $estado_civil      = $conexao->escape_string(htmlspecialchars($_POST['estado_civil'] ?? ''));
+    $profissao         = $conexao->escape_string(htmlspecialchars($_POST['profissao'] ?? ''));
+    $pis               = $conexao->escape_string(htmlspecialchars($_POST['pis'] ?? ''));
+    $ctps              = $conexao->escape_string(htmlspecialchars($_POST['ctps'] ?? ''));
+    $sexo              = $conexao->escape_string(htmlspecialchars($_POST['sexo'] ?? ''));
+    $tell_principal    = $conexao->escape_string(htmlspecialchars($_POST['telefone_principal'] ?? ''));
+    $tell_secundario   = $conexao->escape_string(htmlspecialchars($_POST['telefone_secundario'] ?? ''));
+    $celular           = $conexao->escape_string(htmlspecialchars($_POST['celular'] ?? ''));
+    $email             = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
+    $email_secundario  = $conexao->escape_string(htmlspecialchars($_POST['email_secundario'] ?? ''));
+    $cep               = $conexao->escape_string(htmlspecialchars($_POST['cep'] ?? ''));
+    $estado            = $conexao->escape_string(htmlspecialchars($_POST['estado'] ?? ''));
+    $cidade            = $conexao->escape_string(htmlspecialchars($_POST['cidade'] ?? ''));
+    $bairro            = $conexao->escape_string(htmlspecialchars($_POST['bairro'] ?? ''));
+    $logradouro        = $conexao->escape_string(htmlspecialchars($_POST['logradouro'] ?? ''));
+    $num               = !empty($_POST['numero_casa']) ? $conexao->escape_string(htmlspecialchars($_POST['numero_casa'])) : null;
+    $complemento       = $conexao->escape_string(htmlspecialchars($_POST['complemento'] ?? ''));
+    $observacao        = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+    $nome_mae          = $conexao->escape_string(htmlspecialchars($_POST['nome_mae'] ?? ''));
+    $tipo_pessoa       = $conexao->escape_string(htmlspecialchars($_POST['tipo_pessoa'] ?? ''));
+    $tipo_parte        = $conexao->escape_string(htmlspecialchars($_POST['tipo_parte'] ?? ''));
 
 
     try {
@@ -167,6 +165,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GE
     $dados_pessoa = [];
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_parte']) && !empty($_POST['tkn']) && $_POST['acao'] == 'editar') {
+
+    $token             = $conexao->escape_string(htmlspecialchars($_POST['tkn'] ?? ''));
+    $nome              = $conexao->escape_string(htmlspecialchars($_POST['nome'] ?? ''));
+    $origem            = $conexao->escape_string(htmlspecialchars($_POST['origem'] ?? ''));
+    $foto_pessoa       = ''; // caso vá tratar foto separadamente
+    $num_doc           = $conexao->escape_string(htmlspecialchars($_POST['num_documento'] ?? ''));
+    $rg                = $conexao->escape_string(htmlspecialchars($_POST['rg'] ?? ''));
+    $dt_nascimento     = !empty($_POST['dt_nascimento']) ? $conexao->escape_string(htmlspecialchars($_POST['dt_nascimento'])) : null;
+    $estado_civil      = $conexao->escape_string(htmlspecialchars($_POST['estado_civil'] ?? ''));
+    $profissao         = $conexao->escape_string(htmlspecialchars($_POST['profissao'] ?? ''));
+    $pis               = $conexao->escape_string(htmlspecialchars($_POST['pis'] ?? ''));
+    $ctps              = $conexao->escape_string(htmlspecialchars($_POST['ctps'] ?? ''));
+    $sexo              = $conexao->escape_string(htmlspecialchars($_POST['sexo'] ?? ''));
+    $tell_principal    = $conexao->escape_string(htmlspecialchars($_POST['telefone_principal'] ?? ''));
+    $tell_secundario   = $conexao->escape_string(htmlspecialchars($_POST['telefone_secundario'] ?? ''));
+    $celular           = $conexao->escape_string(htmlspecialchars($_POST['celular'] ?? ''));
+    $email             = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
+    $email_secundario  = $conexao->escape_string(htmlspecialchars($_POST['email_secundario'] ?? ''));
+    $cep               = $conexao->escape_string(htmlspecialchars($_POST['cep'] ?? ''));
+    $estado            = $conexao->escape_string(htmlspecialchars($_POST['estado'] ?? ''));
+    $cidade            = $conexao->escape_string(htmlspecialchars($_POST['cidade'] ?? ''));
+    $bairro            = $conexao->escape_string(htmlspecialchars($_POST['bairro'] ?? ''));
+    $logradouro        = $conexao->escape_string(htmlspecialchars($_POST['logradouro'] ?? ''));
+    $num               = !empty($_POST['numero_casa']) ? $conexao->escape_string(htmlspecialchars($_POST['numero_casa'])) : null;
+    $complemento       = $conexao->escape_string(htmlspecialchars($_POST['complemento'] ?? ''));
+    $observacao        = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+    $nome_mae          = $conexao->escape_string(htmlspecialchars($_POST['nome_mae'] ?? ''));
+    $tipo_pessoa       = $conexao->escape_string(htmlspecialchars($_POST['tipo_pessoa'] ?? ''));
+    $tipo_parte        = $conexao->escape_string(htmlspecialchars($_POST['tipo_parte'] ?? ''));
+    $excluir_foto      = !empty($_POST['excluir_foto']) ? true : false; // checkbox
+
+
+    exit;
+}
 
 ?>
 
@@ -226,7 +259,7 @@ include_once('../geral/topo.php');
                 <hr>
 
                 <div class="container_field_form">
-                    <form action="" method="POST" enctype="multipart/form-data">
+                    <form action="" method="POST" enctype="multipart/form-data" id="<?php echo ($_GET['acao'] ?? '') ? 'editar' : 'cadastrar' ?>">
                         <fieldset>
                             <legend>Dados Pessoais</legend>
 
@@ -397,8 +430,9 @@ include_once('../geral/topo.php');
                                                 id="tipo_parte_cliente"
                                                 name="tipo_parte"
                                                 value="cliente"
-                                                <?php echo ($dados_pessoa['tipo_parte'] ?? '') == 'cliente' ? 'checked' : '' ?>>
+                                                <?php echo (!isset($dados_pessoa['tipo_parte']) || $dados_pessoa['tipo_parte'] === 'cliente') ? 'checked' : '' ?>>
                                         </div>
+
 
                                         <div>
                                             <label for="tipo_parte_contrario">Contrário</label>
@@ -411,12 +445,13 @@ include_once('../geral/topo.php');
                                         </div>
                                     </div>
 
-                                    <?php  if ($dados_pessoa["foto_pessoa"] !== ''): ?>
-                                    <div class="exclusao_foto" >
-                                        <label for="excluir_foto">Marque para excluir a foto</label>
-                                        <input type="checkbox" name="excluir_foto" id="excluir_foto" value="" >
-                                    </div>
-                                    <?php  endif ?>
+                                    <?php if (!empty($dados_pessoa["foto_pessoa"])): ?>
+                                        <div class="exclusao_foto">
+                                            <label for="excluir_foto">Marque para excluir a foto</label>
+                                            <input type="checkbox" name="excluir_foto" id="excluir_foto" value="sim">
+                                        </div>
+                                    <?php endif; ?>
+
 
                                 </div>
 
@@ -624,6 +659,11 @@ include_once('../geral/topo.php');
                                             maxlength="150"
                                             placeholder="EX: Visitas apenas pela manhã">
                                     </div>
+
+                                    <input type="hidden" name="acao" value="<?php echo ($_GET['acao'] ?? '') ? 'editar' : 'cadastrar' ?>">
+
+                                    <input type="hidden" name="tkn" value="<?php echo ($_GET['acao'] ?? '') ? $_GET['tkn'] : '' ?>">
+
                                 </div>
 
                             </div>
@@ -631,7 +671,7 @@ include_once('../geral/topo.php');
                         </fieldset>
 
                         <div class="container_btn_submit">
-                            <button type="submit" class="btn_cadastrar"> Cadastrar Pessoa </button>
+                            <button type="submit" class="btn_cadastrar"> <?php echo ($_GET['acao'] ?? '') ? 'Editar Pessoa' : 'Cadastrar Pessoa' ?> </button>
                         </div>
 
                     </form>
@@ -807,8 +847,10 @@ include_once('../geral/topo.php');
     <!-- Ajax para cadastro de pessoa -->
     <script>
         $(document).ready(function() {
+
+            let form = $("#cadastrar").length ? $("#cadastrar") : '';
             // Validação ao submeter o formulário
-            $('form').on('submit', function(e) {
+            $(form).on('submit', function(e) {
 
                 $('.btn_cadastrar').attr('disabled', true)
 
@@ -874,6 +916,78 @@ include_once('../geral/topo.php');
         })
     </script>
 
+    <!-- Ajax para atualização de pessoa -->
+    <script>
+        $(document).ready(function() {
+            // Validação ao submeter o formulário
+            let form = $("#editar").length ? $("#editar") : '';
+
+            $(form).on('submit', function(e) {
+
+                $('.btn_cadastrar').attr('disabled', true)
+
+                // Swal.fire({
+                //     title: "Carregando...",
+                //     didOpen: () => {
+                //         Swal.showLoading();
+                //     }
+                // });
+
+                e.preventDefault();
+
+
+                // Ajax para realizar a atualização
+                let dados_form = new FormData(this);
+                $.ajax({
+                    url: 'cadastro_pessoa.php',
+                    type: 'POST',
+                    data: dados_form,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.status === 'erro') {
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Erro",
+                                text: res.message
+                            });
+
+                            $('.btn_cadastrar').attr('disabled', false)
+
+
+                        } else if (res.status === 'success') {
+                            console.log('sucesso')
+                            Swal.close();
+
+                            // setTimeout(() => {
+                            //     Swal.fire({
+                            //         title: "Sucesso!",
+                            //         text: res.message,
+                            //         icon: "success"
+                            //     }).then((result) => {
+                            //         window.location.href = "./docs_pessoa.php?tkn=" + res.token;
+                            //     });
+                            // }, 300);
+                        }
+
+
+                    },
+                    error: function(err) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro",
+                            text: err.message,
+                        });
+                    }
+                })
+
+
+
+            });
+        })
+    </script>
 
     <!-- Busca do cep -->
     <script>
