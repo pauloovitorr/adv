@@ -16,16 +16,46 @@
   --azul-fundo: #061124;
 }
 
+html {
+  scrollbar-width: thin; 
+  scrollbar-color: #061124 #f1f1f1; 
+}
+
+/* Customização da scrollbar para Chrome, Edge e navegadores WebKit */
+html::-webkit-scrollbar {
+  width: 14px; 
+}
+
+html::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 10px; 
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #061124; 
+  border-radius: 10px; 
+  border: 2px solid #f1f1f1; 
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: #0a1b3a; 
+}
+
+
 body{
   overflow-x: hidden;
+  background-color: #f2f2f2;
 }
 
 .container_principal {
   width: calc(100% - 80px);
   min-height: calc(100vh - 90px);
   margin-left: 80px;
-  background-color: #f2f2f2;
   border: 1px solid transparent;
+}
+
+.container_topo{
+  background-color: white;
 }
 
 .pai_conteudo {

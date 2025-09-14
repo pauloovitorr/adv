@@ -293,7 +293,7 @@ include_once('../geral/topo.php');
 
                                                     <div class="opcoes_pessoa">
                                                         <ul>
-                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                            <a href="./ficha_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                             </a>
 
