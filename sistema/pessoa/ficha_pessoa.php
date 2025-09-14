@@ -10,7 +10,7 @@ $id_user = $_SESSION['cod'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pessoas/ficha_pessoa.css">
-    <title>Pessoas</title>
+    <title>Perfil Pessoa</title>
 </head>
 
 <?php
@@ -26,17 +26,19 @@ include_once('../geral/topo.php');
             <div class="page-content">
                 <!-- Header do perfil -->
                 <div class="profile-header">
-                    
+
 
                     <div class="profile-title-section">
                         <div class="profile-photo-container">
-                            <img src="/img/img_clientes/68c71cb2ea79468c71cb2ea799.jpg" alt="Foto do cliente" class="profile-photo" id="clientPhoto">
+                            <img src="../../img/user.png" alt="Foto do cliente" class="profile-photo" id="clientPhoto">
                             <div class="profile-photo-placeholder" id="photoPlaceholder" style="display: none;">
                                 <i class="fas fa-user"></i>
                             </div>
                         </div>
                         <div class="profile-info">
                             <h1 class="profile-name">PAULO VITOR SANTOS DA SILVA</h1>
+
+
                             <div class="profile-meta">
                                 <span class="profile-type">
                                     <i class="fas fa-user-tie"></i> Cliente
@@ -45,25 +47,41 @@ include_once('../geral/topo.php');
                                     <i class="fas fa-tag"></i> Indicação
                                 </span>
 
+                                <span class="profile-status active">
+                                    <i class="fas fa-circle"></i> Ativo
+                                </span>
+                            </div>
+
+
+                            <div class="profile-meta">
+
+                                <span class="profile-origin">
+                                    <i class="fas fa-file-alt"></i>
+                                    Cadastro: 10/09/2025 às 19:56
+                                </span>
+
                                 <span class="profile-origin">
                                     <i class="fas fa-file-alt"></i>
                                     Última Atualização: 10/09/2025 às 19:56
                                 </span>
 
-                                <span class="profile-status active">
-                                    <i class="fas fa-circle"></i> Ativo
-                                </span>
+
                             </div>
                         </div>
                     </div>
 
                     <div class="profile-actions">
-                        <button class="btn-secondary">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn-primary">
-                            <i class="fas fa-plus"></i> Novo Processo
-                        </button>
+                        <a href="./cadastro_pessoa.php?acao=editar&tkn=" style="text-decoration: none;">
+                            <button class="btn-secondary">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                        </a>
+
+                        <a href="./docs_pessoa.php?tkn=" style="text-decoration: none;">
+                            <button class="btn-secondary">
+                                <i class="fas fa-plus"></i> Novo Processo
+                            </button>
+                        </a>
                     </div>
                 </div>
 
@@ -86,14 +104,9 @@ include_once('../geral/topo.php');
                                 <i class="fas fa-map-marker-alt"></i> Endereço
                             </button>
                         </a>
-                        <a href="#documents">
-                            <button class="tab-item" data-tab="documents">
+                        <a href="#docs">
+                            <button class="tab-item" data-tab="docs">
                                 <i class="fas fa-file-alt"></i> Documentos
-                            </button>
-                        </a>
-                        <a href="#processes">
-                            <button class="tab-item" data-tab="processes">
-                                <i class="fas fa-briefcase"></i> Processos
                             </button>
                         </a>
 
@@ -117,6 +130,22 @@ include_once('../geral/topo.php');
                                     <div class="info-item">
                                         <label class="info-label">Sexo</label>
                                         <div class="info-value">Masculino</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <label class="info-label">CPF</label>
+                                        <div class="info-value">376.842.074-40</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <label class="info-label">RG</label>
+                                        <div class="info-value">39.735.353-4</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <label class="info-label">PIS/PASEP</label>
+                                        <div class="info-value">815.3306.386-4</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <label class="info-label">CTPS</label>
+                                        <div class="info-value">0010019581981010409</div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Estado Civil</label>
@@ -143,9 +172,7 @@ include_once('../geral/topo.php');
                                         <div class="info-value">
                                             <i class="fas fa-phone contact-icon"></i>
                                             (18) 99760-7919
-                                            <button class="btn-link">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
+
                                         </div>
                                     </div>
                                     <div class="info-item">
@@ -167,9 +194,7 @@ include_once('../geral/topo.php');
                                         <div class="info-value">
                                             <i class="fas fa-envelope contact-icon"></i>
                                             paulov.pv50@gmail.com
-                                            <button class="btn-link">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
+
                                         </div>
                                     </div>
                                     <div class="info-item">
@@ -223,46 +248,24 @@ include_once('../geral/topo.php');
                             </div>
                         </div>
 
-                        <!-- Documentos -->
-                        <div class="tab-pane" id="documents">
-                            <div class="info-grid">
-                                <div class="info-card">
-                                    <div class="info-item">
-                                        <label class="info-label">CPF</label>
-                                        <div class="info-value">376.842.074-40</div>
-                                    </div>
-                                    <div class="info-item">
-                                        <label class="info-label">RG</label>
-                                        <div class="info-value">39.735.353-4</div>
-                                    </div>
-                                    <div class="info-item">
-                                        <label class="info-label">PIS/PASEP</label>
-                                        <div class="info-value">815.3306.386-4</div>
-                                    </div>
-                                    <div class="info-item">
-                                        <label class="info-label">CTPS</label>
-                                        <div class="info-value">0010019581981010409</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Processos -->
-                        <div class="tab-pane" id="processes">
+
+                        <!-- Documentos -->
+                        <div class="tab-pane" id="docs">
                             <div class="processes-section">
                                 <div class="section-header">
-                                    <h3>Processos do Cliente</h3>
-                                    <button class="btn-primary">
-                                        <i class="fas fa-plus"></i> Novo Processo
-                                    </button>
+                                    <h3>Documentos do Cliente</h3>
+                                    <a href="./docs_pessoa.php?tkn=" style="text-decoration: none;">
+                                        <button class="btn-secondary">
+                                            <i class="fas fa-plus"></i> Novo Documento
+                                        </button>
+                                    </a>
                                 </div>
                                 <div class="empty-state">
-                                    <i class="fas fa-briefcase empty-icon"></i>
-                                    <h4>Nenhum processo cadastrado</h4>
-                                    <p>Este cliente ainda não possui processos associados.</p>
-                                    <button class="btn-primary">
-                                        <i class="fas fa-plus"></i> Criar Primeiro Processo
-                                    </button>
+                                    <i class="fa-solid fa-folder empty-icon"></i>
+                                    <h4>Nenhum documento cadastrado</h4>
+                                    <p>Este cliente ainda não possui documentos associados.</p>
+
                                 </div>
                             </div>
                         </div>
