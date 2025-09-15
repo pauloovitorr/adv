@@ -345,6 +345,73 @@ ease;
   font-weight: 500;
 }
 
+
+.lista_arquivos {
+  /* border: 1px solid red; */
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  /* margin-top: 12px; */
+}
+
+.lista_arquivos a {
+  text-decoration: none;
+  color: #333;
+}
+
+
+.doc {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #eee, #ddd);
+}
+
+.doc .img_bg_doc {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.nome_arquivo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  z-index: 1;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+
+.nome_arquivo:hover {
+  white-space: normal; 
+  overflow: visible;   
+  background: rgba(0,0,0,0.7);
+  padding: 4px 6px;
+}
+
+
+
+
+
+
 /* Responsividade */
 @media (max-width: 768px) {
   .main-content {

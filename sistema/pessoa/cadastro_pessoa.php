@@ -139,7 +139,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['tkn'])) {
 
-    $acao = $conexao->escape_string(htmlspecialchars($_GET['acao']));
     $token_pessoa  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
 
     $sql_busca_pessoa_tkn = 'SELECT * FROM pessoas where tk = ? and usuario_config_id_usuario_config = ?';
@@ -983,8 +982,8 @@ include_once('../geral/topo.php');
 
 
             // telefones
-            $('#tell_principal').mask('(99) 99999-9999')
-            $('#tell_secundario').mask('(99) 99999-9999')
+            $('#telefone_principal').mask('(99) 99999-9999')
+            $('#telefone_secundario').mask('(99) 99999-9999')
             $('#celular').mask('(99) 9999-9999')
             $('#cep').mask('99999-999')
 
