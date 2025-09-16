@@ -62,7 +62,7 @@
     }
 
     .div_opcao_menu_lat img {
-        width: 30px;
+        width: 20px;
     }
 </style>
 

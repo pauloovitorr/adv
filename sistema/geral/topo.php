@@ -291,7 +291,7 @@
     }
 </style>
 
-<div class="container_topo">
+<header class="container_topo">
 
     <div class="pai_topo">
         <div class="logo_pesquisa">
@@ -336,4 +336,4 @@
         </div>
     </div>
 
-</div>
+</header>
