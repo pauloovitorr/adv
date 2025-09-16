@@ -433,7 +433,7 @@ include_once('../geral/topo.php');
                 <?php endif ?>
 
                 <div class="etapa">
-                    <div class="num">3º</div>
+                    <div class="num"><?php echo count($dados_pessoa) > 0 ? '2°' : '3°' ?></div>
                     <div class="descricao">Finalização</div>
                 </div>
 

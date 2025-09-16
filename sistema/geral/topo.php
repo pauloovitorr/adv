@@ -1,4 +1,3 @@
-
 <!-- Css Geral e topo das páginas internas como btn add, buscar, filtrar etc... -->
 <link rel="stylesheet" href="../css/geral.css">
 <!-- <link rel="stylesheet" href="../css/topo_funcoes.css"> -->
@@ -20,11 +19,16 @@
 
 <style>
     .container_topo {
-        width: calc(100% - 80px);
         height: 90px;
-        margin-left: 80px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        width: calc(100% - 80px);
+        margin-left: 80px;
+        
     }
 
     .pai_topo {
@@ -36,6 +40,8 @@
         justify-content: space-between;
         margin: 0 auto;
     }
+
+
 
     .logo_pesquisa {
         width: 30%;
@@ -187,7 +193,7 @@
     }
 
     .opcoes_perfil ul li:hover {
-        background-color:rgb(235, 235, 235);
+        background-color: rgb(235, 235, 235);
     }
 
     /* Mostra o dropdown ao passar o mouse */
@@ -205,18 +211,24 @@
     }
 
     .btn_add button {
-        width: 100%;
-        height: 35px;
-        background-color: #378ADC;
-        border: none;
-        border-radius: 8px;
+
+        background: #4299e1;
         color: white;
-        font-size: 16px;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
         display: flex;
         align-items: center;
-        justify-content: center;
         gap: 8px;
-        cursor: pointer;
+        transition: all 0.2s ease;
+
+    }
+
+    .btn_add button :hover {
+        background: #3182ce;
     }
 
     .btn_add button img {
@@ -281,13 +293,61 @@
     }
 
     .opcoes_add ul li:hover {
-        background-color:rgb(235, 235, 235);
+        background-color: rgb(235, 235, 235);
     }
 
     .btn_add:hover .opcoes_add,
     .btn_add .opcoes_add:hover {
         opacity: 1;
         pointer-events: auto;
+    }
+
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        width: 300px;
+        height: 40px;
+        padding: 0 16px 0 40px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8f9fa;
+        font-size: 14px;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #4299e1;
+        background: white;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        font-size: 14px;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header-link {
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .notification-icon {
+        color: #a0aec0;
+        font-size: 18px;
+        cursor: pointer;
     }
 </style>
 
@@ -297,15 +357,20 @@
         <div class="logo_pesquisa">
             <img src="../../img/logo.png" alt="logo">
 
-            <div class="container_pesquisa">
-                <input type="text" placeholder="Pesquisar">
-                <div class="icone_pesquisa"><img src="../../img/icone_pesquisa.png" alt="logo"></div>
+            <div class="search-container">
+                <input type="text" placeholder="Pesquisar" class="search-input">
+                <i class="fas fa-search search-icon"></i>
             </div>
         </div>
 
+
+
         <div class="infos_menu">
-            <div class="visu_site"><a href="">Visualizar site</a></div>
-            <div class="icone_notificacao"><img src="../../img/notificacao.png" alt="icone de notificação"></div>
+
+            <div class="header-right">
+                <span class="header-link">Visualizar site</span>
+                <i class="fas fa-bell notification-icon"></i>
+            </div>
 
             <div class="btn_add">
                 <button>Adicionar <img src="../../img/seta_down.png" alt="seta para baixo"> </button>

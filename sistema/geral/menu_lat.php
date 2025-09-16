@@ -15,19 +15,29 @@
 
     .menu_lateral ul {
         list-style: none;
-        width: 90%;
+        width: 100%;
         margin: 0 auto;
         padding: 0;
     }
 
     .menu_lateral ul li {
+        height: 65px;
         display: flex;
         justify-content: center;
         /* Alinhado ao centro por padrão */
         align-items: center;
-        margin: 40px 0;
+        /* margin: 40px 0; */
         transition: justify-content .3s;
         /* Transição suave */
+    }
+
+    #painel{
+        height: 90px;
+        border-bottom: 1px solid #7070708f;
+    }
+
+    #painel > a > div > img{
+        width: 30px;
     }
 
     /* .menu_lateral:hover ul li {
@@ -40,6 +50,8 @@
         text-decoration: none;
         display: flex;
         align-items: center;
+        width: 100%;
+        height: 100%;
     }
 
     .menu_lateral ul li a p {
@@ -58,7 +70,9 @@
 
     .div_opcao_menu_lat {
         display: flex;
+        justify-content: center;
         align-items: center;
+        width: 100%;
     }
 
     .div_opcao_menu_lat img {
