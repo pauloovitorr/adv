@@ -104,7 +104,7 @@
                     <p>PESSOAS</p>
                 </div>
             </a></li>
-        <li id="processos"><a href="">
+        <li id="processos"><a href="../processo/processos.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/processos.png" alt="">
                     <p>PROCESSOS</p>
                 </div>

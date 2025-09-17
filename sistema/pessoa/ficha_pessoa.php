@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pessoas/ficha_pessoa.css">
-    <title>Perfil Pessoa</title>
+    <title>ADV Conectado</title>
 </head>
 
 <?php

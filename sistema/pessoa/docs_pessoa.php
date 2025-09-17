@@ -291,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
 
 
-    <title>Documentos</title>
+    <title>ADV Conectado</title>
 </head>
 
 <?php

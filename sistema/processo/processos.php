@@ -152,19 +152,19 @@ include_once('../geral/topo.php');
             </div>
 
             <div class="opcoes_funcoes">
-                <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Nova Pessoa </button>
+                <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Novo Processo </button>
 
                 <form action="" method="get">
 
                     <div class="div_pai_funcoes">
-                        <input type="text" id="buscar_pessoas" name="buscar_pessoas" value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>" placeholder="Buscar Por Nome">
+                        <input type="text" id="buscar_pessoas" name="buscar_pessoas" value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>" placeholder="Buscar Por Tipo de Ação">
                         <i class="fa-regular fa-pen-to-square"></i>
                     </div>
 
                     <div class="div_pai_funcoes">
                         
                         <select name="filtrar" id="filtrar">
-                            <option value="">Filtrar</option>
+                            <option value="">Filtrar Por Grupo</option>
                             <option value="cliente" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'cliente') ? 'selected' : '' ?>>Clientes</option>
                             <option value="contrário" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'contrário') ? 'selected' : '' ?>>Partes Contrárias</option>
                             <option value="com_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'com_andamento') ? 'selected' : '' ?>>Com Processo em Andamento</option>
@@ -177,7 +177,6 @@ include_once('../geral/topo.php');
                         <i class="fa-solid fa-arrow-up-wide-short"></i>
                         <select name="ordenar" id="ordenar">
                             <option value="">ordenar</option>
-                            <option value="nome" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'nome') ? 'selected' : '' ?>>Nome da Pessoa</option>
                             <option value="recentes" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'recentes') ? 'selected' : '' ?>>Mais Recentes</option>
                             <option value="antigos" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'antigos') ? 'selected' : '' ?>>Mais Antigos</option>
                         </select>
@@ -207,143 +206,76 @@ include_once('../geral/topo.php');
 
                     <thead>
                         <tr>
-                            <td>Nome</td>
-                            <td>Contato</td>
-                            <td>Logradouro/Bairro</td>
-                            <td>Data de Cadastro</td>
+                            <td>Tipo de Ação</td>
+                            <td>Grupo de ação</td>
+                            <td>Número do Processo</td>
+                            <td>Contingenciamento</td>
                             <td>Ações</td>
                         </tr>
                     </thead>
 
                     <tbody>
 
-                        <?php
+                        <tr>
 
-                        if ($res->num_rows > 0):
+                            <td colspan="5">
+                                <div class="dados_pessoa">
+                                    <div class="conteudo_pessoa container_nome">
+                                        <div class="icone">NL</div>
+                                        <div class="nome_pessoa">
+                                            <p> Nulidade de licitação </p>
+                                            <span> Paulo Vitor</span>
+                                        </div>
+                                    </div>
 
-                            while ($pessoa = mysqli_fetch_assoc($res)):
+                                    <div class="conteudo_pessoa container_contato">
+                                        <p>Administrativo</p>
+                                    </div>
 
-                        ?>
-                                <tr>
+                                    <div class="conteudo_pessoa container_cidade">
+                                        <p>5106560-00.0000.0.00.0000</p>
+                                    </div>
 
-                                    <td colspan="5">
+                                    <div class="conteudo_pessoa container_dt">
+                                        <p>Provável/Chance Alta</p>
+                                    </div>
 
-                                        <div class="dados_pessoa <?php echo $pessoa['tipo_parte'] == 'cliente' ? 'cliente' : 'contrario'  ?>">
-                                            <div class="conteudo_pessoa container_nome">
-                                                <div class="icone"><?php echo strtoupper(substr($pessoa['nome'], 0, 2)); ?></div>
-                                                <div class="nome_pessoa">
-                                                    <p> <?php echo $pessoa['nome'] ?> </p>
-                                                    <span> <?php echo $pessoa['tipo_parte'] ?> </span>
-                                                </div>
-                                            </div>
 
-                                            <div class="conteudo_pessoa container_contato">
-                                                <?php
-                                                if ($pessoa['telefone_principal']):
+                                    <div class="conteudo_pessoa container_acao">
+                                        <div class="opcoes_acao">
+                                            <i class="fa fa-ellipsis-h"></i>
 
-                                                    $telefone = $pessoa['telefone_principal'];
-
-                                                    // Remove tudo que não for número
-                                                    $telefoneLimpo = preg_replace('/\D/', '', $telefone);
-
-                                                    // Adiciona o DDI do Brasil (55) se ainda não tiver
-                                                    if (strpos($telefoneLimpo, '55') !== 0) {
-                                                        $telefoneLimpo = '55' . $telefoneLimpo;
-                                                    }
-                                                ?>
-                                                    <a href="https://wa.me/send?phone=<?= $telefoneLimpo ?>" target="__blak" class="whatsapp">
-                                                        <img src="../../img/whatsapp.png" alt="whatsapp"> <?= $pessoa['telefone_principal'] ?>
+                                            <div class="opcoes_pessoa">
+                                                <ul>
+                                                    <a href="./ficha_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                        <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                     </a>
 
-                                                <?php
-                                                else:
-                                                ?>
-                                                    <p style="font-size: 14px; color:rgb(94, 94, 94);">Não foi cadastrado</p>
+                                                    <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                        <li><i class="fa-regular fa-id-card"></i> Documentos</li>
+                                                    </a>
 
-                                                <?php
-                                                endif;
-                                                ?>
+                                                    <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                        <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
+                                                    </a>
+
+                                                    <a href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
+                                                        <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
+                                                    </a>
+
+                                                    <a href="javascript:void(0)" class="excluir_pessoa">
+                                                        <input type="hidden" class="token" value="<?php echo $pessoa['tk'] ?>">
+                                                        <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
+                                                    </a>
+                                                </ul>
                                             </div>
-
-                                            <div class="conteudo_pessoa container_cidade">
-
-                                                <?php
-                                                if ($pessoa['logradouro'] || $pessoa['bairro']):
-                                                ?>
-                                                    <p><?php echo $pessoa['logradouro'] . '/' . $pessoa['bairro'] ?></p>
-
-                                                <?php
-                                                else:
-                                                ?>
-                                                    <p style="font-size: 14px; color:rgb(94, 94, 94);">Não foi cadastrado</p>
-
-                                                <?php
-                                                endif;
-                                                ?>
-                                            </div>
-
-                                            <div class="conteudo_pessoa container_dt">
-                                                <p><?php echo date('d-m-Y', strtotime($pessoa['dt_cadastro_pessoa'])); ?></p>
-                                            </div>
-
-
-                                            <div class="conteudo_pessoa container_acao">
-                                                <div class="opcoes_acao">
-                                                    <i class="fa fa-ellipsis-h"></i>
-
-                                                    <div class="opcoes_pessoa">
-                                                        <ul>
-                                                            <a href="./ficha_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
-                                                                <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
-                                                            </a>
-
-                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
-                                                                <li><i class="fa-regular fa-id-card"></i> Documentos</li>
-                                                            </a>
-
-                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
-                                                                <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
-                                                            </a>
-
-                                                            <a href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
-                                                                <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
-                                                            </a>
-
-                                                            <a href="javascript:void(0)" class="excluir_pessoa">
-                                                                <input type="hidden" class="token" value="<?php echo $pessoa['tk'] ?>">
-                                                                <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
-                                                            </a>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
                                         </div>
-                                    </td>
-                                </tr>
 
-                            <?php
-                            endwhile;
-                        else:
-                            ?>
-
-                            <tr>
-                                <td colspan="5">
-                                    <div class="sem_pessoas">
-                                        <p>Nenhuma Pessoa Cadastrada</p>
-                                        <img src="../../img/listagem_pessoas.png" alt="" style="max-width: 200px;">
                                     </div>
-                                </td>
 
-                            </tr>
-
-                        <?php
-                        endif;
-                        ?>
-
-
-
+                                </div>
+                            </td>
+                        </tr>
 
                     </tbody>
 
@@ -380,7 +312,7 @@ include_once('../geral/topo.php');
         });
     </script>
 
-    <script>
+    <!-- <script>
         $(document).ready(function() {
             $('#add_pessoa').click(function() {
                 window.open('./cadastro_pessoa.php', '_self');
@@ -442,7 +374,7 @@ include_once('../geral/topo.php');
                 });
             })
         })
-    </script>
+    </script> -->
 
 </body>
 
