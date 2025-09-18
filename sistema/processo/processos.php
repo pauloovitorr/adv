@@ -152,7 +152,7 @@ include_once('../geral/topo.php');
             </div>
 
             <div class="opcoes_funcoes">
-                <button class="btn_adicionar" id="add_pessoa"> <i class="fa-solid fa-plus"></i> Novo Processo </button>
+                <button class="btn_adicionar" id="add_processo"> <i class="fa-solid fa-plus"></i> Novo Processo </button>
 
                 <form action="" method="get">
 
@@ -312,15 +312,15 @@ include_once('../geral/topo.php');
         });
     </script>
 
-    <!-- <script>
+    <script>
         $(document).ready(function() {
-            $('#add_pessoa').click(function() {
-                window.open('./cadastro_pessoa.php', '_self');
+            $('#add_processo').click(function() {
+                window.open('./cadastro_processo.php', '_self');
             })
         })
     </script>
 
-    <script>
+    <!-- <script>
         $(function() {
             $('.excluir_pessoa').on('click', function() {
                 let tk = $(this).find('.token').val()
