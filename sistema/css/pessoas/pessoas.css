@@ -190,7 +190,8 @@
   cursor: pointer;
 }
 
-.cliente::before {
+.cliente::before,
+.processo::before {
   content: "";
   position: absolute;
   width: 5px;

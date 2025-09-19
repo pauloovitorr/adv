@@ -130,10 +130,14 @@ fieldset legend {
   gap: 4px;
 }
 
+.container_input  label{
+  font-size: 14px;
+}
+
 .container_input select {
   height: 35px;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--preto-primario);
   border: 1px solid var(--branco-secundario);
 }
@@ -144,14 +148,14 @@ fieldset legend {
   border-radius: 5px;
   border: 1px solid var(--branco-secundario);
   padding: 4px;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--preto-primario);
 }
 
 .container_input input::placeholder,
 .custo_add_arquivo {
   color: rgb(153, 153, 153);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
 }
 

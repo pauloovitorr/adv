@@ -66,121 +66,189 @@ include_once('../geral/topo.php');
                                 <div class="container_inputs">
 
                                     <div class="container_input">
-                                        <label for="pessoa">Cliente <span style="color: red;">*</span></label>
-                                        <select name="tipo_pessoa" id="pessoa" required>
-                                            <option value="PF">Paulo Vitor</option>
-                                            <option value="">Carlos Antônio</option>
+                                        <label for="cliente">Cliente <span style="color: red;">*</span></label>
+                                        <select name="cliente" id="cliente" required>
+                                            <option value="">Selecione o Cliente</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="pessoa">Contrário</label>
-                                        <select name="tipo_pessoa" id="pessoa">
-                                            <option value="">Paulo Vitor</option>
-                                            <option value="">Carlos Antônio</option>
+                                        <label for="contrario">Contrário</label>
+                                        <select name="contrario" id="contrario">
+                                            <option value="">Selecione o Contrário</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="container_input">
+                                        <label for="grupo_acao">Grupo de Ação <span style="color: red;">*</span></label>
+                                        <select name="grupo_acao" id="grupo_acao" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="administrativo">Administrativo</option>
+                                            <option value="trabalhista">Trabalhista</option>
+                                            <option value="civil">Cível</option>
+                                            <option value="familia">Família e Sucessões</option>
+                                            <option value="previdenciario">Previdenciário</option>
+                                            <option value="tributario">Tributário</option>
+                                            <option value="consumidor">Consumidor</option>
+                                            <option value="empresarial">Empresarial</option>
+                                            <option value="penal">Penal</option>
+                                            <option value="imobiliario">Imobiliário</option>
+                                            <option value="eleitoral">Eleitoral</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="referencia">Referência</label>
+                                        <label for="tipo_acao">Tipo de Ação <span style="color: red;">*</span></label>
+                                        <select name="tipo_acao" id="tipo_acao" required>
+                                            <option value="">Selecione o grupo primeiro...</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="referencia">Referência <span style="color: red;">*</span></label>
                                         <input
                                             type="text"
                                             name="referencia"
                                             id="referencia"
                                             value=""
-                                            minlength="4"
-                                            maxlength="40"
+                                            maxlength="8"
                                             placeholder="Ex: PA_001 "
                                             required>
                                     </div>
 
-                                    <div class="container_input">
-                                        <label for="">Grupo de Ação</label>
-                                        <select name="tipo_pessoa" id="" required>
-                                            <option value="">Administrativo</option>
-                                            <option value="">Trabalhista</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="container_input">
-                                        <label for="">Tipo de Ação</label>
-                                        <select name="tipo_pessoa" id="" required>
-                                            <option value="">Nulidade de Licitação</option>
-                                        </select>
-                                    </div>
 
                                 </div>
 
                                 <div class="container_inputs">
 
                                     <div class="container_input">
-                                        <label for="referencia">Núm do Processo</label>
+                                        <label for="numero_processo">Núm do Processo</label>
                                         <input
                                             type="text"
-                                            name="referencia"
-                                            id="referencia"
+                                            name="numero_processo"
+                                            id="numero_processo"
                                             value=""
                                             minlength="4"
                                             maxlength="40"
-                                            placeholder="Ex: PA_001 "
-                                            required>
+                                            placeholder="Ex: 0001234-56.2023.8.26.0100">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="referencia">Núm do Protocolo</label>
+                                        <label for="numero_protocolo">Núm do Protocolo</label>
                                         <input
                                             type="text"
-                                            name="referencia"
-                                            id="referencia"
+                                            name="numero_protocolo"
+                                            id="numero_protocolo"
                                             value=""
                                             minlength="4"
                                             maxlength="40"
-                                            placeholder="Ex: PA_001 "
-                                            required>
+                                            placeholder="Ex: PROT_2023_00123">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="referencia">Processo Originário</label>
+                                        <label for="processo_originario">Processo Originário</label>
                                         <input
                                             type="text"
-                                            name="referencia"
-                                            id="referencia"
+                                            name="processo_originario"
+                                            id="processo_originario"
                                             value=""
                                             minlength="4"
                                             maxlength="40"
-                                            placeholder="Ex: PA_001 "
-                                            required>
+                                            placeholder="Ex: 0009876-54.2020.8.26.0100">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="referencia">Valor da Causa</label>
+                                        <label for="valor_causa">Valor da Causa</label>
                                         <input
                                             type="text"
-                                            name="referencia"
-                                            id="referencia"
+                                            name="valor_causa"
+                                            id="valor_causa"
                                             value=""
-                                            minlength="4"
-                                            maxlength="40"
-                                            placeholder="Ex: PA_001 "
-                                            required>
+                                            placeholder="Ex: 150.000,00">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="referencia">Valor dos Honorários</label>
+                                        <label for="valor_honorarios">Valor dos Honorários</label>
                                         <input
                                             type="text"
-                                            name="referencia"
-                                            id="referencia"
+                                            name="valor_honorarios"
+                                            id="valor_honorarios"
                                             value=""
-                                            minlength="4"
-                                            maxlength="40"
-                                            placeholder="Ex: PA_001 "
-                                            required>
+                                            placeholder="Ex: 30.000,00">
                                     </div>
-
-                                    
 
                                 </div>
+
+                                <div class="container_inputs">
+
+
+                                    <div class="container_input">
+                                        <label for="etapa_kanban">Etapa Kanban</label>
+                                        <select name="etapa_kanban" id="etapa_kanban" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="analise_do_caso">Análise do Caso</option>
+                                            <option value="negociacao">Negociação</option>
+                                            <option value="aguardando_documentos">Aguardando Documentos</option>
+                                            <option value="proposta">Proposta</option>
+                                            <option value="andamento">Processo em Andamento</option>
+                                            <option value="fechamento">Fechamento</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="container_input">
+                                        <label for="contingenciamento">Contingenciamento</label>
+                                        <select name="contingenciamento" id="contingenciamento" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="provável/chance alta">Provável/Chance Alta</option>
+                                            <option value="possível/talvez">Possível/Talvez</option>
+                                            <option value="remota/difícil">Remota/Difícil</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="container_input">
+                                        <label for="data_requerimento">Data Requerimento</label>
+                                        <input
+                                            type="date"
+                                            name="data_requerimento"
+                                            id="data_requerimento"
+                                            required>
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="resultado_processo">Resultado Processo</label>
+                                        <input
+                                            type="text"
+                                            name="resultado_processo"
+                                            id="resultado_processo"
+                                            value=""
+                                            minlength="4"
+                                            maxlength="100"
+                                            placeholder="Ex: Sentença favorável, acordo homologado, improcedente..."
+                                            required>
+                                    </div>
+
+                                    <div class="container_input">
+                                        <label for="observacao">Observação</label>
+                                        <input
+                                            type="text"
+                                            name="observacao"
+                                            id="observacao"
+                                            value=""
+                                            maxlength="255"
+                                            placeholder="Digite aqui alguma observação relevante">
+                                    </div>
+
+
+
+
+
+
+
+                                </div>
+
 
                                 <!-- <div class="container_inputs">
                                     <div class="container_input" id="container_dt_nascimento">
@@ -270,6 +338,169 @@ include_once('../geral/topo.php');
         </div>
     </main>
 
+
+
+    <script>
+        const tiposPorGrupo = {
+            administrativo: [{
+                    value: "nulidade_licitacao",
+                    text: "Nulidade de Licitação"
+                },
+                {
+                    value: "improbidade",
+                    text: "Improbidade Administrativa"
+                },
+                {
+                    value: "ms_administrativo",
+                    text: "Mandado de Segurança Administrativo"
+                }
+            ],
+            trabalhista: [{
+                    value: "reclamacao_trabalhista",
+                    text: "Reclamação Trabalhista"
+                },
+                {
+                    value: "verbas_rescisorias",
+                    text: "Verbas Rescisórias"
+                },
+                {
+                    value: "adicional_insalubridade",
+                    text: "Adicional de Insalubridade/Periculosidade"
+                }
+            ],
+            civil: [{
+                    value: "acao_cobranca",
+                    text: "Ação de Cobrança"
+                },
+                {
+                    value: "indenizacao_danos",
+                    text: "Indenização por Danos"
+                },
+                {
+                    value: "execucao_titulo",
+                    text: "Execução de Título Extrajudicial"
+                }
+            ],
+            familia: [{
+                    value: "divorcio",
+                    text: "Divórcio"
+                },
+                {
+                    value: "guarda_pensao",
+                    text: "Guarda e Pensão Alimentícia"
+                },
+                {
+                    value: "inventario",
+                    text: "Inventário e Partilha"
+                }
+            ],
+            previdenciario: [{
+                    value: "aposentadoria_invalidez",
+                    text: "Aposentadoria por Invalidez"
+                },
+                {
+                    value: "auxilio_doenca",
+                    text: "Auxílio-Doença"
+                },
+                {
+                    value: "pensao_morte",
+                    text: "Pensão por Morte"
+                }
+            ],
+            tributario: [{
+                    value: "execucao_fiscal",
+                    text: "Execução Fiscal"
+                },
+                {
+                    value: "ms_tributario",
+                    text: "Mandado de Segurança Tributário"
+                },
+                {
+                    value: "anulatoria_debito",
+                    text: "Ação Anulatória de Débito Fiscal"
+                }
+            ],
+            consumidor: [{
+                    value: "acao_revisional",
+                    text: "Ação Revisional de Contrato"
+                },
+                {
+                    value: "planos_saude",
+                    text: "Ação contra Planos de Saúde"
+                },
+                {
+                    value: "produto_defeituoso",
+                    text: "Indenização por Produto/Serviço Defeituoso"
+                }
+            ],
+            empresarial: [{
+                    value: "recuperacao_judicial",
+                    text: "Recuperação Judicial"
+                },
+                {
+                    value: "falencia",
+                    text: "Falência"
+                },
+                {
+                    value: "dissolucao_sociedade",
+                    text: "Dissolução de Sociedade"
+                }
+            ],
+            penal: [{
+                    value: "defesa_criminal",
+                    text: "Defesa Criminal"
+                },
+                {
+                    value: "habeas_corpus",
+                    text: "Habeas Corpus"
+                },
+                {
+                    value: "revisao_criminal",
+                    text: "Revisão Criminal"
+                }
+            ],
+            imobiliario: [{
+                    value: "despejo",
+                    text: "Despejo"
+                },
+                {
+                    value: "usucapiao",
+                    text: "Usucapião"
+                },
+                {
+                    value: "acao_renovatoria",
+                    text: "Ação Renovatória de Aluguel"
+                }
+            ],
+            eleitoral: [{
+                    value: "prestacao_contas",
+                    text: "Prestação de Contas Eleitorais"
+                },
+                {
+                    value: "aije",
+                    text: "Ação de Investigação Judicial Eleitoral (AIJE)"
+                }
+            ]
+        };
+
+        document.getElementById("grupo_acao").addEventListener("change", function() {
+            const grupoSelecionado = this.value;
+            const tipoSelect = document.getElementById("tipo_acao");
+
+            // limpa os tipos anteriores
+            tipoSelect.innerHTML = "<option value=''>Selecione...</option>";
+
+            // adiciona os tipos conforme o grupo
+            if (tiposPorGrupo[grupoSelecionado]) {
+                tiposPorGrupo[grupoSelecionado].forEach(tipo => {
+                    const option = document.createElement("option");
+                    option.value = tipo.value;
+                    option.textContent = tipo.text;
+                    tipoSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>

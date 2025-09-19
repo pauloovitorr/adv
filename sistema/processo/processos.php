@@ -208,7 +208,7 @@ include_once('../geral/topo.php');
                         <tr>
                             <td>Tipo de Ação</td>
                             <td>Grupo de ação</td>
-                            <td>Número do Processo</td>
+                            <td>Referência</td>
                             <td>Contingenciamento</td>
                             <td>Ações</td>
                         </tr>
@@ -219,7 +219,7 @@ include_once('../geral/topo.php');
                         <tr>
 
                             <td colspan="5">
-                                <div class="dados_pessoa">
+                                <div class="dados_pessoa processo">
                                     <div class="conteudo_pessoa container_nome">
                                         <div class="icone">NL</div>
                                         <div class="nome_pessoa">
@@ -232,8 +232,10 @@ include_once('../geral/topo.php');
                                         <p>Administrativo</p>
                                     </div>
 
-                                    <div class="conteudo_pessoa container_cidade">
-                                        <p>5106560-00.0000.0.00.0000</p>
+                                    
+
+                                    <div class="conteudo_pessoa container_dt">
+                                        <p>PRO_NU_02</p>
                                     </div>
 
                                     <div class="conteudo_pessoa container_dt">
