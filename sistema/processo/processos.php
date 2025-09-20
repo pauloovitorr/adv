@@ -162,7 +162,7 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="div_pai_funcoes">
-                        
+
                         <select name="filtrar" id="filtrar">
                             <option value="">Filtrar Por Grupo</option>
                             <option value="cliente" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'cliente') ? 'selected' : '' ?>>Clientes</option>
@@ -219,26 +219,26 @@ include_once('../geral/topo.php');
                         <tr>
 
                             <td colspan="5">
-                                <div class="dados_pessoa processo">
-                                    <div class="conteudo_pessoa container_nome">
-                                        <div class="icone">NL</div>
+
+                                <div class="dados_processo processo_chance_alta">
+                                    <div class="conteudo_pessoa container_tipo_acao">
+                                        <div class="icone">PA</div>
                                         <div class="nome_pessoa">
                                             <p> Nulidade de licitação </p>
-                                            <span> Paulo Vitor</span>
+                                            <span> Paulo </span>
                                         </div>
                                     </div>
 
-                                    <div class="conteudo_pessoa container_contato">
+                                    <div class="conteudo_pessoa container_grupo">
                                         <p>Administrativo</p>
+
                                     </div>
 
-                                    
-
-                                    <div class="conteudo_pessoa container_dt">
+                                    <div class="conteudo_pessoa container_ref">
                                         <p>PRO_NU_02</p>
                                     </div>
 
-                                    <div class="conteudo_pessoa container_dt">
+                                    <div class="conteudo_pessoa container_chance">
                                         <p>Provável/Chance Alta</p>
                                     </div>
 
@@ -249,24 +249,24 @@ include_once('../geral/topo.php');
 
                                             <div class="opcoes_pessoa">
                                                 <ul>
-                                                    <a href="./ficha_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                    <a href="./ficha_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
                                                         <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                     </a>
 
-                                                    <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                    <a href="./docs_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
                                                         <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                     </a>
 
-                                                    <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                    <a href="./docs_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
                                                         <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
                                                     </a>
 
-                                                    <a href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
+                                                    <a href="./cadastro_pessoa.php?acao=editar&amp;tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
                                                         <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                     </a>
 
                                                     <a href="javascript:void(0)" class="excluir_pessoa">
-                                                        <input type="hidden" class="token" value="<?php echo $pessoa['tk'] ?>">
+                                                        <input type="hidden" class="token" value="fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
                                                         <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                     </a>
                                                 </ul>
