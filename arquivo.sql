@@ -84,3 +84,29 @@ CREATE TABLE documento (
     CONSTRAINT pk_documento PRIMARY KEY (id_documento),
     CONSTRAINT fk_documento_usuario FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config (id_usuario_config)
 );
+
+
+CREATE TABLE processo (
+    id_processo INT AUTO_INCREMENT NOT NULL,
+    cliente_id INT NOT NULL,
+    contrario_id INT,
+    grupo_acao VARCHAR(80) NOT NULL,
+    tipo_acao_id VARCHAR(80) NOT NULL,
+    referencia VARCHAR(8) NOT NULL,
+    num_processo VARCHAR(50),
+    num_protocolo VARCHAR(50),
+    processo_originario VARCHAR(50),
+    valor_causa VARCHAR(16),
+    valor_honorarios VARCHAR(16),
+    etapa_kanban VARCHAR(50),
+    contingenciamento VARCHAR(50),
+    data_requerimento DATE,
+    resultado_processo VARCHAR(100),
+    observacao TEXT,
+    dt_cadastro_processo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT pk_processo PRIMARY KEY (id_processo),
+    CONSTRAINT fk_processo FOREIGN KEY (cliente_id) REFERENCES pessoas(id_pessoa)
+    
+);

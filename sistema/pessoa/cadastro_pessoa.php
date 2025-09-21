@@ -6,8 +6,8 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !empty($_POST['nome']) && !empty($_POST['origem']) && !empty($_POST['tipo_pessoa']) && $_POST['acao'] == 'cadastrar') {
 
-    $token          = bin2hex(random_bytes(64 / 2));
-    $usuario        = $_SESSION['cod'];
+    $token             = bin2hex(random_bytes(64 / 2));
+    $usuario           = $_SESSION['cod'];
     $nome              = $conexao->escape_string(htmlspecialchars($_POST['nome'] ?? ''));
     $origem            = $conexao->escape_string(htmlspecialchars($_POST['origem'] ?? ''));
     $foto_pessoa       = '';

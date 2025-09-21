@@ -243,7 +243,7 @@
 
 .nome_pessoa {
   width: 75%;
-  /* border: 1px solid red; */
+
 }
 
 .nome_pessoa p {
@@ -284,6 +284,8 @@
 
 .container_cidade p,
 .container_dt p,
+.container_grupo p,
+.container_ref p,
 .container_chance p {
   color: rgb(94, 94, 94);
   font-size: 14px;

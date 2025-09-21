@@ -4,6 +4,72 @@ include_once('../../scripts.php');
 
 $id_user = $_SESSION['cod'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty($_POST['grupo_acao']) && !empty($_POST['tipo_acao']) && !empty($_POST['referencia']) && $_POST['acao'] == 'cadastrar') {
+
+    //     $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
+    //     $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
+    //     $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
+    //     $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
+    //     $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
+    //     $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['numero_processo'] ?? ''));
+    //     $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['numero_protocolo'] ?? ''));
+    //     $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
+    //     $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
+    //     $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
+    //     $etapa_kanban        = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
+    //     $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
+    //     $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
+    //     $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
+    //     $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+    //     $acao                = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
+
+    //     $sql = "INSERT INTO processo (
+    //     cliente_id,
+    //     contrario_id,
+    //     grupo_acao,
+    //     tipo_acao_id,
+    //     referencia,
+    //     num_processo,
+    //     num_protocolo,
+    //     processo_originario,
+    //     valor_causa,
+    //     valor_honorarios,
+    //     etapa_kanban,
+    //     contingenciamento,
+    //     data_requerimento,
+    //     resultado_processo,
+    //     observacao
+    // ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    //     $stmt = $conexao->prepare($sql);
+
+    //     $stmt->bind_param(
+    //         "iisssssssssssss",
+    //         $cliente,
+    //         $contrario,
+    //         $grupo_acao,
+    //         $tipo_acao,
+    //         $referencia,
+    //         $numero_processo,
+    //         $numero_protocolo,
+    //         $processo_originario,
+    //         $valor_causa,
+    //         $valor_honorarios,
+    //         $etapa_kanban,
+    //         $contingenciamento,
+    //         $data_requerimento,
+    //         $resultado_processo,
+    //         $observacao
+    //     );
+
+    //     if ($stmt->execute()) {
+    //         echo "Processo cadastrado com sucesso! ID: " . $stmt->insert_id;
+    //     } else {
+    //         echo "Erro ao cadastrar processo: " . $stmt->error;
+    //     }
+
+    $stmt->close();
+}
 
 ?>
 
@@ -69,6 +135,7 @@ include_once('../geral/topo.php');
                                         <label for="cliente">Cliente <span style="color: red;">*</span></label>
                                         <select name="cliente" id="cliente" required>
                                             <option value="">Selecione o Cliente</option>
+                                            <option value="73">Paulo Vitor</option>
                                         </select>
                                     </div>
 
@@ -76,6 +143,7 @@ include_once('../geral/topo.php');
                                         <label for="contrario">Contrário</label>
                                         <select name="contrario" id="contrario">
                                             <option value="">Selecione o Contrário</option>
+                                            <option value="84">Fernanda</option>
                                         </select>
                                     </div>
 
@@ -242,86 +310,16 @@ include_once('../geral/topo.php');
                                     </div>
 
 
-
-
-
-
-
                                 </div>
 
-
-                                <!-- <div class="container_inputs">
-                                    <div class="container_input" id="container_dt_nascimento">
-                                        <label for="dt_nascimento">Data de nascimento</label>
-                                        <input
-                                            type="date"
-                                            name="dt_nascimento"
-                                            id="dt_nascimento"
-                                            value="<?php echo htmlspecialchars($dados_pessoa['dt_nascimento'] ?? '') ?>">
-                                    </div>
-
-                                    <div class="container_input">
-                                        <label for="profissao">Profissão</label>
-                                        <input
-                                            type="text"
-                                            name="profissao"
-                                            id="profissao"
-                                            value="<?php echo htmlspecialchars($dados_pessoa['profissao'] ?? '') ?>"
-                                            minlength="4"
-                                            maxlength="40"
-                                            placeholder="EX: Autônomo">
-                                    </div>
-
-                                    <div class="container_input" id="container_ctps">
-                                        <label for="ctps">CTPS</label>
-                                        <input
-                                            type="text"
-                                            name="ctps"
-                                            id="ctps"
-                                            value="<?php echo htmlspecialchars($dados_pessoa['ctps'] ?? '') ?>"
-                                            minlength="4"
-                                            maxlength="40"
-                                            placeholder="Carteira de trabalho">
-                                    </div>
-
-                                    <div class="container_input" id="container_pis">
-                                        <label for="pis">PIS/PASEP</label>
-                                        <input
-                                            type="text"
-                                            name="pis"
-                                            id="pis"
-                                            value="<?php echo htmlspecialchars($dados_pessoa['pis'] ?? '') ?>"
-                                            minlength="11"
-                                            maxlength="14"
-                                            placeholder="999.9999.999-9">
-                                    </div>
-
-                                    <div class="container_input">
-                                        <label for="origem">Origem <span style="color: red;">*</span></label>
-                                        <select name="origem" id="origem" required>
-                                            <option value="">Selecione a origem</option>
-                                            <option value="Escritório" <?php echo ($dados_pessoa['origem'] ?? '') == 'Escritório' ? 'selected' : '' ?>>Escritório</option>
-                                            <option value="Indicação" <?php echo ($dados_pessoa['origem'] ?? '') == 'Indicação' ? 'selected' : '' ?>>Indicação</option>
-                                            <option value="Anúncio" <?php echo ($dados_pessoa['origem'] ?? '') == 'Anúncio' ? 'selected' : '' ?>>Anúncio</option>
-                                            <option value="Facebook" <?php echo ($dados_pessoa['origem'] ?? '') == 'Facebook' ? 'selected' : '' ?>>Facebook</option>
-                                        </select>
-                                    </div>
-                                </div> -->
-
-
-
+                                <input type="hidden" name="acao" value="<?php echo ($_GET['acao'] ?? '') ? 'editar' : 'cadastrar' ?>">
 
                             </div>
 
-
-
-
                         </fieldset>
 
-
-
                         <div class="container_btn_submit">
-                            <button type="submit" class="btn_cadastrar"> <?php echo ($_GET['acao'] ?? '') ? 'Editar Pessoa' : 'Cadastrar Pessoa' ?> </button>
+                            <button type="submit" class="btn_cadastrar"> <?php echo ($_GET['acao'] ?? '') ? 'Editar Processo' : 'Cadastrar Processo' ?> </button>
                         </div>
 
                     </form>
@@ -771,36 +769,54 @@ include_once('../geral/topo.php');
     </script> -->
 
 
-    <!-- jQuery primeiro -->
-    <!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> -->
-    <!-- Depois Select2 -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 
-    <!-- Só depois seus scripts -->
-    <!-- <script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
         $(document).ready(function() {
-            $('#usuarios').select2({
-                placeholder: "Digite para buscar usuário",
-                minimumInputLength: 3, // só faz a busca a partir de 2 caracteres
+            $('#cliente').select2({
+                placeholder: "Selecione o Cliente",
+                minimumInputLength: 1, // Só busca AJAX após digitar 1 caractere
                 ajax: {
-                    url: 'buscar_usuarios.php', // seu endpoint em PHP
-                    type: 'GET', // ou 'POST'
+                    url: 'buscar_usuarios.php', // Seu endpoint (comente se ainda não estiver pronto)
+                    type: 'GET',
                     dataType: 'json',
-                    delay: 250, // atraso para não fazer várias requisições rápidas
+                    delay: 250,
                     data: function(params) {
                         return {
-                            q: params.term // termo digitado pelo usuário
+                            q: params.term // Parâmetro de busca
                         };
                     },
                     processResults: function(data) {
                         return {
-                            results: data
+                            results: data // Assume que o PHP retorna array como [{id: x, text: 'Nome'}]
                         };
                     }
                 }
             });
         });
-    </script> -->
+    </script>
+
+
+
+    <style>
+        .select2-container .select2-selection--single {
+            height: 35px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: var(--preto-primario) !important;
+            border: 1px solid var(--branco-secundario) !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 32px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 32px !important;
+        }
+    </style>
 
 </body>
 
