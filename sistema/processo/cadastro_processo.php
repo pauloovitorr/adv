@@ -4,8 +4,29 @@ include_once('../../scripts.php');
 
 $id_user = $_SESSION['cod'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_pessoa'])) {
+
+    $nome               = $conexao->escape_string(htmlspecialchars($_POST['busca_pessoa'] ?? ''));
+    $sql_busca_pessoa   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user;";
+
+    $res = $conexao->query($sql_busca_pessoa);
+
+    $pessoa_localizadas = [];
+
+    while ($pessoa = $res->fetch_assoc()) {
+        array_push($pessoa_localizadas, $pessoa);
+    }
+
+    echo json_encode($pessoa_localizadas);
+
+    $conexao->close();
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty($_POST['grupo_acao']) && !empty($_POST['tipo_acao']) && !empty($_POST['referencia']) && $_POST['acao'] == 'cadastrar') {
 
+
+    // var_dump($_POST);
     //     $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
     //     $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
     //     $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
@@ -68,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     //         echo "Erro ao cadastrar processo: " . $stmt->error;
     //     }
 
-    $stmt->close();
+    // $stmt->close();
 }
 
 ?>
@@ -135,7 +156,7 @@ include_once('../geral/topo.php');
                                         <label for="cliente">Cliente <span style="color: red;">*</span></label>
                                         <select name="cliente" id="cliente" required>
                                             <option value="">Selecione o Cliente</option>
-                                            <option value="73">Paulo Vitor</option>
+
                                         </select>
                                     </div>
 
@@ -252,7 +273,7 @@ include_once('../geral/topo.php');
 
 
                                     <div class="container_input">
-                                        <label for="etapa_kanban">Etapa Kanban</label>
+                                        <label for="etapa_kanban">Etapa Kanban <span style="color: red;">*</span></label>
                                         <select name="etapa_kanban" id="etapa_kanban" required>
                                             <option value="">Selecione...</option>
                                             <option value="analise_do_caso">Análise do Caso</option>
@@ -266,7 +287,7 @@ include_once('../geral/topo.php');
 
 
                                     <div class="container_input">
-                                        <label for="contingenciamento">Contingenciamento</label>
+                                        <label for="contingenciamento">Contingenciamento <span style="color: red;">*</span></label>
                                         <select name="contingenciamento" id="contingenciamento" required>
                                             <option value="">Selecione...</option>
                                             <option value="provável/chance alta">Provável/Chance Alta</option>
@@ -281,8 +302,7 @@ include_once('../geral/topo.php');
                                         <input
                                             type="date"
                                             name="data_requerimento"
-                                            id="data_requerimento"
-                                            required>
+                                            id="data_requerimento">
                                     </div>
 
                                     <div class="container_input">
@@ -294,8 +314,7 @@ include_once('../geral/topo.php');
                                             value=""
                                             minlength="4"
                                             maxlength="100"
-                                            placeholder="Ex: Sentença favorável, acordo homologado, improcedente..."
-                                            required>
+                                            placeholder="Ex: Sentença favorável, acordo homologado, improcedente...">
                                     </div>
 
                                     <div class="container_input">
@@ -774,30 +793,44 @@ include_once('../geral/topo.php');
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#cliente').select2({
-                placeholder: "Selecione o Cliente",
-                minimumInputLength: 1, // Só busca AJAX após digitar 1 caractere
-                ajax: {
-                    url: 'buscar_usuarios.php', // Seu endpoint (comente se ainda não estiver pronto)
-                    type: 'GET',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term // Parâmetro de busca
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data // Assume que o PHP retorna array como [{id: x, text: 'Nome'}]
-                        };
-                    }
+        $('#cliente').select2({
+            placeholder: "Selecione o Cliente",
+            minimumInputLength: 2,
+            language: {
+                inputTooShort: function(args) {
+                    var remainingChars = args.minimum - args.input.length;
+                    return "Digite " + remainingChars + " ou mais caracteres";
+                },
+                noResults: function() {
+                    return "Nenhum resultado encontrado";
+                },
+                searching: function() {
+                    return "Buscando...";
                 }
-            });
+            },
+            ajax: {
+                url: 'cadastro_processo.php',
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        busca_pessoa: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id_pessoa,
+                                text: item.nome
+                            };
+                        })
+                    };
+                }
+            }
         });
     </script>
-
 
 
     <style>
