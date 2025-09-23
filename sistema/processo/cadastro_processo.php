@@ -4,92 +4,125 @@ include_once('../../scripts.php');
 
 $id_user = $_SESSION['cod'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_pessoa'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_cliente'])) {
 
-    $nome               = $conexao->escape_string(htmlspecialchars($_POST['busca_pessoa'] ?? ''));
-    $sql_busca_pessoa   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user;";
-
-    $res = $conexao->query($sql_busca_pessoa);
-
+    $nome               = $conexao->escape_string(htmlspecialchars($_POST['busca_cliente'] ?? ''));
     $pessoa_localizadas = [];
 
-    while ($pessoa = $res->fetch_assoc()) {
-        array_push($pessoa_localizadas, $pessoa);
+    if ($nome !== 'padrao' &&  !empty($nome)) {
+        $sql_busca_cliente   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $res = $conexao->query($sql_busca_cliente);
+
+        while ($pessoa = $res->fetch_assoc()) {
+            array_push($pessoa_localizadas, $pessoa);
+        }
+    } else {
+        $sql_busca_cliente   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente'  AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $res = $conexao->query($sql_busca_cliente);
+
+        while ($pessoa = $res->fetch_assoc()) {
+            array_push($pessoa_localizadas, $pessoa);
+        }
     }
 
     echo json_encode($pessoa_localizadas);
+    $conexao->close();
+    exit;
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_contrario'])) {
 
+    $nome               = $conexao->escape_string(htmlspecialchars($_POST['busca_contrario'] ?? ''));
+    $pessoa_localizadas = [];
+
+    if ($nome !== 'padrao' &&  !empty($nome)) {
+        $sql_busca_contrario   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'contrário' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $res = $conexao->query($sql_busca_contrario);
+
+        while ($pessoa = $res->fetch_assoc()) {
+            array_push($pessoa_localizadas, $pessoa);
+        }
+    } else {
+        $sql_busca_contrario   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'contrário'  AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $res = $conexao->query($sql_busca_contrario);
+
+        while ($pessoa = $res->fetch_assoc()) {
+            array_push($pessoa_localizadas, $pessoa);
+        }
+    }
+
+    echo json_encode($pessoa_localizadas);
     $conexao->close();
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty($_POST['grupo_acao']) && !empty($_POST['tipo_acao']) && !empty($_POST['referencia']) && $_POST['acao'] == 'cadastrar') {
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty($_POST['grupo_acao']) && !empty($_POST['tipo_acao']) && !empty($_POST['referencia']) && !empty($_POST['etapa_kanban']) && !empty($_POST['contingenciamento']) && $_POST['acao'] == 'cadastrar') {
 
 
     // var_dump($_POST);
-    //     $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
-    //     $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
-    //     $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
-    //     $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
-    //     $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
-    //     $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['numero_processo'] ?? ''));
-    //     $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['numero_protocolo'] ?? ''));
-    //     $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
-    //     $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
-    //     $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
-    //     $etapa_kanban        = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
-    //     $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
-    //     $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
-    //     $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
-    //     $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
-    //     $acao                = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
+        $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
+        $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
+        $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
+        $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
+        $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
+        $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['numero_processo'] ?? ''));
+        $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['numero_protocolo'] ?? ''));
+        $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
+        $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
+        $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
+        $etapa_kanban        = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
+        $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
+        $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
+        $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
+        $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+        $acao                = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
 
-    //     $sql = "INSERT INTO processo (
-    //     cliente_id,
-    //     contrario_id,
-    //     grupo_acao,
-    //     tipo_acao_id,
-    //     referencia,
-    //     num_processo,
-    //     num_protocolo,
-    //     processo_originario,
-    //     valor_causa,
-    //     valor_honorarios,
-    //     etapa_kanban,
-    //     contingenciamento,
-    //     data_requerimento,
-    //     resultado_processo,
-    //     observacao
-    // ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO processo (
+        cliente_id,
+        contrario_id,
+        grupo_acao,
+        tipo_acao_id,
+        referencia,
+        num_processo,
+        num_protocolo,
+        processo_originario,
+        valor_causa,
+        valor_honorarios,
+        etapa_kanban,
+        contingenciamento,
+        data_requerimento,
+        resultado_processo,
+        observacao
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    //     $stmt = $conexao->prepare($sql);
+        $stmt = $conexao->prepare($sql);
 
-    //     $stmt->bind_param(
-    //         "iisssssssssssss",
-    //         $cliente,
-    //         $contrario,
-    //         $grupo_acao,
-    //         $tipo_acao,
-    //         $referencia,
-    //         $numero_processo,
-    //         $numero_protocolo,
-    //         $processo_originario,
-    //         $valor_causa,
-    //         $valor_honorarios,
-    //         $etapa_kanban,
-    //         $contingenciamento,
-    //         $data_requerimento,
-    //         $resultado_processo,
-    //         $observacao
-    //     );
+        $stmt->bind_param(
+            "iisssssssssssss",
+            $cliente,
+            $contrario,
+            $grupo_acao,
+            $tipo_acao,
+            $referencia,
+            $numero_processo,
+            $numero_protocolo,
+            $processo_originario,
+            $valor_causa,
+            $valor_honorarios,
+            $etapa_kanban,
+            $contingenciamento,
+            $data_requerimento,
+            $resultado_processo,
+            $observacao
+        );
 
-    //     if ($stmt->execute()) {
-    //         echo "Processo cadastrado com sucesso! ID: " . $stmt->insert_id;
-    //     } else {
-    //         echo "Erro ao cadastrar processo: " . $stmt->error;
-    //     }
+        if ($stmt->execute()) {
+            echo "Processo cadastrado com sucesso! ID: " . $stmt->insert_id;
+        } else {
+            echo "Erro ao cadastrar processo: " . $stmt->error;
+        }
 
-    // $stmt->close();
+    $stmt->close();
 }
 
 ?>
@@ -219,7 +252,7 @@ include_once('../geral/topo.php');
                                             id="numero_processo"
                                             value=""
                                             minlength="4"
-                                            maxlength="40"
+                                            maxlength="25"
                                             placeholder="Ex: 0001234-56.2023.8.26.0100">
                                     </div>
 
@@ -231,7 +264,7 @@ include_once('../geral/topo.php');
                                             id="numero_protocolo"
                                             value=""
                                             minlength="4"
-                                            maxlength="40"
+                                            maxlength="25"
                                             placeholder="Ex: PROT_2023_00123">
                                     </div>
 
@@ -243,7 +276,7 @@ include_once('../geral/topo.php');
                                             id="processo_originario"
                                             value=""
                                             minlength="4"
-                                            maxlength="40"
+                                            maxlength="25"
                                             placeholder="Ex: 0009876-54.2020.8.26.0100">
                                     </div>
 
@@ -276,11 +309,14 @@ include_once('../geral/topo.php');
                                         <label for="etapa_kanban">Etapa Kanban <span style="color: red;">*</span></label>
                                         <select name="etapa_kanban" id="etapa_kanban" required>
                                             <option value="">Selecione...</option>
-                                            <option value="analise_do_caso">Análise do Caso</option>
-                                            <option value="negociacao">Negociação</option>
-                                            <option value="aguardando_documentos">Aguardando Documentos</option>
-                                            <option value="proposta">Proposta</option>
-                                            <option value="andamento">Processo em Andamento</option>
+                                            <option value="Análise do Caso">Análise do Caso</option>
+                                            <option value="Negociação">Negociação</option>
+                                            <option value="Aguardando Documentos">Aguardando Documentos</option>
+                                            <option value="Proposta">Proposta</option>
+                                            <option value="Ação Protocolada">Ação Protocolada</option>
+                                            <option value="Aguardando Audiência ">Aguardando Audiência </option>
+                                            <option value="Aguardando Julgamento">Aguardando Julgamento </option>
+                                            <option value="Desenvolvendo Recurso">Desenvolvendo Recurso </option>
                                             <option value="fechamento">Fechamento</option>
                                         </select>
                                     </div>
@@ -356,7 +392,7 @@ include_once('../geral/topo.php');
     </main>
 
 
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         const tiposPorGrupo = {
             administrativo: [{
@@ -521,125 +557,31 @@ include_once('../geral/topo.php');
 
 
     <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
-    <!-- <script>
+    <script>
         $(document).ready(function() {
 
             // mascaras campos
-
-            // mascara nome e nome mae
-            $('#nome_pessoa').on('input', function() {
-                const valor = $(this).val();
-                // Filtrar apenas letras e acentos
-                const valorFiltrado = valor.replace(/[^a-zA-ZÀ-ÖÙ-öù-ÿ\s]/g, '');
-                $(this).val(valorFiltrado);
-            });
-
-            $('#nome_mae').on('input', function() {
-                const valor = $(this).val();
-                // Filtrar apenas letras e acentos
-                const valor_digitado = valor.replace(/[^a-zA-ZÀ-ÖÙ-öù-ÿ\s]/g, '');
-                $(this).val(valor_digitado);
-            });
-
-            $('#cidade').on('input', function() {
-                const valor = $(this).val();
-                // Filtrar apenas letras e acentos
-                const valor_digitado = valor.replace(/[^a-zA-ZÀ-ÖÙ-öù-ÿ\s]/g, '');
-                $(this).val(valor_digitado);
-            });
-
-            var CpfCnMaskBehavior = function(val) {
-                var len = val.replace(/\D/g, '').length;
-                if (len <= 11) {
-                    return '000.000.000-009';
-                }
-                return '00.000.000/0000-00';
-            };
-
-            // CPF/CNPJ
-            var cpfCnpjpOptions = {
-                onKeyPress: function(val, e, field, options) {
-                    field.mask(CpfCnpjMaskBehavior.apply({}, arguments), options);
-                },
-                onComplete: function(val, e, field, options) {
-                    var len = val.replace(/\D/g, '').length;
-                    if (len === 11) {
-                        $(field).mask('000.000.000-00');
-                    } else if (len === 14) {
-                        $(field).mask('00.000.000/0000-00');
-                    }
-                }
-            };
-
-            $('#num_doc').mask(CpfCnpjMaskBehavior, cpfCnpjpOptions);
-
-            // Remove a máscara antes de enviar o formulário (opcional)
-            // $('form').on('submit', function() {
-            //     var documento = $('#num_doc').val();
-            //     $('#num_doc').val(documento.replace(/[^\d]+/g, ''));
-            // });
-
-
-            // data de nascimento
             const hoje = new Date(); // Data atual
             const ano = hoje.getFullYear();
             const mes = String(hoje.getMonth() + 1).padStart(2, '0'); // Mês atual (ajustado para 0-11)
             const dia = String(hoje.getDate()).padStart(2, '0'); // Dia atual
-
             const dataMaxima = `${ano}-${mes}-${dia}`;
+            $('#data_requerimento').attr('max', dataMaxima);
 
-            // Define o atributo 'max' no campo de data
-            $('#dt_nascimento').attr('max', dataMaxima);
-
-            // pis
-            $('#pis').mask('999.9999.999-9');
-
-            // valida foto
-            // Valida foto
-            $('#foto').on('change', function() {
-                const file = this.files[0]; // Obtém o primeiro arquivo selecionado
-                const fileName = file.name.toLowerCase(); // Nome do arquivo em minúsculas
-                const allowedExtensions = ['.jpg', '.jpeg', '.png']; // Extensões permitidas
-
-                // Verifica se a extensão do arquivo está na lista permitida
-                const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
-
-                if (!isValid) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Arquivo Inválido",
-                        text: "Por favor, selecione um arquivo de imagem válido (JPG, JPEG, PNG).",
-                    });
-                    $(this).val(''); // Reseta o campo de input
-                    $('#nome-arquivo').text('Selecione o arquivo'); // Volta para o texto padrão
-                    $('.custo_add_arquivo').css('color', 'rgb(153, 153, 153)')
-                } else {
-                    // Atualiza o texto com o nome do arquivo selecionado
-                    $('#nome-arquivo').text(file.name);
-                    $('.custo_add_arquivo').css('color', '#141414')
-                }
-            });
-
-
-            // telefones
-            $('#telefone_principal').mask('(99) 99999-9999')
-            $('#telefone_secundario').mask('(99) 99999-9999')
-            $('#celular').mask('(99) 9999-9999')
-            $('#cep').mask('99999-999')
-
-            // num casa
-            $('#num').on('input', function() {
-                // Permite apenas números
-                this.value = this.value.replace(/\D/g, '');
-
-                // Limita a 6 caracteres
-                if (this.value.length > 6) {
-                    this.value = this.value.slice(0, 6);
-                }
-            });
+            $('#numero_processo').mask('0000000-00.0000.0.00.0000');
+            $('#processo_originario').mask('0000000-00.0000.0.00.0000');
+            $('#valor_causa').mask('000.000.000,00', {reverse: true});
+            $('#valor_honorarios').mask('000.000.000,00', {reverse: true});
 
         });
-    </script> -->
+    </script>
+
+
+
+
+
+
+
     <!-- Ajax para cadastro de pessoa -->
     <!-- <script>
         $(document).ready(function() {
@@ -788,8 +730,6 @@ include_once('../geral/topo.php');
     </script> -->
 
 
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
@@ -815,7 +755,45 @@ include_once('../geral/topo.php');
                 delay: 250,
                 data: function(params) {
                     return {
-                        busca_pessoa: params.term
+                        busca_cliente: params.term || 'padrao'
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id_pessoa,
+                                text: item.nome
+                            };
+                        })
+                    };
+                }
+            }
+        });
+
+        $('#contrario').select2({
+            placeholder: "Selecione o Contrário",
+            minimumInputLength: 2,
+            language: {
+                inputTooShort: function(args) {
+                    var remainingChars = args.minimum - args.input.length;
+                    return "Digite " + remainingChars + " ou mais caracteres";
+                },
+                noResults: function() {
+                    return "Nenhum resultado encontrado";
+                },
+                searching: function() {
+                    return "Buscando...";
+                }
+            },
+            ajax: {
+                url: 'cadastro_processo.php',
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        busca_contrario: params.term || 'padrao'
                     };
                 },
                 processResults: function(data) {
