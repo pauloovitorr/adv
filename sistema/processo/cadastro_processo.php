@@ -60,8 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
 
     // var_dump($_POST);
+        
         $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
         $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
+        $token               = bin2hex(random_bytes(64 / 2));
         $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
         $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
         $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
@@ -80,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         $sql = "INSERT INTO processo (
         cliente_id,
         contrario_id,
+        tk,
         grupo_acao,
         tipo_acao_id,
         referencia,
@@ -92,15 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         contingenciamento,
         data_requerimento,
         resultado_processo,
-        observacao
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        observacao,
+        usuario_config_id_usuario_config
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
         $stmt = $conexao->prepare($sql);
 
         $stmt->bind_param(
-            "iisssssssssssss",
+            "iisssssssssssssss",
             $cliente,
             $contrario,
+            $token,
             $grupo_acao,
             $tipo_acao,
             $referencia,
@@ -113,7 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
             $contingenciamento,
             $data_requerimento,
             $resultado_processo,
-            $observacao
+            $observacao,
+            $id_user
         );
 
         if ($stmt->execute()) {
@@ -123,6 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         }
 
     $stmt->close();
+    header('Location:'. "./docs_processo.php?tkn=$token");
+
 }
 
 ?>
@@ -154,7 +162,7 @@ include_once('../geral/topo.php');
                     <div class="descricao color_selecionado">Cadastro</div>
                 </div>
 
-                <div class="separador"></div>
+                <div class="separador bg_selecionado"></div>
                 <div class="etapa">
                     <div class="num">2º</div>
                     <div class="descricao">Documentos</div>

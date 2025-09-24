@@ -162,7 +162,7 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="div_pai_funcoes">
-                        
+
                         <select name="filtrar" id="filtrar">
                             <option value="">Filtrar</option>
                             <option value="cliente" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'cliente') ? 'selected' : '' ?>>Clientes</option>
@@ -228,7 +228,10 @@ include_once('../geral/topo.php');
 
                                     <td colspan="5">
 
-                                        <div class="dados_pessoa <?php echo $pessoa['tipo_parte'] == 'cliente' ? 'cliente' : 'contrario'  ?>">
+                                        <div
+                                            class="dados_pessoa <?php echo ($pessoa['tipo_parte'] === 'cliente' ? 'cliente' : 'contrario'); ?>"
+                                            onclick="window.location.href='./ficha_pessoa.php?tkn=<?php echo $pessoa['tk']; ?>'">
+
                                             <div class="conteudo_pessoa container_nome">
                                                 <div class="icone"><?php echo strtoupper(substr($pessoa['nome'], 0, 2)); ?></div>
                                                 <div class="nome_pessoa">

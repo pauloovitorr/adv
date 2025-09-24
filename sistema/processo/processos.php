@@ -4,19 +4,19 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-//     $sql_quantidade_pessoas = "SELECT 
-//     COUNT(*) AS total_pessoas,
-//     COUNT(CASE WHEN tipo_parte = 'cliente' THEN 1 END) AS total_clientes,
-//     COUNT(CASE WHEN tipo_parte = 'contrário' THEN 1 END) AS total_contrarias
-// FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
-// ";
-//     $res_qtd = $conexao->query($sql_quantidade_pessoas);
-//     if ($res_qtd->num_rows == 1) {
-//         $res_qtd = mysqli_fetch_assoc($res_qtd);
-//         $total = $res_qtd["total_pessoas"];
-//         $cliente = $res_qtd["total_clientes"];
-//         $contrario = $res_qtd["total_contrarias"];
-//     }
+    $sql_quantidade_pessoas = "SELECT 
+    COUNT(*) AS total_pessoas,
+    COUNT(CASE WHEN tipo_parte = 'cliente' THEN 1 END) AS total_clientes,
+    COUNT(CASE WHEN tipo_parte = 'contrário' THEN 1 END) AS total_contrarias
+FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
+";
+    $res_qtd = $conexao->query($sql_quantidade_pessoas);
+    if ($res_qtd->num_rows == 1) {
+        $res_qtd = mysqli_fetch_assoc($res_qtd);
+        $total = $res_qtd["total_pessoas"];
+        $cliente = $res_qtd["total_clientes"];
+        $contrario = $res_qtd["total_contrarias"];
+    }
 
     if (count($_GET) > 0) {
         $nome    = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;

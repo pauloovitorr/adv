@@ -3,48 +3,49 @@
 include_once('../../scripts.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['tkn'])) {
-    header('location:' . './pessoas.php');
+    header('location:' . './processos.php');
 }
 
 $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['tkn'])) {
-    $token_pessoa = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
-    $sql_busca_pessoa_tkn = 'SELECT id_pessoa FROM pessoas where tk = ? and usuario_config_id_usuario_config = ?';
-    $stmt = $conexao->prepare($sql_busca_pessoa_tkn);
-    $stmt->bind_param('si', $token_pessoa, $id_user);
+    $token_processo = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
+    $sql_busca_processo_tkn = 'SELECT id_processo FROM processo where tk = ? and usuario_config_id_usuario_config = ?';
+    $stmt = $conexao->prepare($sql_busca_processo_tkn);
+    $stmt->bind_param('si', $token_processo, $id_user);
     $stmt->execute();
 
     $result = $stmt->get_result();
-
+  
     if ($result->num_rows == 1) {
-        $res_pessoa_tkn = $result->fetch_assoc();
-        $id_pessoa = $res_pessoa_tkn['id_pessoa'];
-        $sql_busca_docs = "SELECT * FROM documento where id_pessoa = $id_pessoa and usuario_config_id_usuario_config = $id_user";
+        $res_processo_tkn = $result->fetch_assoc();
+        
+        $id_processo = $res_processo_tkn['id_processo'];
+        $sql_busca_docs = "SELECT * FROM documento_processo where id_processo = $id_processo and usuario_config_id_usuario_config = $id_user";
 
         $lista_docs = $conexao->query($sql_busca_docs);
         $conexao->close();
     } else {
-        header('location: ./pessoas.php');
+        header('location: ./processos.php');
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 
-    $token_pessoa = $conexao->escape_string(htmlspecialchars($_POST['tkn']));
-    $sql_busca_pessoa_tkn = 'SELECT id_pessoa FROM pessoas where tk = ? and usuario_config_id_usuario_config = ?';
-    $stmt = $conexao->prepare($sql_busca_pessoa_tkn);
-    $stmt->bind_param('si', $token_pessoa, $id_user);
+    $token_processo = $conexao->escape_string(htmlspecialchars($_POST['tkn']));
+    $sql_busca_processo_tkn = 'SELECT id_processo FROM processo where tk = ? and usuario_config_id_usuario_config = ?';
+    $stmt = $conexao->prepare($sql_busca_processo_tkn);
+    $stmt->bind_param('si', $token_processo, $id_user);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows == 1) {
-        $res_pessoa_tkn = $result->fetch_assoc();
-        $id_pessoa = $res_pessoa_tkn['id_pessoa'];
+        $res_processo_tkn = $result->fetch_assoc();
+        $id_processo = $res_processo_tkn['id_processo'];
     } else {
         $res = [
             'status' => 'erro',
-            'message' => 'Pessoa responsável pelo documentato não foi encontrada no sistema!'
+            'message' => 'Processo vinculado ao documentato não foi encontrada no sistema!'
         ];
         http_response_code(404);
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
@@ -52,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
         exit;
     }
 
+
+  
 
     $arquivo = $_FILES['file'];
 
@@ -61,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     $tamanhoArquivo = $arquivo['size'];
     $novo_nome_arquivo = uniqid() . date('now') . '.' . $extensao_arquivo;
 
-    $caminho = '../geral/docs/pessoas/' . $novo_nome_arquivo;
+    $caminho = '../geral/docs/processos/' . $novo_nome_arquivo;
 
     $conexao->begin_transaction();
 
@@ -96,14 +99,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 
                 $ip = $_SERVER['REMOTE_ADDR'];
 
-                $sql_docs = "INSERT INTO documento (nome_original, caminho_arquivo, dt_criacao, id_pessoa, usuario_config_id_usuario_config) VALUES (?, ?, NOW(),?,?)";
+                $sql_docs = "INSERT INTO documento_processo (nome_original, caminho_arquivo, dt_criacao, id_processo, usuario_config_id_usuario_config) VALUES (?, ?, NOW(),?,?)";
 
                 $stmt = $conexao->prepare($sql_docs);
-                $stmt->bind_param("ssii", $nome_arquivo, $caminho, $id_pessoa, $id_user);
+                $stmt->bind_param("ssii", $nome_arquivo, $caminho, $id_processo, $id_user);
 
                 if ($stmt->execute()) {
 
-                    if (cadastro_log('Cadastrou Documento na Pessoa', $nome_arquivo, $ip, $id_user)) {
+                    if (cadastro_log('Cadastrou Documento no Processo', $nome_arquivo, $ip, $id_user)) {
 
                         $res = [
                             'status' => 'success',
@@ -183,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
             // Busca os dados do documento
             $sql_busca_dados = "SELECT nome_original, caminho_arquivo 
-                                FROM documento 
+                                FROM documento_processo 
                                 WHERE id_documento = ?  
                                 AND usuario_config_id_usuario_config = ?";
 
@@ -222,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             }
 
             // Exclui o registro do banco
-            $sql_delete_doc = 'DELETE FROM documento WHERE id_documento = ? AND usuario_config_id_usuario_config = ?';
+            $sql_delete_doc = 'DELETE FROM documento_processo WHERE id_documento = ? AND usuario_config_id_usuario_config = ?';
             $stmt = $conexao->prepare($sql_delete_doc);
             $stmt->bind_param('ii', $id_doc, $id_user);
 
@@ -395,7 +398,7 @@ include_once('../geral/topo.php');
     <script>
         // Inicialize o Dropzone
         Dropzone.options.myAwesomeDropzone = {
-            url: "./docs_pessoa.php", // URL do backend
+            url: "./docs_processo.php", // URL do backend
             maxFilesize: 3, // Limite de 3 MB
             maxFiles: 30, // permitir até 10
             parallelUploads: 30, // manda vários de uma vez
@@ -488,7 +491,7 @@ include_once('../geral/topo.php');
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: './docs_pessoa.php',
+                            url: './docs_processo.php',
                             type: 'DELETE',
                             contentType: 'application/json',
                             data: JSON.stringify({
@@ -498,7 +501,7 @@ include_once('../geral/topo.php');
                             success: function(res) {
                                 Swal.fire({
                                     title: "Exclusão",
-                                    text: "Pessoa excluída com sucesso!",
+                                    text: "Documento excluído com sucesso!",
                                     icon: "success"
                                 });
 
@@ -520,7 +523,7 @@ include_once('../geral/topo.php');
                     text: "Cadastro finalizado com sucesso!",
                     icon: "success"
                 }).then(() => {
-                    window.location.href = "./pessoas.php";
+                    window.location.href = "./processos.php";
                 });
 
 
