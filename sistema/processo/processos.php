@@ -4,71 +4,71 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-    $sql_quantidade_pessoas = "SELECT 
-    COUNT(*) AS total_pessoas,
-    COUNT(CASE WHEN tipo_parte = 'cliente' THEN 1 END) AS total_clientes,
-    COUNT(CASE WHEN tipo_parte = 'contrário' THEN 1 END) AS total_contrarias
-FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
-";
-    $res_qtd = $conexao->query($sql_quantidade_pessoas);
+    $sql_quantidade_processos = "SELECT 
+    COUNT(*) AS total_processo,tipo_acao_id,grupo_acao,referencia,contingenciamento
+FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
+    $res_qtd = $conexao->query($sql_quantidade_processos);
+
+
     if ($res_qtd->num_rows == 1) {
         $res_qtd = mysqli_fetch_assoc($res_qtd);
-        $total = $res_qtd["total_pessoas"];
-        $cliente = $res_qtd["total_clientes"];
-        $contrario = $res_qtd["total_contrarias"];
+        $total = $res_qtd["total_processo"];
+
+        var_dump($res_qtd);
     }
 
-    if (count($_GET) > 0) {
-        $nome    = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
-        $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
-        $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
+    // if (count($_GET) > 0) {
+    //     $nome    = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
+    //     $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
+    //     $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
-        $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
-        $params = [];
-        $types  = "";
+    //     $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
+    //     $params = [];
+    //     $types  = "";
 
-        if (!empty($nome)) {
-            $sql_filtros .= " AND nome LIKE ?";
-            $params[] = "%$nome%";
-            $types   .= "s";
-        }
+    //     if (!empty($nome)) {
+    //         $sql_filtros .= " AND nome LIKE ?";
+    //         $params[] = "%$nome%";
+    //         $types   .= "s";
+    //     }
 
-        if (!empty($filtrar)) {
-            if ($filtrar === "cliente" || $filtrar === "contrário") {
-                $sql_filtros .= " AND tipo_parte = ?";
-                $params[] = $filtrar;
-                $types   .= "s";
-            }
-        }
+    //     if (!empty($filtrar)) {
+    //         if ($filtrar === "cliente" || $filtrar === "contrário") {
+    //             $sql_filtros .= " AND tipo_parte = ?";
+    //             $params[] = $filtrar;
+    //             $types   .= "s";
+    //         }
+    //     }
 
-        switch ($ordenar) {
-            case "nome":
-                $sql_filtros .= " ORDER BY nome ASC";
-                break;
-            case "recentes":
-                $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
-                break;
-            case "antigos":
-                $sql_filtros .= " ORDER BY dt_cadastro_pessoa ASC";
-                break;
-            default:
-                $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
-                break;
-        }
+    //     switch ($ordenar) {
+    //         case "nome":
+    //             $sql_filtros .= " ORDER BY nome ASC";
+    //             break;
+    //         case "recentes":
+    //             $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
+    //             break;
+    //         case "antigos":
+    //             $sql_filtros .= " ORDER BY dt_cadastro_pessoa ASC";
+    //             break;
+    //         default:
+    //             $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
+    //             break;
+    //     }
 
-        $stmt = $conexao->prepare($sql_filtros);
+    //     $stmt = $conexao->prepare($sql_filtros);
 
-        if (!empty($params)) {
-            $stmt->bind_param($types, ...$params);
-        }
+    //     if (!empty($params)) {
+    //         $stmt->bind_param($types, ...$params);
+    //     }
 
-        $stmt->execute();
-        $res = $stmt->get_result();
-    } else {
+    //     $stmt->execute();
+    //     $res = $stmt->get_result();
+    // } else {
 
-        $sql_busca_pessoas = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_pessoa DESC";
+        $sql_busca_pessoas = "SELECT tipo_acao_id, grupo_acao, referencia, contingenciamento
+FROM processo WHERE usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_processo DESC";
         $res = $conexao->query($sql_busca_pessoas);
-    }
+    // }
 }
 
 
@@ -146,9 +146,8 @@ include_once('../geral/topo.php');
         <div class="pai_conteudo">
 
             <div class="infos_pagina">
-                <button> <i class="fa-regular fa-user"></i> <?php echo $total <= 1 ?  "$total Pessoa Cadastrada" : "$total Pessoas Cadastradas" ?> </button>
-                <button> <i class="fa-regular fa-user"></i> <?php echo $cliente <= 1 ?  "$cliente Cliente" : "$cliente Clientes " ?> </button>
-                <button> <i class="fa-regular fa-user"></i> <?php echo $contrario <= 1 ?  "$contrario Contrário " : "$contrario Contrários " ?> </button>
+                <button> <i class="fa-regular fa-user"></i> <?php echo $total <= 1 ?  "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
+                
             </div>
 
             <div class="opcoes_funcoes">
