@@ -407,6 +407,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
 include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <a href="./pessoas.php" class="breadcrumb-link">Pessoas</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current"><?php echo ($_GET['acao'] ?? '') ? 'Edição Cadastro' : 'Cadastro' ?></span>
+            <span class="breadcrumb-separator">/</span>
+        </div>
+    </div>
+</div>
 
 <body>
     <main class="container_principal">
@@ -442,7 +452,7 @@ include_once('../geral/topo.php');
             <section class="container_cadastro">
                 <div class="topo_sessao">
                     <i class="fa-solid fa-user-plus"></i>
-                    <p>Nova Pessoa</p>
+                    <p><?php echo ($_GET['acao'] ?? '') ? 'Edição Pessoa' : 'Nova Pessoa' ?></p>
                 </div>
 
                 <hr>

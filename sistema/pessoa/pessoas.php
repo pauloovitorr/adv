@@ -140,6 +140,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <span class="breadcrumb-current">Pessoas</span>
+            <span class="breadcrumb-separator">/</span>
+        </div>
+    </div>
+</div>
 
 <body>
     <main class="container_principal">

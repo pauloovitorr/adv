@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
 
 
     if ($result->num_rows >= 1) {
-       
+
         $dados_pessoa = [];
         $documentos = [];
 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
                 ];
             }
         }
-        
+
 
 
         $conexao->close();
@@ -100,6 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
 include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
+
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <a href="./pessoas.php" class="breadcrumb-link">Pessoas</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Ficha Pessoa</span>
+            
+        </div>
+    </div>
+</div>
+
 
 <body>
     <main class="container_principal">
@@ -378,7 +390,7 @@ include_once('../geral/topo.php');
                                             <?php $ext = strtolower(pathinfo($doc["caminho_arquivo"], PATHINFO_EXTENSION)); ?>
                                             <a href="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" target="__blank">
                                                 <div class="doc">
-                                                    
+
                                                     <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
                                                         <img class="img_bg_doc" src="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
                                                         <div class="nome_arquivo"><span><?= htmlspecialchars($doc["nome_original"]) ?></span></div>

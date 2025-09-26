@@ -299,6 +299,18 @@ include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
 
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <a href="./processos.php" class="breadcrumb-link">Pessoas</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $_GET['tkn'] ?>" class="breadcrumb-link">Editar Cadastro</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Documentos</span>
+        </div>
+    </div>
+</div>
+
 <body>
 
     <main class="container_principal">

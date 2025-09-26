@@ -5,7 +5,7 @@ $id_user = $_SESSION['cod'];
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     $sql_quantidade_processos = "SELECT 
-    COUNT(*) AS total_processo,tipo_acao_id,grupo_acao,referencia,contingenciamento
+    COUNT(*) AS total_processo
 FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
     $res_qtd = $conexao->query($sql_quantidade_processos);
 
@@ -14,7 +14,7 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $res_qtd = mysqli_fetch_assoc($res_qtd);
         $total = $res_qtd["total_processo"];
 
-        var_dump($res_qtd);
+        // var_dump($res_qtd);
     }
 
     // if (count($_GET) > 0) {
@@ -65,9 +65,11 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
     //     $res = $stmt->get_result();
     // } else {
 
-        $sql_busca_pessoas = "SELECT tipo_acao_id, grupo_acao, referencia, contingenciamento
-FROM processo WHERE usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_processo DESC";
-        $res = $conexao->query($sql_busca_pessoas);
+    $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+FROM processo as p 
+INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
+WHERE p.usuario_config_id_usuario_config = $id_user ORDER BY p.dt_cadastro_processo DESC";
+    $res = $conexao->query($sql_busca_pessoas);
     // }
 }
 
@@ -140,14 +142,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <span class="breadcrumb-current">Processos</span>
+            <span class="breadcrumb-separator">/</span>
+        </div>
+    </div>
+</div>
 
 <body>
     <main class="container_principal">
         <div class="pai_conteudo">
 
             <div class="infos_pagina">
-                <button> <i class="fa-regular fa-user"></i> <?php echo $total <= 1 ?  "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
-                
+                <button> <i class="fa-regular fa-user"> </i> <?php echo $total <= 1 ?  "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
+
             </div>
 
             <div class="opcoes_funcoes">
@@ -215,68 +225,80 @@ include_once('../geral/topo.php');
 
                     <tbody>
 
-                        <tr>
-
-                            <td colspan="5">
-
-                                <div class="dados_processo processo_chance_media">
-                                    <div class="conteudo_pessoa container_tipo_acao">
-                                        <div class="icone">PA</div>
-                                        <div class="nome_pessoa">
-                                            <p> Nulidade de licitação </p>
-                                            <span> Paulo </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="conteudo_pessoa container_grupo">
-                                        <p>Administrativo</p>
-
-                                    </div>
-
-                                    <div class="conteudo_pessoa container_ref">
-                                        <p>PRO_NU_02</p>
-                                    </div>
-
-                                    <div class="conteudo_pessoa container_chance">
-                                        <p>Provável/Chance Alta</p>
-                                    </div>
+                        <?php
 
 
-                                    <div class="conteudo_pessoa container_acao">
-                                        <div class="opcoes_acao">
-                                            <i class="fa fa-ellipsis-h"></i>
+                        if ($res->num_rows):
 
-                                            <div class="opcoes_pessoa">
-                                                <ul>
-                                                    <a href="./ficha_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
-                                                        <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
-                                                    </a>
+                            while ($proceso = mysqli_fetch_assoc($res)):
 
-                                                    <a href="./docs_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
-                                                        <li><i class="fa-regular fa-id-card"></i> Documentos</li>
-                                                    </a>
+                                // var_dump($proceso);
+                        ?>
 
-                                                    <a href="./docs_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
-                                                        <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
-                                                    </a>
+                                <tr>
 
-                                                    <a href="./cadastro_pessoa.php?acao=editar&amp;tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
-                                                        <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
-                                                    </a>
+                                    <td colspan="5">
 
-                                                    <a href="javascript:void(0)" class="excluir_pessoa">
-                                                        <input type="hidden" class="token" value="fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
-                                                        <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
-                                                    </a>
-                                                </ul>
+                                        <div class="dados_processo processo_chance_media">
+                                            <div class="conteudo_pessoa container_tipo_acao">
+                                                <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?></div>
+                                                <div class="nome_pessoa">
+                                                    <p> <?php echo $proceso['tipo_acao']; ?> </p>
+                                                    <span> <?php echo $proceso['nome']; ?> </span>
+                                                </div>
                                             </div>
+
+                                            <div class="conteudo_pessoa container_grupo">
+                                                <p><?php echo ucfirst($proceso['grupo_acao']); ?></p>
+
+                                            </div>
+
+                                            <div class="conteudo_pessoa container_ref">
+                                                <p><?php echo $proceso['referencia']; ?></p>
+                                            </div>
+
+                                            <div class="conteudo_pessoa container_chance">
+                                                <p> <?php echo ucfirst($proceso['contingenciamento']); ?> </p>
+                                            </div>
+
+
+                                            <div class="conteudo_pessoa container_acao">
+                                                <div class="opcoes_acao">
+                                                    <i class="fa fa-ellipsis-h"></i>
+
+                                                    <div class="opcoes_pessoa">
+                                                        <ul>
+                                                            <a href="./ficha_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                                <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
+                                                            </a>
+
+                                                            <a href="./docs_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                                <li><i class="fa-regular fa-id-card"></i> Documentos</li>
+                                                            </a>
+
+
+                                                            <a href="./cadastro_pessoa.php?acao=editar&amp;tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                                <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
+                                                            </a>
+
+                                                            <a href="javascript:void(0)" class="excluir_pessoa">
+                                                                <input type="hidden" class="token" value="fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                                <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
+                                                            </a>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
                                         </div>
+                                    </td>
+                                </tr>
 
-                                    </div>
-
-                                </div>
-                            </td>
-                        </tr>
+                        <?php
+                            endwhile;
+                        endif;
+                        ?>
 
                     </tbody>
 

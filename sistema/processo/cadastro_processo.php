@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         contrario_id,
         tk,
         grupo_acao,
-        tipo_acao_id,
+        tipo_acao,
         referencia,
         num_processo,
         num_protocolo,
@@ -151,6 +151,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
+
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <a href="./processos.php" class="breadcrumb-link">Processos</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Cadastro</span>
+            <span class="breadcrumb-separator">/</span>
+        </div>
+    </div>
+</div>
 
 <body>
     <main class="container_principal">
@@ -404,141 +415,140 @@ include_once('../geral/topo.php');
     <script>
         const tiposPorGrupo = {
             administrativo: [{
-                    value: "nulidade_licitacao",
                     text: "Nulidade de Licitação"
                 },
                 {
-                    value: "improbidade",
+                    
                     text: "Improbidade Administrativa"
                 },
                 {
-                    value: "ms_administrativo",
+                   
                     text: "Mandado de Segurança Administrativo"
                 }
             ],
             trabalhista: [{
-                    value: "reclamacao_trabalhista",
+                    
                     text: "Reclamação Trabalhista"
                 },
                 {
-                    value: "verbas_rescisorias",
+                    
                     text: "Verbas Rescisórias"
                 },
                 {
-                    value: "adicional_insalubridade",
+                   
                     text: "Adicional de Insalubridade/Periculosidade"
                 }
             ],
             civil: [{
-                    value: "acao_cobranca",
+                    
                     text: "Ação de Cobrança"
                 },
                 {
-                    value: "indenizacao_danos",
+                    
                     text: "Indenização por Danos"
                 },
                 {
-                    value: "execucao_titulo",
+                    
                     text: "Execução de Título Extrajudicial"
                 }
             ],
             familia: [{
-                    value: "divorcio",
+                    
                     text: "Divórcio"
                 },
                 {
-                    value: "guarda_pensao",
+                    
                     text: "Guarda e Pensão Alimentícia"
                 },
                 {
-                    value: "inventario",
+                    
                     text: "Inventário e Partilha"
                 }
             ],
             previdenciario: [{
-                    value: "aposentadoria_invalidez",
+                    
                     text: "Aposentadoria por Invalidez"
                 },
                 {
-                    value: "auxilio_doenca",
+                    
                     text: "Auxílio-Doença"
                 },
                 {
-                    value: "pensao_morte",
+                    
                     text: "Pensão por Morte"
                 }
             ],
             tributario: [{
-                    value: "execucao_fiscal",
+                    
                     text: "Execução Fiscal"
                 },
                 {
-                    value: "ms_tributario",
+                    
                     text: "Mandado de Segurança Tributário"
                 },
                 {
-                    value: "anulatoria_debito",
+                   
                     text: "Ação Anulatória de Débito Fiscal"
                 }
             ],
             consumidor: [{
-                    value: "acao_revisional",
+                    
                     text: "Ação Revisional de Contrato"
                 },
                 {
-                    value: "planos_saude",
+                    
                     text: "Ação contra Planos de Saúde"
                 },
                 {
-                    value: "produto_defeituoso",
+                    
                     text: "Indenização por Produto/Serviço Defeituoso"
                 }
             ],
             empresarial: [{
-                    value: "recuperacao_judicial",
+                    
                     text: "Recuperação Judicial"
                 },
                 {
-                    value: "falencia",
+                   
                     text: "Falência"
                 },
                 {
-                    value: "dissolucao_sociedade",
+                    
                     text: "Dissolução de Sociedade"
                 }
             ],
             penal: [{
-                    value: "defesa_criminal",
+                    
                     text: "Defesa Criminal"
                 },
                 {
-                    value: "habeas_corpus",
+                   
                     text: "Habeas Corpus"
                 },
                 {
-                    value: "revisao_criminal",
+                    
                     text: "Revisão Criminal"
                 }
             ],
             imobiliario: [{
-                    value: "despejo",
+                    
                     text: "Despejo"
                 },
                 {
-                    value: "usucapiao",
+                   
                     text: "Usucapião"
                 },
                 {
-                    value: "acao_renovatoria",
+                    
                     text: "Ação Renovatória de Aluguel"
                 }
             ],
             eleitoral: [{
-                    value: "prestacao_contas",
+                    
                     text: "Prestação de Contas Eleitorais"
                 },
                 {
-                    value: "aije",
+                    
                     text: "Ação de Investigação Judicial Eleitoral (AIJE)"
                 }
             ]
@@ -555,7 +565,7 @@ include_once('../geral/topo.php');
             if (tiposPorGrupo[grupoSelecionado]) {
                 tiposPorGrupo[grupoSelecionado].forEach(tipo => {
                     const option = document.createElement("option");
-                    option.value = tipo.value;
+                    option.value = tipo.text;
                     option.textContent = tipo.text;
                     tipoSelect.appendChild(option);
                 });
