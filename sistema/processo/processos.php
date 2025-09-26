@@ -295,8 +295,22 @@ include_once('../geral/topo.php');
                                     </td>
                                 </tr>
 
-                        <?php
+                            <?php
                             endwhile;
+                        else:
+                            ?>
+
+                            <tr>
+                                <td colspan="5">
+                                    <div class="sem_pessoas">
+                                        <p>Nenhuma Processo Cadastrado</p>
+                                        <img src="../../img/listagem_processo.png" alt="" style="max-width: 200px;">
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                        <?php
                         endif;
                         ?>
 

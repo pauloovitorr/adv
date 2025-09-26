@@ -208,8 +208,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
         $caminho_img = $stmt_img->get_result();
         $caminho_img = $caminho_img->fetch_assoc();
 
-        // var_dump($caminho_img);
-        // exit;
+        
+        $foto_pessoa = $caminho_img['foto_pessoa'];
 
 
         $foto = $_FILES['foto'] ?? null;
