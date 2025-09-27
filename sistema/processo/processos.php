@@ -232,7 +232,7 @@ include_once('../geral/topo.php');
 
                             while ($proceso = mysqli_fetch_assoc($res)):
 
-                                // var_dump($proceso);
+                                var_dump($proceso);
                         ?>
 
                                 <tr>
@@ -268,21 +268,21 @@ include_once('../geral/topo.php');
 
                                                     <div class="opcoes_pessoa">
                                                         <ul>
-                                                            <a href="./ficha_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                            <a href="./ficha_processo.php?tkn=<?php echo $proceso['tk'] ?>">
                                                                 <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                             </a>
 
-                                                            <a href="./docs_pessoa.php?tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                            <a href="./docs_processo.php?tkn=<?php echo $proceso['tk'] ?>">
                                                                 <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                             </a>
 
 
-                                                            <a href="./cadastro_pessoa.php?acao=editar&amp;tkn=fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $proceso['tk'] ?>">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 
                                                             <a href="javascript:void(0)" class="excluir_pessoa">
-                                                                <input type="hidden" class="token" value="fdbe2ccc6050705b62a4232adf976bd03114d9d86ab75bd3ba964007fd1e5d9c">
+                                                                <input type="hidden" class="token" value="<?php echo $proceso['tk'] ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
                                                         </ul>

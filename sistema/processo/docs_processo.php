@@ -302,6 +302,18 @@ include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
 
+<div class="container_breadcrumb">
+    <div class="pai_topo">
+        <div class="breadcrumb">
+            <a href="./processos.php" class="breadcrumb-link">Processos</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="./cadastro_processo.php?acao=editar&tkn=<?php echo $_GET['tkn'] ?>" class="breadcrumb-link">Editar Processo</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Documentos</span>
+        </div>
+    </div>
+</div>
+
 <body>
 
     <main class="container_principal">

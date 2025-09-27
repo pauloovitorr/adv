@@ -60,26 +60,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
 
     // var_dump($_POST);
-        
-        $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
-        $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
-        $token               = bin2hex(random_bytes(64 / 2));
-        $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
-        $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
-        $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
-        $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['numero_processo'] ?? ''));
-        $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['numero_protocolo'] ?? ''));
-        $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
-        $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
-        $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
-        $etapa_kanban        = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
-        $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
-        $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
-        $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
-        $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
-        $acao                = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
 
-        $sql = "INSERT INTO processo (
+    $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
+    $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
+    $token               = bin2hex(random_bytes(64 / 2));
+    $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
+    $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
+    $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
+    $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['numero_processo'] ?? ''));
+    $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['numero_protocolo'] ?? ''));
+    $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
+    $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
+    $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
+    $etapa_kanban        = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
+    $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
+    $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
+    $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
+    $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+    $acao                = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
+
+    $sql = "INSERT INTO processo (
         cliente_id,
         contrario_id,
         tk,
@@ -99,39 +99,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         usuario_config_id_usuario_config
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
-        $stmt = $conexao->prepare($sql);
+    $stmt = $conexao->prepare($sql);
 
-        $stmt->bind_param(
-            "iisssssssssssssss",
-            $cliente,
-            $contrario,
-            $token,
-            $grupo_acao,
-            $tipo_acao,
-            $referencia,
-            $numero_processo,
-            $numero_protocolo,
-            $processo_originario,
-            $valor_causa,
-            $valor_honorarios,
-            $etapa_kanban,
-            $contingenciamento,
-            $data_requerimento,
-            $resultado_processo,
-            $observacao,
-            $id_user
-        );
+    $stmt->bind_param(
+        "iisssssssssssssss",
+        $cliente,
+        $contrario,
+        $token,
+        $grupo_acao,
+        $tipo_acao,
+        $referencia,
+        $numero_processo,
+        $numero_protocolo,
+        $processo_originario,
+        $valor_causa,
+        $valor_honorarios,
+        $etapa_kanban,
+        $contingenciamento,
+        $data_requerimento,
+        $resultado_processo,
+        $observacao,
+        $id_user
+    );
 
-        if ($stmt->execute()) {
-            echo "Processo cadastrado com sucesso! ID: " . $stmt->insert_id;
-        } else {
-            echo "Erro ao cadastrar processo: " . $stmt->error;
-        }
+    if ($stmt->execute()) {
+        echo "Processo cadastrado com sucesso! ID: " . $stmt->insert_id;
+    } else {
+        echo "Erro ao cadastrar processo: " . $stmt->error;
+    }
 
     $stmt->close();
-    header('Location:'. "./docs_processo.php?tkn=$token");
-
+    header('Location:' . "./docs_processo.php?tkn=$token");
 }
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['tkn'])) {
+
+    $token_processo  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
+
+    $sql_busca_processo_tkn = 'SELECT 
+    p.id_processo,
+    p.tk,
+    p.grupo_acao,
+    p.tipo_acao,
+    p.referencia,
+    p.num_processo,
+    p.num_protocolo,
+    p.processo_originario,
+    p.valor_causa,
+    p.valor_honorarios,
+    p.etapa_kanban,
+    p.contingenciamento,
+    p.data_requerimento,
+    p.resultado_processo,
+    p.observacao,
+    p.dt_cadastro_processo,
+    p.dt_atualizacao_processo,
+
+    -- Dados do cliente
+    c.id_pessoa   AS cliente_id,
+    c.nome        AS cliente_nome,
+    c.tipo_parte  AS cliente_tipo_parte,
+
+    -- Dados do contrário
+    ct.id_pessoa  AS contrario_id,
+    ct.nome       AS contrario_nome,
+    ct.tipo_parte AS contrario_tipo_parte
+
+FROM processo p
+LEFT JOIN pessoas c  ON p.cliente_id   = c.id_pessoa
+LEFT JOIN pessoas ct ON p.contrario_id = ct.id_pessoa
+where p.tk = ? and p.usuario_config_id_usuario_config = ?;
+';
+
+    $stmt = $conexao->prepare($sql_busca_processo_tkn);
+    $stmt->bind_param('si', $token_processo, $id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+        $dados_processo = $result->fetch_assoc();
+        // print_r($dados_processo);
+        $conexao->close();
+    } else {
+        header('location: ./processos.php');
+        $conexao->close();
+        exit;
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $dados_processo = [];
+}
+
+
+
 
 ?>
 
@@ -151,6 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 include_once('../geral/menu_lat.php');
 include_once('../geral/topo.php');
 ?>
+
 
 <div class="container_breadcrumb">
     <div class="pai_topo">
@@ -225,24 +287,30 @@ include_once('../geral/topo.php');
                                         <label for="grupo_acao">Grupo de Ação <span style="color: red;">*</span></label>
                                         <select name="grupo_acao" id="grupo_acao" required>
                                             <option value="">Selecione...</option>
-                                            <option value="administrativo">Administrativo</option>
-                                            <option value="trabalhista">Trabalhista</option>
-                                            <option value="civil">Cível</option>
-                                            <option value="familia">Família e Sucessões</option>
-                                            <option value="previdenciario">Previdenciário</option>
-                                            <option value="tributario">Tributário</option>
-                                            <option value="consumidor">Consumidor</option>
-                                            <option value="empresarial">Empresarial</option>
-                                            <option value="penal">Penal</option>
-                                            <option value="imobiliario">Imobiliário</option>
-                                            <option value="eleitoral">Eleitoral</option>
+                                            <option value="administrativo" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'administrativo' ? 'selected' : '' ?>>Administrativo</option>
+                                            <option value="trabalhista" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'trabalhista' ? 'selected' : '' ?>>Trabalhista</option>
+                                            <option value="civil" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'civil' ? 'selected' : '' ?>>Cível</option>
+                                            <option value="familia" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'familia' ? 'selected' : '' ?>>Família e Sucessões</option>
+                                            <option value="previdenciario" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'previdenciario' ? 'selected' : '' ?>>Previdenciário</option>
+                                            <option value="tributario" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'tributario' ? 'selected' : '' ?>>Tributário</option>
+                                            <option value="consumidor" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'consumidor' ? 'selected' : '' ?>>Consumidor</option>
+                                            <option value="empresarial" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'empresarial' ? 'selected' : '' ?>>Empresarial</option>
+                                            <option value="penal" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'penal' ? 'selected' : '' ?>>Penal</option>
+                                            <option value="imobiliario" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'imobiliario' ? 'selected' : '' ?>>Imobiliário</option>
+                                            <option value="eleitoral" <?php echo ($dados_processo['grupo_acao'] ?? '') === 'eleitoral' ? 'selected' : '' ?>>Eleitoral</option>
                                         </select>
                                     </div>
 
                                     <div class="container_input">
                                         <label for="tipo_acao">Tipo de Ação <span style="color: red;">*</span></label>
                                         <select name="tipo_acao" id="tipo_acao" required>
-                                            <option value="">Selecione o grupo primeiro...</option>
+                                            <?php if (!empty($dados_processo['tipo_acao'])): ?>
+                                                <option value="<?php echo htmlspecialchars($dados_processo['tipo_acao']) ?>" selected>
+                                                    <?php echo htmlspecialchars($dados_processo['tipo_acao']) ?>
+                                                </option>
+                                            <?php else: ?>
+                                                <option value="">Selecione o grupo primeiro...</option>
+                                            <?php endif; ?>
                                         </select>
                                     </div>
 
@@ -252,11 +320,12 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="referencia"
                                             id="referencia"
-                                            value=""
+                                            value="<?php echo htmlspecialchars($dados_processo['referencia'] ?? '') ?>"
                                             maxlength="8"
                                             placeholder="Ex: PA_001 "
                                             required>
                                     </div>
+
 
 
                                 </div>
@@ -264,24 +333,24 @@ include_once('../geral/topo.php');
                                 <div class="container_inputs">
 
                                     <div class="container_input">
-                                        <label for="numero_processo">Núm do Processo</label>
+                                        <label for="num_processo">Núm do Processo</label>
                                         <input
                                             type="text"
-                                            name="numero_processo"
-                                            id="numero_processo"
-                                            value=""
+                                            name="num_processo"
+                                            id="num_processo"
+                                            value="<?php echo htmlspecialchars($dados_processo['num_processo'] ?? '') ?>"
                                             minlength="4"
                                             maxlength="25"
                                             placeholder="Ex: 0001234-56.2023.8.26.0100">
                                     </div>
 
                                     <div class="container_input">
-                                        <label for="numero_protocolo">Núm do Protocolo</label>
+                                        <label for="num_protocolo">Núm do Protocolo</label>
                                         <input
                                             type="text"
-                                            name="numero_protocolo"
-                                            id="numero_protocolo"
-                                            value=""
+                                            name="num_protocolo"
+                                            id="num_protocolo"
+                                            value="<?php echo htmlspecialchars($dados_processo['num_protocolo'] ?? '') ?>"
                                             minlength="4"
                                             maxlength="25"
                                             placeholder="Ex: PROT_2023_00123">
@@ -293,7 +362,7 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="processo_originario"
                                             id="processo_originario"
-                                            value=""
+                                            value="<?php echo htmlspecialchars($dados_processo['processo_originario'] ?? '') ?>"
                                             minlength="4"
                                             maxlength="25"
                                             placeholder="Ex: 0009876-54.2020.8.26.0100">
@@ -305,7 +374,7 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="valor_causa"
                                             id="valor_causa"
-                                            value=""
+                                            value="<?php echo htmlspecialchars($dados_processo['valor_causa'] ?? '') ?>"
                                             placeholder="Ex: 150.000,00">
                                     </div>
 
@@ -315,49 +384,48 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="valor_honorarios"
                                             id="valor_honorarios"
-                                            value=""
+                                            value="<?php echo htmlspecialchars($dados_processo['valor_honorarios'] ?? '') ?>"
                                             placeholder="Ex: 30.000,00">
                                     </div>
+
 
                                 </div>
 
                                 <div class="container_inputs">
 
-
                                     <div class="container_input">
                                         <label for="etapa_kanban">Etapa Kanban <span style="color: red;">*</span></label>
                                         <select name="etapa_kanban" id="etapa_kanban" required>
                                             <option value="">Selecione...</option>
-                                            <option value="Análise do Caso">Análise do Caso</option>
-                                            <option value="Negociação">Negociação</option>
-                                            <option value="Aguardando Documentos">Aguardando Documentos</option>
-                                            <option value="Proposta">Proposta</option>
-                                            <option value="Ação Protocolada">Ação Protocolada</option>
-                                            <option value="Aguardando Audiência ">Aguardando Audiência </option>
-                                            <option value="Aguardando Julgamento">Aguardando Julgamento </option>
-                                            <option value="Desenvolvendo Recurso">Desenvolvendo Recurso </option>
-                                            <option value="fechamento">Fechamento</option>
+                                            <option value="Análise do Caso" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Análise do Caso' ? 'selected' : '' ?>>Análise do Caso</option>
+                                            <option value="Negociação" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Negociação' ? 'selected' : '' ?>>Negociação</option>
+                                            <option value="Aguardando Documentos" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Aguardando Documentos' ? 'selected' : '' ?>>Aguardando Documentos</option>
+                                            <option value="Proposta" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Proposta' ? 'selected' : '' ?>>Proposta</option>
+                                            <option value="Ação Protocolada" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Ação Protocolada' ? 'selected' : '' ?>>Ação Protocolada</option>
+                                            <option value="Aguardando Audiência" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Aguardando Audiência' ? 'selected' : '' ?>>Aguardando Audiência</option>
+                                            <option value="Aguardando Julgamento" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Aguardando Julgamento' ? 'selected' : '' ?>>Aguardando Julgamento</option>
+                                            <option value="Desenvolvendo Recurso" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Desenvolvendo Recurso' ? 'selected' : '' ?>>Desenvolvendo Recurso</option>
+                                            <option value="fechamento" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'fechamento' ? 'selected' : '' ?>>Fechamento</option>
                                         </select>
                                     </div>
-
 
                                     <div class="container_input">
                                         <label for="contingenciamento">Contingenciamento <span style="color: red;">*</span></label>
                                         <select name="contingenciamento" id="contingenciamento" required>
                                             <option value="">Selecione...</option>
-                                            <option value="provável/chance alta">Provável/Chance Alta</option>
-                                            <option value="possível/talvez">Possível/Talvez</option>
-                                            <option value="remota/difícil">Remota/Difícil</option>
+                                            <option value="provável/chance alta" <?php echo ($dados_processo['contingenciamento'] ?? '') === 'provável/chance alta' ? 'selected' : '' ?>>Provável/Chance Alta</option>
+                                            <option value="possível/talvez" <?php echo ($dados_processo['contingenciamento'] ?? '') === 'possível/talvez' ? 'selected' : '' ?>>Possível/Talvez</option>
+                                            <option value="remota/difícil" <?php echo ($dados_processo['contingenciamento'] ?? '') === 'remota/difícil' ? 'selected' : '' ?>>Remota/Difícil</option>
                                         </select>
                                     </div>
-
 
                                     <div class="container_input">
                                         <label for="data_requerimento">Data Requerimento</label>
                                         <input
                                             type="date"
                                             name="data_requerimento"
-                                            id="data_requerimento">
+                                            id="data_requerimento"
+                                            value="<?php echo htmlspecialchars($dados_processo['data_requerimento'] ?? '') ?>">
                                     </div>
 
                                     <div class="container_input">
@@ -366,7 +434,7 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="resultado_processo"
                                             id="resultado_processo"
-                                            value=""
+                                            value="<?php echo htmlspecialchars($dados_processo['resultado_processo'] ?? '') ?>"
                                             minlength="4"
                                             maxlength="100"
                                             placeholder="Ex: Sentença favorável, acordo homologado, improcedente...">
@@ -378,13 +446,13 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="observacao"
                                             id="observacao"
-                                            value=""
+                                            value="<?php echo htmlspecialchars($dados_processo['observacao'] ?? '') ?>"
                                             maxlength="255"
                                             placeholder="Digite aqui alguma observação relevante">
                                     </div>
 
-
                                 </div>
+
 
                                 <input type="hidden" name="acao" value="<?php echo ($_GET['acao'] ?? '') ? 'editar' : 'cadastrar' ?>">
 
@@ -418,137 +486,137 @@ include_once('../geral/topo.php');
                     text: "Nulidade de Licitação"
                 },
                 {
-                    
+
                     text: "Improbidade Administrativa"
                 },
                 {
-                   
+
                     text: "Mandado de Segurança Administrativo"
                 }
             ],
             trabalhista: [{
-                    
+
                     text: "Reclamação Trabalhista"
                 },
                 {
-                    
+
                     text: "Verbas Rescisórias"
                 },
                 {
-                   
+
                     text: "Adicional de Insalubridade/Periculosidade"
                 }
             ],
             civil: [{
-                    
+
                     text: "Ação de Cobrança"
                 },
                 {
-                    
+
                     text: "Indenização por Danos"
                 },
                 {
-                    
+
                     text: "Execução de Título Extrajudicial"
                 }
             ],
             familia: [{
-                    
+
                     text: "Divórcio"
                 },
                 {
-                    
+
                     text: "Guarda e Pensão Alimentícia"
                 },
                 {
-                    
+
                     text: "Inventário e Partilha"
                 }
             ],
             previdenciario: [{
-                    
+
                     text: "Aposentadoria por Invalidez"
                 },
                 {
-                    
+
                     text: "Auxílio-Doença"
                 },
                 {
-                    
+
                     text: "Pensão por Morte"
                 }
             ],
             tributario: [{
-                    
+
                     text: "Execução Fiscal"
                 },
                 {
-                    
+
                     text: "Mandado de Segurança Tributário"
                 },
                 {
-                   
+
                     text: "Ação Anulatória de Débito Fiscal"
                 }
             ],
             consumidor: [{
-                    
+
                     text: "Ação Revisional de Contrato"
                 },
                 {
-                    
+
                     text: "Ação contra Planos de Saúde"
                 },
                 {
-                    
+
                     text: "Indenização por Produto/Serviço Defeituoso"
                 }
             ],
             empresarial: [{
-                    
+
                     text: "Recuperação Judicial"
                 },
                 {
-                   
+
                     text: "Falência"
                 },
                 {
-                    
+
                     text: "Dissolução de Sociedade"
                 }
             ],
             penal: [{
-                    
+
                     text: "Defesa Criminal"
                 },
                 {
-                   
+
                     text: "Habeas Corpus"
                 },
                 {
-                    
+
                     text: "Revisão Criminal"
                 }
             ],
             imobiliario: [{
-                    
+
                     text: "Despejo"
                 },
                 {
-                   
+
                     text: "Usucapião"
                 },
                 {
-                    
+
                     text: "Ação Renovatória de Aluguel"
                 }
             ],
             eleitoral: [{
-                    
+
                     text: "Prestação de Contas Eleitorais"
                 },
                 {
-                    
+
                     text: "Ação de Investigação Judicial Eleitoral (AIJE)"
                 }
             ]
@@ -588,8 +656,12 @@ include_once('../geral/topo.php');
 
             $('#numero_processo').mask('0000000-00.0000.0.00.0000');
             $('#processo_originario').mask('0000000-00.0000.0.00.0000');
-            $('#valor_causa').mask('000.000.000,00', {reverse: true});
-            $('#valor_honorarios').mask('000.000.000,00', {reverse: true});
+            $('#valor_causa').mask('000.000.000,00', {
+                reverse: true
+            });
+            $('#valor_honorarios').mask('000.000.000,00', {
+                reverse: true
+            });
 
         });
     </script>
@@ -748,85 +820,94 @@ include_once('../geral/topo.php');
     </script> -->
 
 
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        $('#cliente').select2({
-            placeholder: "Selecione o Cliente",
-            minimumInputLength: 2,
-            language: {
-                inputTooShort: function(args) {
-                    var remainingChars = args.minimum - args.input.length;
-                    return "Digite " + remainingChars + " ou mais caracteres";
+        $(document).ready(function() {
+            // Inicializa CLIENTE
+            $('#cliente').select2({
+                placeholder: "Selecione o Cliente",
+                minimumInputLength: 0,
+                language: {
+                    inputTooShort: function(args) {
+                        return "Digite " + (args.minimum - args.input.length) + " ou mais caracteres";
+                    },
+                    noResults: function() {
+                        return "Nenhum resultado encontrado";
+                    },
+                    searching: function() {
+                        return "Buscando...";
+                    }
                 },
-                noResults: function() {
-                    return "Nenhum resultado encontrado";
-                },
-                searching: function() {
-                    return "Buscando...";
+                ajax: {
+                    url: 'cadastro_processo.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            busca_cliente: params.term || 'padrao'
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.id_pessoa,
+                                    text: item.nome
+                                };
+                            })
+                        };
+                    }
                 }
-            },
-            ajax: {
-                url: 'cadastro_processo.php',
-                type: 'POST',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        busca_cliente: params.term || 'padrao'
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: $.map(data, function(item) {
-                            return {
-                                id: item.id_pessoa,
-                                text: item.nome
-                            };
-                        })
-                    };
-                }
-            }
-        });
+            });
 
-        $('#contrario').select2({
-            placeholder: "Selecione o Contrário",
-            minimumInputLength: 2,
-            language: {
-                inputTooShort: function(args) {
-                    var remainingChars = args.minimum - args.input.length;
-                    return "Digite " + remainingChars + " ou mais caracteres";
+            // Inicializa CONTRÁRIO
+            $('#contrario').select2({
+                placeholder: "Selecione o Contrário",
+                minimumInputLength: 0,
+                language: {
+                    inputTooShort: function(args) {
+                        return "Digite " + (args.minimum - args.input.length) + " ou mais caracteres";
+                    },
+                    noResults: function() {
+                        return "Nenhum resultado encontrado";
+                    },
+                    searching: function() {
+                        return "Buscando...";
+                    }
                 },
-                noResults: function() {
-                    return "Nenhum resultado encontrado";
-                },
-                searching: function() {
-                    return "Buscando...";
+                ajax: {
+                    url: 'cadastro_processo.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            busca_contrario: params.term || 'padrao'
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.id_pessoa,
+                                    text: item.nome
+                                };
+                            })
+                        };
+                    }
                 }
-            },
-            ajax: {
-                url: 'cadastro_processo.php',
-                type: 'POST',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        busca_contrario: params.term || 'padrao'
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: $.map(data, function(item) {
-                            return {
-                                id: item.id_pessoa,
-                                text: item.nome
-                            };
-                        })
-                    };
-                }
-            }
+            });
+
+
         });
     </script>
+
+
+
+
 
 
     <style>
