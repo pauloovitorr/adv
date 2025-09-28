@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
     $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
     $referencia          = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
-    $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['numero_processo'] ?? ''));
-    $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['numero_protocolo'] ?? ''));
+    $numero_processo     = $conexao->escape_string(htmlspecialchars($_POST['num_processo'] ?? ''));
+    $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['num_protocolo'] ?? ''));
     $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
     $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
     $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
@@ -131,6 +131,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $stmt->close();
     header('Location:' . "./docs_processo.php?tkn=$token");
 }
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty($_POST['grupo_acao']) && !empty($_POST['tipo_acao']) && !empty($_POST['referencia']) && !empty($_POST['etapa_kanban']) && !empty($_POST['contingenciamento']) && $_POST['acao'] == 'editar') {
+
+
+    $cliente_id           = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
+    $contrario_id         = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
+    $grupo_acao           = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
+    $tipo_acao            = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
+    $referencia           = $conexao->escape_string(htmlspecialchars($_POST['referencia'] ?? ''));
+    $num_processo         = $conexao->escape_string(htmlspecialchars($_POST['num_processo'] ?? ''));
+    $num_protocolo        = $conexao->escape_string(htmlspecialchars($_POST['num_protocolo'] ?? ''));
+    $processo_originario  = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
+    $valor_causa          = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
+    $valor_honorarios     = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
+    $etapa_kanban         = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
+    $contingenciamento    = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
+    $data_requerimento    = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
+    $resultado_processo   = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
+    $observacao           = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+    $acao                 = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
+    $pro_id               = $conexao->escape_string(htmlspecialchars($_POST['pro_id'] ?? ''));
+
+    $sql = "UPDATE processo 
+               SET cliente_id = ?, 
+                   contrario_id = ?, 
+                   grupo_acao = ?, 
+                   tipo_acao = ?, 
+                   referencia = ?, 
+                   num_processo = ?, 
+                   num_protocolo = ?, 
+                   processo_originario = ?, 
+                   valor_causa = ?, 
+                   valor_honorarios = ?, 
+                   etapa_kanban = ?, 
+                   contingenciamento = ?, 
+                   data_requerimento = ?, 
+                   resultado_processo = ?, 
+                   observacao = ?, 
+                   usuario_config_id_usuario_config = ?
+             WHERE id_processo = ?";
+
+    $stmt = $conexao->prepare($sql);
+
+
+    $stmt->bind_param(
+        "iissssssssssssssi",
+        $cliente_id,
+        $contrario_id,
+        $grupo_acao,
+        $tipo_acao,
+        $referencia,
+        $num_processo,
+        $num_protocolo,
+        $processo_originario,
+        $valor_causa,
+        $valor_honorarios,
+        $etapa_kanban,
+        $contingenciamento,
+        $data_requerimento,
+        $resultado_processo,
+        $observacao,
+        $id_user,
+        $pro_id
+    );
+
+    // Executa
+    if ($stmt->execute()) {
+        echo "Processo atualizado com sucesso!";
+    } else {
+        echo "Erro ao atualizar: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
+
+
 
 
 
@@ -219,7 +298,7 @@ include_once('../geral/topo.php');
         <div class="breadcrumb">
             <a href="./processos.php" class="breadcrumb-link">Processos</a>
             <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Cadastro</span>
+            <span class="breadcrumb-current"><?php echo ($_GET['acao'] ?? '') ? 'Edição Processo' : 'Cadastro' ?></span>
             <span class="breadcrumb-separator">/</span>
         </div>
     </div>
@@ -232,18 +311,25 @@ include_once('../geral/topo.php');
             <section class="container_etapa_cadastro">
                 <div class="etapa">
                     <div class="num bg_selecionado">1º</div>
-                    <div class="descricao color_selecionado">Cadastro</div>
+                    <div class="descricao color_selecionado"><?php echo count($dados_processo) > 0 ? 'Edição' : 'Cadastro'  ?></div>
                 </div>
 
-                <div class="separador bg_selecionado"></div>
-                <div class="etapa">
-                    <div class="num">2º</div>
-                    <div class="descricao">Documentos</div>
-                </div>
 
-                <div class="separador"></div>
+
+                <?php if (count($dados_processo) > 0): ?>
+                    <div class="separador bg_selecionado" style="width: 50%;"></div>
+                <?php else: ?>
+                    <div class="separador bg_selecionado"></div>
+                    <div class="etapa">
+                        <div class="num">2º</div>
+                        <div class="descricao">Documentos</div>
+                    </div>
+
+                    <div class="separador"></div>
+                <?php endif ?>
+
                 <div class="etapa">
-                    <div class="num">2°</div>
+                    <div class="num"><?php echo count($dados_processo) > 0 ? '2°' : '3°' ?></div>
                     <div class="descricao">Finalização</div>
                 </div>
 
@@ -262,6 +348,8 @@ include_once('../geral/topo.php');
                         <fieldset>
                             <legend>Dados do Processo</legend>
 
+
+
                             <div class="bloco-formulario">
 
                                 <div class="container_inputs">
@@ -270,7 +358,6 @@ include_once('../geral/topo.php');
                                         <label for="cliente">Cliente <span style="color: red;">*</span></label>
                                         <select name="cliente" id="cliente" required>
                                             <option value="">Selecione o Cliente</option>
-
                                         </select>
                                     </div>
 
@@ -278,7 +365,6 @@ include_once('../geral/topo.php');
                                         <label for="contrario">Contrário</label>
                                         <select name="contrario" id="contrario">
                                             <option value="">Selecione o Contrário</option>
-                                            <option value="84">Fernanda</option>
                                         </select>
                                     </div>
 
@@ -455,6 +541,8 @@ include_once('../geral/topo.php');
 
 
                                 <input type="hidden" name="acao" value="<?php echo ($_GET['acao'] ?? '') ? 'editar' : 'cadastrar' ?>">
+
+                                <input type="hidden" name="pro_id" value="<?php echo htmlspecialchars($dados_processo['id_processo'] ?? '') ?>">
 
                             </div>
 
@@ -901,6 +989,19 @@ include_once('../geral/topo.php');
                 }
             });
 
+            // ===============================
+            // INJETA VALORES PRÉ-SELECIONADOS
+            // ===============================
+            var cliente_id = "<?php echo $dados_processo['cliente_id'] ?? '' ?>";
+            var cliente_nome = "<?php echo $dados_processo['cliente_nome'] ?? '' ?>";
+            var optionCliente = new Option(cliente_nome, cliente_id, true, true);
+            $('#cliente').append(optionCliente).trigger('change');
+
+
+            var contrario_id = "<?php echo $dados_processo['contrario_id'] ?? '' ?>";
+            var contrario_nome = "<?php echo $dados_processo['contrario_nome'] ?? '' ?>";
+            var optionContrario = new Option(contrario_nome, contrario_id, true, true);
+            $('#contrario').append(optionContrario).trigger('change');
 
         });
     </script>
