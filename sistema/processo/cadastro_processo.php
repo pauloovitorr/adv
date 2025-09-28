@@ -200,7 +200,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
     // Executa
     if ($stmt->execute()) {
-        echo "Processo atualizado com sucesso!";
+        header("Location: ./cadastro_processo.php?acao=editar&tkn=" . $_GET['tkn']);
+        exit;
     } else {
         echo "Erro ao atualizar: " . $stmt->error;
     }
