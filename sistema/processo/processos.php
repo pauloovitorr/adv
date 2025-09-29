@@ -5,125 +5,135 @@ $id_user = $_SESSION['cod'];
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     $sql_quantidade_processos = "SELECT 
-    COUNT(*) AS total_processo
+    COUNT(*) AS total_processo,
+    COUNT( CASE WHEN contingenciamento = 'provável/chance alta' THEN 1 END ) AS chance_alta,
+    COUNT( CASE WHEN contingenciamento = 'possível/talvez' THEN 1 END ) AS chance_media,
+    COUNT( CASE WHEN contingenciamento = 'remota/difícil' THEN 1 END ) AS chance_baixa
 FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
     $res_qtd = $conexao->query($sql_quantidade_processos);
 
 
     if ($res_qtd->num_rows == 1) {
-        $res_qtd = mysqli_fetch_assoc($res_qtd);
-        $total = $res_qtd["total_processo"];
+        $res_qtd        = mysqli_fetch_assoc($res_qtd);
+        $total          = $res_qtd["total_processo"];
+        $chance_alta    = $res_qtd["chance_alta"];
+        $chance_media   = $res_qtd["chance_media"];
+        $chance_baixa   = $res_qtd["chance_baixa"];
 
         // var_dump($res_qtd);
     }
 
-    // if (count($_GET) > 0) {
-    //     $nome    = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
-    //     $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
-    //     $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
+    if (count($_GET) > 0) {
+        $tipo_acao    = isset($_GET['buscar_tipo_acao']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_tipo_acao'])) : null;
+        $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
+        $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
-    //     $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
-    //     $params = [];
-    //     $types  = "";
+        $sql_filtros = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+        FROM processo as p 
+        INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
+        WHERE p.usuario_config_id_usuario_config = $id_user";
 
-    //     if (!empty($nome)) {
-    //         $sql_filtros .= " AND nome LIKE ?";
-    //         $params[] = "%$nome%";
-    //         $types   .= "s";
-    //     }
+        $params = [];
+        $types  = "";
 
-    //     if (!empty($filtrar)) {
-    //         if ($filtrar === "cliente" || $filtrar === "contrário") {
-    //             $sql_filtros .= " AND tipo_parte = ?";
-    //             $params[] = $filtrar;
-    //             $types   .= "s";
-    //         }
-    //     }
+        if (!empty($tipo_acao)) {
+            $sql_filtros .= " AND tipo_acao LIKE ?";
+            $params[] = "%$tipo_acao%";
+            $types   .= "s";
+        }
 
-    //     switch ($ordenar) {
-    //         case "nome":
-    //             $sql_filtros .= " ORDER BY nome ASC";
-    //             break;
-    //         case "recentes":
-    //             $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
-    //             break;
-    //         case "antigos":
-    //             $sql_filtros .= " ORDER BY dt_cadastro_pessoa ASC";
-    //             break;
-    //         default:
-    //             $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
-    //             break;
-    //     }
+        if (!empty($filtrar)) {
+            $sql_filtros .= " AND grupo_acao = ?";
+            $params[] = $filtrar;
+            $types   .= "s";
+        }
 
-    //     $stmt = $conexao->prepare($sql_filtros);
+        switch ($ordenar) {
+            case "tipo_acao":
+                $sql_filtros .= " ORDER BY tipo_acao ASC";
+                break;
+            case "recentes":
+                $sql_filtros .= " ORDER BY dt_cadastro_processo DESC";
+                break;
+            case "antigos":
+                $sql_filtros .= " ORDER BY dt_cadastro_processo ASC";
+                break;
+            default:
+                $sql_filtros .= " ORDER BY dt_cadastro_processo DESC";
+                break;
+        }
 
-    //     if (!empty($params)) {
-    //         $stmt->bind_param($types, ...$params);
-    //     }
+        $stmt = $conexao->prepare($sql_filtros);
 
-    //     $stmt->execute();
-    //     $res = $stmt->get_result();
-    // } else {
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
 
-    $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+        $stmt->execute();
+        $res = $stmt->get_result();
+    } else {
+
+        $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
 FROM processo as p 
 INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
 WHERE p.usuario_config_id_usuario_config = $id_user ORDER BY p.dt_cadastro_processo DESC";
-    $res = $conexao->query($sql_busca_pessoas);
-    // }
+        $res = $conexao->query($sql_busca_pessoas);
+    }
 }
 
 
 
-// if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-//     $input = file_get_contents("php://input");
-//     $data = json_decode($input, true);
-//     $token = $data['token'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == 'deletar') {
+
+    $token = htmlspecialchars($conexao->real_escape_string($_POST['token']));
+
+    if ($token) {
+
+        try {
+            $conexao->begin_transaction();
+            $sql_busca_processo = "SELECT referencia 
+                       FROM processo 
+                       WHERE usuario_config_id_usuario_config = $id_user 
+                         AND tk = '$token'";
+            $res = $conexao->query($sql_busca_processo);
+
+            $processo_encontrado = $res->fetch_assoc();
+            $referencia_processo = $processo_encontrado['referencia'] ?? null;
 
 
-
-//     if ($token) {
-
-//         try {
-//             $conexao->begin_transaction();
-//             $sql_busca_pessoas = "SELECT nome FROM pessoas where usuario_config_id_usuario_config = $id_user and tk = '$token'";
-//             $res = $conexao->query($sql_busca_pessoas);
-//             $nome_pessoa_excluida = $res->fetch_assoc();
-//             $nome_pessoa_excluida = $nome_pessoa_excluida['nome'];
-
-//             $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
-//             $stmt = $conexao->prepare($sql_delete_pessoa);
-//             $stmt->bind_param('si', $token, $id_user);
+            $sql_delete_processo = 'DELETE FROM processo WHERE tk = ? AND usuario_config_id_usuario_config = ?';
+            $stmt = $conexao->prepare($sql_delete_processo);
+            $stmt->bind_param('si', $token, $id_user);
 
 
-//             if ($stmt->execute()) {
+            if ($stmt->execute()) {
 
 
-//                 $ip = $_SERVER['REMOTE_ADDR'];
+                $ip = $_SERVER['REMOTE_ADDR'];
 
-//                 if (cadastro_log('Excluiu Pessoa', $nome_pessoa_excluida, $ip, $id_user)) {
-//                     $res = [
-//                         'status' => 'success',
-//                         'message' => 'Pessoa excluída com sucesso!',
-//                     ];
-//                     echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                     $conexao->commit();
-//                     $conexao->close();
-//                     exit;
-//                 }
-//             }
-//         } catch (Exception $err) {
-//             $res = [
-//                 'status' => 'erro',
-//                 'message' => 'Erro:' . $err->getMessage()
-//             ];
-//             echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//             $conexao->rollback();
-//             $conexao->close();
-//             exit;
-//         }
-//     }
-// }
+                if (cadastro_log('Excluiu Processo', $referencia_processo, $ip, $id_user)) {
+                    $res = [
+                        'status' => 'success',
+                        'message' => 'Processo excluída com sucesso!',
+                    ];
+                    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                    $conexao->commit();
+                    $conexao->close();
+                    exit;
+                }
+            }
+        } catch (Exception $err) {
+            $res = [
+                'status' => 'erro',
+                'message' => 'Erro:' . $err->getMessage()
+            ];
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->rollback();
+            $conexao->close();
+            exit;
+        }
+    }
+}
 
 
 ?>
@@ -156,8 +166,10 @@ include_once('../geral/topo.php');
         <div class="pai_conteudo">
 
             <div class="infos_pagina">
-                <button> <i class="fa-regular fa-user"> </i> <?php echo $total <= 1 ?  "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
-
+                <button> <i class="fa-regular fa-folder"></i> <?php echo $total <= 1 ?  "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i> <?php echo  "$chance_alta chance alta" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i> <?php echo  "$chance_media chance média" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i> <?php echo  "$chance_baixa chance baixa" ?> </button>
             </div>
 
             <div class="opcoes_funcoes">
@@ -166,18 +178,25 @@ include_once('../geral/topo.php');
                 <form action="" method="get">
 
                     <div class="div_pai_funcoes">
-                        <input type="text" id="buscar_pessoas" name="buscar_pessoas" value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>" placeholder="Buscar Por Tipo de Ação">
+                        <input type="text" id="buscar_tipo_acao" name="buscar_tipo_acao" value="<?= isset($_GET['buscar_tipo_acao']) ? htmlspecialchars($_GET['buscar_tipo_acao']) : '' ?>" placeholder="Buscar Por Tipo de Ação">
                         <i class="fa-regular fa-pen-to-square"></i>
                     </div>
 
                     <div class="div_pai_funcoes">
 
-                        <select name="filtrar" id="filtrar">
-                            <option value="">Filtrar Por Grupo</option>
-                            <option value="cliente" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'cliente') ? 'selected' : '' ?>>Clientes</option>
-                            <option value="contrário" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'contrário') ? 'selected' : '' ?>>Partes Contrárias</option>
-                            <option value="com_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'com_andamento') ? 'selected' : '' ?>>Com Processo em Andamento</option>
-                            <option value="sem_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'sem_andamento') ? 'selected' : '' ?>>Sem Processo em Andamento</option>
+                        <select name="filtrar" id="filtrar" style="width: 200px;">
+                            <option value="">Filtrar</option>
+                            <option value="administrativo" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'administrativo') ? 'selected' : '' ?>>Administrativo</option>
+                            <option value="trabalhista" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'trabalhista') ? 'selected' : '' ?>>Trabalhista</option>
+                            <option value="civil" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'civil') ? 'selected' : '' ?>>Civil</option>
+                            <option value="familia" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'familia') ? 'selected' : '' ?>>Família</option>
+                            <option value="previdenciario" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'previdenciario') ? 'selected' : '' ?>>Previdenciário</option>
+                            <option value="tributario" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'tributario') ? 'selected' : '' ?>>Tributário</option>
+                            <option value="consumidor" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'consumidor') ? 'selected' : '' ?>>Consumidor</option>
+                            <option value="empresarial" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'empresarial') ? 'selected' : '' ?>>Empresarial</option>
+                            <option value="penal" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'penal') ? 'selected' : '' ?>>Penal</option>
+                            <option value="imobiliario" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'imobiliario') ? 'selected' : '' ?>>Imobiliário</option>
+                            <option value="eleitoral" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'eleitoral') ? 'selected' : '' ?>>Eleitoral</option>
                         </select>
                     </div>
 
@@ -186,14 +205,15 @@ include_once('../geral/topo.php');
                         <i class="fa-solid fa-arrow-up-wide-short"></i>
                         <select name="ordenar" id="ordenar">
                             <option value="">ordenar</option>
+                            <option value="tipo_acao" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'tipo_acao') ? 'selected' : '' ?>>Tipo Ação</option>
                             <option value="recentes" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'recentes') ? 'selected' : '' ?>>Mais Recentes</option>
                             <option value="antigos" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] === 'antigos') ? 'selected' : '' ?>>Mais Antigos</option>
                         </select>
                     </div>
 
-                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
+                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;" for="buscar_tipo_acao"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
 
-                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-broom"></i></label> </a></button>
+                    <button type="submit" class="btn_pesquisar"><a href="./processos.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_tipo_acao"><i class="fa-solid fa-broom"></i></label> </a></button>
                 </form>
 
                 <!-- <div class="div_pai_funcoes">
@@ -252,7 +272,7 @@ include_once('../geral/topo.php');
                                         }
                                         ?>
 
-                                        <div class="dados_processo <?php echo $classeChance ?>">
+                                        <div class="dados_processo <?php echo $classeChance ?>" onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'">
                                             <div class="conteudo_pessoa container_tipo_acao">
                                                 <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?></div>
                                                 <div class="nome_pessoa">
@@ -281,20 +301,20 @@ include_once('../geral/topo.php');
 
                                                     <div class="opcoes_pessoa">
                                                         <ul>
-                                                            <a href="./ficha_processo.php?tkn=<?php echo $proceso['tk'] ?>">
+                                                            <a href="./ficha_processo.php?tkn=<?php echo $proceso['tk'] ?>  " target="_blank">
                                                                 <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                             </a>
 
-                                                            <a href="./docs_processo.php?tkn=<?php echo $proceso['tk'] ?>">
+                                                            <a href="./docs_processo.php?tkn=<?php echo $proceso['tk'] ?>" target="_blank">
                                                                 <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                             </a>
 
 
-                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $proceso['tk'] ?>">
+                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $proceso['tk'] ?>" target="_blank">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 
-                                                            <a href="javascript:void(0)" class="excluir_pessoa">
+                                                            <a href="javascript:void(0)" class="excluir_processo">
                                                                 <input type="hidden" class="token" value="<?php echo $proceso['tk'] ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
@@ -370,13 +390,14 @@ include_once('../geral/topo.php');
         })
     </script>
 
-    <!-- <script>
+    <script>
         $(function() {
-            $('.excluir_pessoa').on('click', function() {
+            $('.excluir_processo').on('click', function() {
                 let tk = $(this).find('.token').val()
 
+
                 Swal.fire({
-                    title: "Deseja realmente excluir a pessoa?",
+                    title: "Deseja realmente excluir o processo?",
                     text: "A ação é irreversível!",
                     icon: "warning",
                     showCancelButton: true,
@@ -388,19 +409,18 @@ include_once('../geral/topo.php');
                     if (result.isConfirmed) {
 
                         $.ajax({
-                            url: './pessoas.php',
-                            type: 'DELETE',
-                            contentType: 'application/json',
-                            data: JSON.stringify({
+                            url: './processos.php?acao=deletar',
+                            type: 'POST',
+                            data: {
                                 token: tk
-                            }),
+                            },
                             dataType: 'json',
                             success: function(res) {
 
                                 if (res.status == "success") {
                                     Swal.fire({
                                         title: "Exclusão",
-                                        text: "Pessoa excluída com sucesso!",
+                                        text: "Proceso excluído com sucesso!",
                                         icon: "success"
                                     });
                                 } else {
@@ -424,7 +444,7 @@ include_once('../geral/topo.php');
                 });
             })
         })
-    </script> -->
+    </script>
 
 </body>
 

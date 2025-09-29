@@ -327,7 +327,7 @@ include_once('../geral/topo.php');
                         <div class="tab-pane" id="docs">
                             <div class="processes-section">
                                 <div class="section-header">
-                                    <h3>Documentos do Cliente</h3>
+                                    <h3>Documentos do Processo</h3>
                                     <a href="./docs_processo.php?tkn=<?= urlencode($_GET['tkn']) ?>" style="text-decoration: none;">
                                         <button class="btn-secondary">
                                             <i class="fas fa-plus"></i> Novo Documento
@@ -357,7 +357,7 @@ include_once('../geral/topo.php');
                                     <div class="empty-state">
                                         <i class="fa-solid fa-folder empty-icon"></i>
                                         <h4>Nenhum documento cadastrado</h4>
-                                        <p>Este cliente ainda não possui documentos associados.</p>
+                                        <p>Este processo ainda não possui documentos associados.</p>
                                     </div>
                                 <?php endif; ?>
                             </div>
