@@ -32,7 +32,7 @@
     }
 
     .pai_topo {
-        width: 96%;
+        width: 100%;
         max-width: 1260px;
         background-color: white;
         display: flex;

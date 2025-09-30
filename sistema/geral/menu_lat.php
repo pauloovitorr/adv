@@ -94,7 +94,7 @@
                     <p>PAINEL</p>
                 </div>
             </a></li>
-        <li id="crm"><a href="">
+        <li id="crm"><a href="../crm/crm_processo.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/crm.png" alt="">
                     <p>CRM</p>
                 </div>

@@ -200,10 +200,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
     // Executa
     if ($stmt->execute()) {
-        header("Location: ./cadastro_processo.php?acao=editar&tkn=" . $_GET['tkn']);
+
+        header("Location: ./cadastro_processo.php?acao=editar&tkn=" . $_GET['tkn'] . "&msg=excluido");
+
+
         exit;
     } else {
-        echo "Erro ao atualizar: " . $stmt->error;
+        header("Location: ./cadastro_processo.php?acao=editar&tkn=" . $_GET['tkn'] . "&msg=erro");
+        exit;
     }
 
     $stmt->close();
@@ -568,6 +572,29 @@ include_once('../geral/topo.php');
     </main>
 
 
+    <?php if (isset($_GET['msg'])): ?>
+        <script>
+            <?php if ($_GET['msg'] === 'excluido'): ?>
+                Swal.fire({
+                    title: "Atualização",
+                    text: "Processo atualizado com sucesso!",
+                    icon: "success",
+                    draggable: true
+                });
+            <?php elseif ($_GET['msg'] === 'erro'): ?>
+                Swal.fire({
+                    title: "Erro",
+                    text: "Ocorreu um problema ao atualizar o processo.",
+                    icon: "error",
+                    draggable: true
+                });
+            <?php endif; ?>
+        </script>
+    <?php endif; ?>
+
+
+
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         const tiposPorGrupo = {
@@ -755,158 +782,6 @@ include_once('../geral/topo.php');
         });
     </script>
 
-
-
-
-
-
-
-    <!-- Ajax para cadastro de pessoa -->
-    <!-- <script>
-        $(document).ready(function() {
-
-            let form = $("#cadastrar").length ? $("#cadastrar") : '';
-            // Validação ao submeter o formulário
-            $(form).on('submit', function(e) {
-
-                $('.btn_cadastrar').attr('disabled', true)
-
-                Swal.fire({
-                    title: "Carregando...",
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                e.preventDefault();
-
-
-                // Ajax para realizar o cadastro
-                let dados_form = new FormData(this);
-                $.ajax({
-                    url: 'cadastro_pessoa.php',
-                    type: 'POST',
-                    data: dados_form,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function(res) {
-                        if (res.status === 'erro') {
-
-                            Swal.fire({
-                                icon: "error",
-                                title: "Erro",
-                                text: res.message
-                            });
-
-                            $('.btn_cadastrar').attr('disabled', false)
-
-
-                        } else if (res.status === 'success') {
-                            Swal.close();
-
-                            setTimeout(() => {
-                                Swal.fire({
-                                    title: "Sucesso!",
-                                    text: res.message,
-                                    icon: "success"
-                                }).then((result) => {
-                                    window.location.href = "./docs_pessoa.php?tkn=" + res.token;
-                                });
-                            }, 300);
-                        }
-
-
-                    },
-                    error: function(err) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Erro",
-                            text: err.message,
-                        });
-                        $('.btn_cadastrar').attr('disabled', false)
-                    }
-                })
-
-
-
-            });
-        })
-    </script> -->
-
-    <!-- Ajax para atualização de pessoa -->
-    <!-- <script>
-        $(document).ready(function() {
-            // Validação ao submeter o formulário
-            let form = $("#editar").length ? $("#editar") : '';
-
-            $(form).on('submit', function(e) {
-
-                $('.btn_cadastrar').attr('disabled', true)
-
-                Swal.fire({
-                    title: "Carregando...",
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                e.preventDefault();
-
-
-                // Ajax para realizar a atualização
-                let dados_form = new FormData(this);
-                $.ajax({
-                    url: 'cadastro_pessoa.php',
-                    type: 'POST',
-                    data: dados_form,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function(res) {
-                        if (res.status === 'erro') {
-
-                            Swal.fire({
-                                icon: "error",
-                                title: "Erro",
-                                text: res.message
-                            });
-
-                            $('.btn_cadastrar').attr('disabled', false)
-
-
-                        } else if (res.status === 'success') {
-                            // console.log('sucesso')
-                            Swal.close();
-
-                            setTimeout(() => {
-                                Swal.fire({
-                                    title: "Sucesso!",
-                                    text: res.message,
-                                    icon: "success"
-                                }).then((result) => {
-                                    window.location.reload()
-                                });
-                            }, 300);
-                        }
-
-
-                    },
-                    error: function(err) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Erro",
-                            text: err.message,
-                        });
-                        $('.btn_cadastrar').attr('disabled', false)
-                    }
-                })
-
-
-
-            });
-        })
-    </script> -->
 
 
 
