@@ -13,6 +13,8 @@ $id_user = $_SESSION['cod'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/kanban/crm.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
     <title>ADV Conectado</title>
 </head>
 
@@ -35,20 +37,13 @@ include_once('../geral/topo.php');
 
             <div class="topo_kanban">
                 <h1>Gestão CRM</h1>
-                <!-- <button id="add-card-btn">+ Adicionar Card</button> -->
+                <button id="config_crm"><i class="fa-solid fa-gear"></i> Configurar CRM</button>
             </div>
 
             <div class="kanban">
                 <div class="kanban-column" data-id="1">
-                    <h2>Em atendimento</h2>
+                    <h2>Análise do Caso</h2>
                     <div class="kanban-cards" id="column1">
-
-                    </div>
-                </div>
-
-                <div class="kanban-column" data-id="2">
-                    <h2>Aguardando confirmação</h2>
-                    <div class="kanban-cards" id="column2">
                         <div class="kanban-card">
                             <div class="badge medium"><span>Média prioridade</span></div>
                             <p class="card-title">Verificar pagamento</p>
@@ -74,45 +69,166 @@ include_once('../geral/topo.php');
                     </div>
                 </div>
 
-                <div class="kanban-column" data-id="3">
-                    <h2>Fazendo</h2>
-                    <div class="kanban-cards" id="column3">
+                <div class="kanban-column" data-id="2">
+                    <h2>Negociação</h2>
+                    <div class="kanban-cards" id="column2"></div>
+                </div>
 
-                    </div>
+                <div class="kanban-column" data-id="3">
+                    <h2>Aguardando Documentos</h2>
+                    <div class="kanban-cards" id="column3"></div>
                 </div>
 
                 <div class="kanban-column" data-id="4">
-                    <h2>Finalizado</h2>
-
-                    <div class="kanban-cards" id="column4">
-
-                    </div>
+                    <h2>Proposta</h2>
+                    <div class="kanban-cards" id="column4"></div>
                 </div>
 
                 <div class="kanban-column" data-id="5">
-                    <h2>Finalizado</h2>
-
+                    <h2>Ação Protocolada</h2>
+                    <div class="kanban-cards" id="column5"></div>
                 </div>
 
                 <div class="kanban-column" data-id="6">
-                    <h2>Finalizado</h2>
-
+                    <h2>Aguardando Audiência</h2>
+                    <div class="kanban-cards" id="column6"></div>
                 </div>
 
                 <div class="kanban-column" data-id="7">
-                    <h2>Finalizado</h2>
-                    <div class="kanban-cards" id="column7">
-
-
-
-                    </div>
+                    <h2>Aguardando Julgamento</h2>
+                    <div class="kanban-cards" id="column7"></div>
                 </div>
 
+                <div class="kanban-column" data-id="8">
+                    <h2>Desenvolvendo Recurso</h2>
+                    <div class="kanban-cards" id="column8"></div>
+                </div>
+
+                <div class="kanban-column" data-id="9">
+                    <h2>Fechamento</h2>
+                    <div class="kanban-cards" id="column9"></div>
+                </div>
             </div>
+
 
 
         </div>
     </main>
+
+
+
+
+    <script>
+        $(document).ready(function() {
+            $("#config_crm").on("click", function() {
+                Swal.fire({
+                    title: 'Configuração do CRM',
+                    html: `
+              <div class="crm-config">
+                <!-- Lista de etapas -->
+                <div class="crm-steps">
+                  <h3>Etapas CRM</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Nome</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sortable-steps">
+                      <tr>
+                        <td>1</td>
+                        <td>Análise do Caso</td>
+                        <td>
+                          <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>Negociação</td>
+                        <td>
+                          <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>3</td>
+                        <td>Aguardando Documentos</td>
+                        <td>
+                          <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Adicionar nova etapa -->
+                <div class="crm-add-step">
+                  <h3>Adicionar Etapa</h3>
+                  <form id="form-add-etapa">
+                    <label for="etapa-nome">Nome</label>
+                    <input type="text" id="etapa-nome" placeholder="Digite o nome da etapa">
+                    <button type="submit" class="add-btn">
+                      <i class="fa-solid fa-plus"></i> Adicionar
+                    </button>
+                  </form>
+                </div>
+              </div>
+            `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Salvar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: " #3085d6",
+                    cancelButtonColor: "#d33",
+                    didOpen: () => {
+                        // Inicializa sortable apenas depois do SweetAlert abrir
+                        new Sortable(document.getElementById('sortable-steps'), {
+                            animation: 150,
+                            ghostClass: 'drag-highlight',
+                            onEnd: function(evt) {
+                                console.log('Nova ordem:', evt.oldIndex, '->', evt.newIndex);
+                            }
+                        });
+
+                        // Captura envio do formulário dentro do Swal
+                        $("#form-add-etapa").on("submit", function(e) {
+                            e.preventDefault();
+                            const nome = $("#etapa-nome").val();
+                            if (nome.trim() !== "") {
+                                $("#sortable-steps").append(`
+                          <tr>
+                            <td>-</td>
+                            <td>${nome}</td>
+                            <td>
+
+                              <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                          </tr>
+                        `);
+                                $("#etapa-nome").val("");
+                            }
+                        });
+                    },
+                    preConfirm: () => {
+                        // coleta dados da tabela
+                        const etapas = [];
+                        $("#sortable-steps tr").each(function() {
+                            const nome = $(this).find("td:nth-child(2)").text();
+                            etapas.push(nome);
+                        });
+                        return {
+                            etapas
+                        };
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log("Etapas salvas:", result.value.etapas);
+                        Swal.fire('Configuração salva!', '', 'success');
+                    }
+                });
+            });
+        });
+    </script>
 
 
 
@@ -209,72 +325,73 @@ include_once('../geral/topo.php');
             // Carregar o estado salvo (se existir)
             // loadKanbanState();
 
-            // Modal para adicionar novo card
-            const modal = document.getElementById('add-card-modal');
-            const addCardBtn = document.getElementById('add-card-btn');
-            const closeBtn = document.querySelector('.close');
-            const addCardForm = document.getElementById('add-card-form');
+            // // Modal para adicionar novo card
+            // const modal = document.getElementById('add-card-modal');
+            // const addCardBtn = document.getElementById('add-card-btn');
+            // const closeBtn = document.querySelector('.close');
+            // const addCardForm = document.getElementById('add-card-form');
 
-            // Abrir modal
-            addCardBtn.addEventListener('click', function() {
-                modal.style.display = 'block';
-            });
+            // // Abrir modal
+            // addCardBtn.addEventListener('click', function() {
+            //     modal.style.display = 'block';
+            // });
 
-            // Fechar modal
-            closeBtn.addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
+            // // Fechar modal
+            // closeBtn.addEventListener('click', function() {
+            //     modal.style.display = 'none';
+            // });
 
-            // Fechar modal ao clicar fora dele
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
+            // // Fechar modal ao clicar fora dele
+            // window.addEventListener('click', function(event) {
+            //     if (event.target === modal) {
+            //         modal.style.display = 'none';
+            //     }
+            // });
 
             // Adicionar novo card
-            addCardForm.addEventListener('submit', function(e) {
-                e.preventDefault();
+            // addCardForm.addEventListener('submit', function(e) {
+            //     e.preventDefault();
 
-                const title = document.getElementById('card-title').value;
-                const columnId = document.getElementById('card-column').value;
-                const priority = document.getElementById('card-priority').value;
+            //     const title = document.getElementById('card-title').value;
+            //     const columnId = document.getElementById('card-column').value;
+            //     const priority = document.getElementById('card-priority').value;
 
-                // Gerar um avatar aleatório
-                const avatarId = Math.floor(Math.random() * 70) + 1;
+            //     // Gerar um avatar aleatório
+            //     const avatarId = Math.floor(Math.random() * 70) + 1;
 
-                addNewCard(columnId, title, priority, avatarId);
+            //     addNewCard(columnId, title, priority, avatarId);
 
-                // Fechar modal e limpar formulário
-                modal.style.display = 'none';
-                addCardForm.reset();
+            //     // Fechar modal e limpar formulário
+            //     modal.style.display = 'none';
+            //     addCardForm.reset();
 
-                // Salvar o estado atualizado
-                saveKanbanState();
-            });
+            //     // Salvar o estado atualizado
+            //     saveKanbanState();
+            // });
 
-            // Função para adicionar novos cards
-            function addNewCard(columnId, title, priority, avatarId) {
-                const column = document.getElementById(`column${columnId}`);
-                const newCard = document.createElement('div');
-                newCard.className = 'kanban-card';
+            //     // Função para adicionar novos cards
+            //     function addNewCard(columnId, title, priority, avatarId) {
+            //         const column = document.getElementById(`column${columnId}`);
+            //         const newCard = document.createElement('div');
+            //         newCard.className = 'kanban-card';
 
-                let priorityText = getPriorityText(priority);
+            //         let priorityText = getPriorityText(priority);
 
-                newCard.innerHTML = `
-            <div class="badge ${priority}"><span>${priorityText}</span></div>
-            <p class="card-title">${title}</p>
-            <div class="card-footer">
-                <img src="https://i.pravatar.cc/30?img=${avatarId}" alt="avatar" class="avatar">
-            </div>
-        `;
+            //         newCard.innerHTML = `
+            //     <div class="badge ${priority}"><span>${priorityText}</span></div>
+            //     <p class="card-title">${title}</p>
+            //     <div class="card-footer">
+            //         <img src="https://i.pravatar.cc/30?img=${avatarId}" alt="avatar" class="avatar">
+            //     </div>
+            // `;
 
-                column.appendChild(newCard);
-            }
+            //         column.appendChild(newCard);
+            //     }
 
-            window.addNewCard = addNewCard;
+            //     window.addNewCard = addNewCard;
         });
     </script>
+
 
     <script>
         const kanban = document.querySelector(".kanban");
@@ -311,9 +428,6 @@ include_once('../geral/topo.php');
             kanban.scrollLeft = scrollLeft - walk;
         });
     </script>
-
-
-
 </body>
 
 </html>
