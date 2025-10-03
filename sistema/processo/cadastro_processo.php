@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $stmt = $conexao->prepare($sql);
 
     $stmt->bind_param(
-        "iisssssssssssssss",
+        "iissssssssissssss",
         $cliente,
         $contrario,
         $token,
@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
 
     $stmt->bind_param(
-        "iissssssssssssssi",
+        "iisssssssissssssi",
         $cliente_id,
         $contrario_id,
         $grupo_acao,
@@ -215,10 +215,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['busca_etapa'])) {
 
+    $lista_etapas = [];
+
+    if ($_POST['busca_etapa'] == 'padrao') {
+        $sql_busca_etapas_crm = "SELECT id_etapas_crm, nome FROM etapas_crm WHERE usuario_config_id_usuario_config = $id_user ORDER BY ordem ASC";
+        $etapas_padrao = $conexao->query($sql_busca_etapas_crm);
+
+
+        while ($etapa = $etapas_padrao->fetch_assoc()) {
+            array_push($lista_etapas, $etapa);
+        }
+    } else {
+
+        $termo = $_POST['busca_etapa'];
+
+        $sql_busca_etapas_crm = "SELECT id_etapas_crm, nome FROM etapas_crm WHERE nome LIKE '%$termo%' AND usuario_config_id_usuario_config = $id_user 
+        ORDER BY ordem ASC";
+        $etapas_padrao = $conexao->query($sql_busca_etapas_crm);
+
+        while ($etapa = $etapas_padrao->fetch_assoc()) {
+            array_push($lista_etapas, $etapa);
+        }
+    }
+
+    echo json_encode($lista_etapas);
+    $conexao->close();
+    exit;
+}
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['tkn'])) {
+
 
     $token_processo  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
 
@@ -240,6 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GE
     p.observacao,
     p.dt_cadastro_processo,
     p.dt_atualizacao_processo,
+ 
 
     -- Dados do cliente
     c.id_pessoa   AS cliente_id,
@@ -249,11 +279,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GE
     -- Dados do contrário
     ct.id_pessoa  AS contrario_id,
     ct.nome       AS contrario_nome,
-    ct.tipo_parte AS contrario_tipo_parte
+    ct.tipo_parte AS contrario_tipo_parte,
+
+    -- Etapas
+    e.id_etapas_crm,
+    e.nome
 
 FROM processo p
-LEFT JOIN pessoas c  ON p.cliente_id   = c.id_pessoa
-LEFT JOIN pessoas ct ON p.contrario_id = ct.id_pessoa
+LEFT JOIN pessoas c     ON p.cliente_id         = c.id_pessoa
+LEFT JOIN pessoas ct    ON p.contrario_id       = ct.id_pessoa
+LEFT JOIN etapas_crm e  ON e.id_etapas_crm      = p.etapa_kanban
 where p.tk = ? and p.usuario_config_id_usuario_config = ?;
 ';
 
@@ -485,18 +520,10 @@ include_once('../geral/topo.php');
                                 <div class="container_inputs">
 
                                     <div class="container_input">
+
                                         <label for="etapa_kanban">Etapa Kanban <span style="color: red;">*</span></label>
                                         <select name="etapa_kanban" id="etapa_kanban" required>
-                                            <option value="">Selecione...</option>
-                                            <option value="Análise do Caso" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Análise do Caso' ? 'selected' : '' ?>>Análise do Caso</option>
-                                            <option value="Negociação" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Negociação' ? 'selected' : '' ?>>Negociação</option>
-                                            <option value="Aguardando Documentos" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Aguardando Documentos' ? 'selected' : '' ?>>Aguardando Documentos</option>
-                                            <option value="Proposta" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Proposta' ? 'selected' : '' ?>>Proposta</option>
-                                            <option value="Ação Protocolada" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Ação Protocolada' ? 'selected' : '' ?>>Ação Protocolada</option>
-                                            <option value="Aguardando Audiência" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Aguardando Audiência' ? 'selected' : '' ?>>Aguardando Audiência</option>
-                                            <option value="Aguardando Julgamento" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Aguardando Julgamento' ? 'selected' : '' ?>>Aguardando Julgamento</option>
-                                            <option value="Desenvolvendo Recurso" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'Desenvolvendo Recurso' ? 'selected' : '' ?>>Desenvolvendo Recurso</option>
-                                            <option value="fechamento" <?php echo ($dados_processo['etapa_kanban'] ?? '') === 'fechamento' ? 'selected' : '' ?>>Fechamento</option>
+
                                         </select>
                                     </div>
 
@@ -865,6 +892,49 @@ include_once('../geral/topo.php');
                 }
             });
 
+
+
+            // Etapas CRM
+            $('#etapa_kanban').select2({
+                placeholder: "Selecione a etapa",
+                minimumInputLength: 0,
+                language: {
+                    inputTooShort: function(args) {
+                        return "Digite " + (args.minimum - args.input.length) + " ou mais caracteres";
+                    },
+                    noResults: function() {
+                        return "Nenhum resultado encontrado";
+                    },
+                    searching: function() {
+                        return "Buscando...";
+                    }
+                },
+                ajax: {
+                    url: 'cadastro_processo.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            busca_etapa: params.term || 'padrao'
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.id_etapas_crm,
+                                    text: item.nome
+                                };
+                            })
+                        };
+                    }
+                }
+            });
+
+
+
+
             // ===============================
             // INJETA VALORES PRÉ-SELECIONADOS
             // ===============================
@@ -878,6 +948,13 @@ include_once('../geral/topo.php');
             var contrario_nome = "<?php echo $dados_processo['contrario_nome'] ?? '' ?>";
             var optionContrario = new Option(contrario_nome, contrario_id, true, true);
             $('#contrario').append(optionContrario).trigger('change');
+
+
+            var etapa_id = "<?php echo $dados_processo['id_etapas_crm'] ?? '' ?>";
+            var etapa_nome = "<?php echo $dados_processo['nome'] ?? '' ?>";
+            var optionEtapa = new Option(etapa_nome, etapa_id, true, true);
+            $('#etapa_kanban').append(optionEtapa).trigger('change');
+
 
         });
     </script>

@@ -110,3 +110,14 @@ CREATE TABLE processo (
     CONSTRAINT fk_processo FOREIGN KEY (cliente_id) REFERENCES pessoas(id_pessoa)
     
 );
+
+
+CREATE TABLE etapas_crm (
+
+    id_etapas_crm INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    usuario_config_id_usuario_config INT NOT NULL,
+    
+    CONSTRAINT pk_etapas_crm PRIMARY KEY (id_etapas_crm),
+    CONSTRAINT fk_etapas_crm FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
+)
