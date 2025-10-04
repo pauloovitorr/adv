@@ -258,6 +258,11 @@ body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
   flex: 1;
 }
 
+.crm-steps{
+  max-height: 350px;
+  overflow-y: scroll;
+}
+
 .crm-steps h3,
 .crm-add-step h3 {
   margin-bottom: 15px;

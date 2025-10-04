@@ -8,7 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $etapas = $conexao->query($sql_busca_etapas_crm);
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    foreach ($_POST['ordem'] as $indice => $valor) {
 
+        $ordem = $indice + 1;
+        $sql_atualiza_ordem = "UPDATE etapas_crm SET ordem = $ordem where id_etapas_crm = $valor ";
+        if ($conexao->query($sql_atualiza_ordem)) {
+            echo json_encode(['status' => 'sucesso']);
+        }
+    }
+    exit;
+}
 
 ?>
 
@@ -143,34 +153,19 @@ include_once('../geral/topo.php');
                         <th>Ações</th>
                       </tr>
                     </thead>
+
                     <tbody id="sortable-steps">
-                    
-                    <?php while($etapa = $etapas->fetch_assoc()) ?>
-                      <tr>
-                        <td>1</td>
-                        <td>Análise do Caso</td>
-                        <td>
-                          <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                      </tr>
-
-
-
-                      <tr>
-                        <td>2</td>
-                        <td>Negociação</td>
-                        <td>
-                          <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>3</td>
-                        <td>Aguardando Documentos</td>
-                        <td>
-                          <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                      </tr>
+                        <?php while ($etapa = $etapas->fetch_assoc()): ?>
+                            <tr class="linha_etapa" data-id="<?php echo $etapa['id_etapas_crm'] ?>">
+                            <td><?php echo $etapa['ordem'] ?></td>
+                            <td><?php echo $etapa['nome'] ?></td>
+                            <td>
+                                <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                            </tr>
+                        <?php endwhile ?>
                     </tbody>
+
                   </table>
                 </div>
 
@@ -194,11 +189,25 @@ include_once('../geral/topo.php');
                     cancelButtonColor: "#d33",
                     didOpen: () => {
                         // Inicializa sortable apenas depois do SweetAlert abrir
-                        new Sortable(document.getElementById('sortable-steps'), {
+                        const sortable = new Sortable(document.getElementById('sortable-steps'), {
                             animation: 150,
                             ghostClass: 'drag-highlight',
                             onEnd: function(evt) {
-                                console.log('Nova ordem:', evt.oldIndex, '->', evt.newIndex);
+                                const ordemAtual = sortable.toArray();
+                                console.log("Ordem atual:", ordemAtual);
+
+                                $.ajax({
+                                    url: './crm_processo.php',
+                                    method: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        ordem: ordemAtual
+                                    },
+                                    success: function(resposta) {
+                                        console.log("Servidor respondeu:", resposta);
+                                    }
+                                })
+
                             }
                         });
 
