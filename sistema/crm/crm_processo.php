@@ -2,6 +2,13 @@
 include_once('../../scripts.php');
 $id_user = $_SESSION['cod'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+    $sql_busca_etapas_crm = "SELECT * FROM etapas_crm WHERE usuario_config_id_usuario_config = $id_user ORDER BY ordem ASC";
+    $etapas = $conexao->query($sql_busca_etapas_crm);
+}
+
+
 
 ?>
 
@@ -137,6 +144,8 @@ include_once('../geral/topo.php');
                       </tr>
                     </thead>
                     <tbody id="sortable-steps">
+                    
+                    <?php while($etapa = $etapas->fetch_assoc()) ?>
                       <tr>
                         <td>1</td>
                         <td>Análise do Caso</td>
@@ -144,6 +153,9 @@ include_once('../geral/topo.php');
                           <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
                         </td>
                       </tr>
+
+
+
                       <tr>
                         <td>2</td>
                         <td>Negociação</td>
