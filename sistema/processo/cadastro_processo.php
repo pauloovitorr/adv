@@ -58,11 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_cliente'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty($_POST['grupo_acao']) && !empty($_POST['tipo_acao']) && !empty($_POST['referencia']) && !empty($_POST['etapa_kanban']) && !empty($_POST['contingenciamento']) && $_POST['acao'] == 'cadastrar') {
 
-
-    // var_dump($_POST);
-
-    $cliente             = $conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? ''));
-    $contrario           = $conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? ''));
+    $cliente             = (int)($conexao->escape_string(htmlspecialchars($_POST['cliente'] ?? 0)));
+    $contrario           = (int)($conexao->escape_string(htmlspecialchars($_POST['contrario'] ?? 0)));
     $token               = bin2hex(random_bytes(64 / 2));
     $grupo_acao          = $conexao->escape_string(htmlspecialchars($_POST['grupo_acao'] ?? ''));
     $tipo_acao           = $conexao->escape_string(htmlspecialchars($_POST['tipo_acao'] ?? ''));
@@ -72,12 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
     $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
     $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
-    $etapa_kanban        = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
+    $etapa_kanban        = (int)($conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? 0)));
     $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
     $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
     $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
     $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
-    $acao                = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
 
     $sql = "INSERT INTO processo (
         cliente_id,
@@ -97,29 +93,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         resultado_processo,
         observacao,
         usuario_config_id_usuario_config
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $conexao->prepare($sql);
 
+    if (!$stmt) {
+        die("Erro na preparação da query: " . $conexao->error);
+    }
+
     $stmt->bind_param(
-        "iissssssssissssss",
-        $cliente,
-        $contrario,
-        $token,
-        $grupo_acao,
-        $tipo_acao,
-        $referencia,
-        $numero_processo,
-        $numero_protocolo,
-        $processo_originario,
-        $valor_causa,
-        $valor_honorarios,
-        $etapa_kanban,
-        $contingenciamento,
-        $data_requerimento,
-        $resultado_processo,
-        $observacao,
-        $id_user
+        "iissssssssssssssi",  // String CORRIGIDA
+        $cliente,             // 1  - i
+        $contrario,           // 2  - i
+        $token,               // 3  - s
+        $grupo_acao,          // 4  - s
+        $tipo_acao,           // 5  - s
+        $referencia,          // 6  - s
+        $numero_processo,     // 7  - s
+        $numero_protocolo,    // 8  - s
+        $processo_originario, // 9  - s
+        $valor_causa,         // 10 - s
+        $valor_honorarios,    // 11 - s 
+        $etapa_kanban,        // 12 - i
+        $contingenciamento,   // 13 - s
+        $data_requerimento,   // 14 - s
+        $resultado_processo,  // 15 - s
+        $observacao,          // 16 - s
+        $id_user              // 17 - i
     );
 
     if ($stmt->execute()) {
@@ -178,24 +178,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
 
     $stmt->bind_param(
-        "iisssssssissssssi",
-        $cliente_id,
-        $contrario_id,
-        $grupo_acao,
-        $tipo_acao,
-        $referencia,
-        $num_processo,
-        $num_protocolo,
-        $processo_originario,
-        $valor_causa,
-        $valor_honorarios,
-        $etapa_kanban,
-        $contingenciamento,
-        $data_requerimento,
-        $resultado_processo,
-        $observacao,
-        $id_user,
-        $pro_id
+        "iissssssssissssii",  
+        $cliente_id,           
+        $contrario_id,         
+        $grupo_acao,          
+        $tipo_acao,           
+        $referencia,          
+        $num_processo,        
+        $num_protocolo,       
+        $processo_originario, 
+        $valor_causa,          
+        $valor_honorarios,     
+        $etapa_kanban,         
+        $contingenciamento,   
+        $data_requerimento,    
+        $resultado_processo,  
+        $observacao,           
+        $id_user,              
+        $pro_id      
     );
 
     // Executa

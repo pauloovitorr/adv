@@ -96,6 +96,9 @@
   cursor: grab;
   transition: all 0.2s ease;
   border-left: 4px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .kanban-card:hover {
@@ -113,13 +116,25 @@
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
+.header_card{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ref_card{
+  font-size: 12px;
+}
+
 .badge {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 
 .badge.high {
@@ -149,94 +164,53 @@
   border-left-color: #57bbfe;
 }
 
-.card-title {
+.tipo_acao {
   font-size: 16px;
   font-weight: 500;
-  margin-bottom: 15px;
   color: #2c3e50;
 }
 
-.card-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
+.grupo_acao{
+   font-size: 14px;
+  font-weight: 500;
+  color: #2c3e50;
 }
 
-.avatar {
+.container_card{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dados_cliente{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.dados_cliente p,
+.card-footer span{
+font-size: 12px;
+}
+
+.dados_cliente img {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgb(226, 226, 226);
+  padding-top: 10px;
 }
 
-.modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 25px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
 
-.close:hover {
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-family: "Poppins", sans-serif;
-}
-
-form button {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
-  width: 100%;
-  margin-top: 10px;
-}
-
-form button:hover {
-  background-color: #2980b9;
-}
 
 /* Pop-up */
 

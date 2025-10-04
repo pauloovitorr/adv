@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $lista_etapas_kanban[] = $row;
     }
 
-    $conexao->close();
+    // $conexao->close();
 }
 
 
@@ -66,6 +66,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+
+
+
+// Função para mapear contingenciamento para classe CSS
+function getBadgeClass($contingenciamento)
+{
+    $contingenciamento = strtolower($contingenciamento);
+
+    if (strpos($contingenciamento, 'provável') !== false) {
+        return 'low';
+    } elseif (strpos($contingenciamento, 'possível') !== false) {
+        return 'medium';
+    } elseif (strpos($contingenciamento, 'remota') !== false) {
+        return 'high';
+    } else {
+        return 'medium'; // padrão
+    }
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -105,17 +125,82 @@ include_once('../geral/topo.php');
 
             <div class="kanban">
                 <?php foreach ($lista_etapas_kanban as $index => $etapa): ?>
+
+                    <?php
+                    $id_etapa =  $etapa['id_etapas_crm'];
+
+                    $sql_busca_processo_etapa = "SELECT 
+                                p.id_processo,
+                                p.tk,
+                                p.grupo_acao,
+                                p.tipo_acao,
+                                p.referencia,
+                                p.valor_causa,
+                                p.valor_honorarios,
+                                p.etapa_kanban,
+                                p.contingenciamento,                         
+
+                                -- Dados do cliente
+                                c.id_pessoa   AS cliente_id,
+                                c.nome        AS cliente_nome,
+                                c.foto_pessoa AS cliente_foto
+
+                            FROM processo p
+                            LEFT JOIN pessoas c     ON p.cliente_id         = c.id_pessoa
+                            where p.etapa_kanban = $id_etapa and p.usuario_config_id_usuario_config = $id_user";
+
+                    $cards_etapa = $conexao->query($sql_busca_processo_etapa);
+
+
+
+                    ?>
+
                     <div class="kanban-column" data-id="<?php echo $index + 1; ?>">
                         <h2><?php echo $etapa['ordem'] . ' - ' . $etapa['nome']; ?></h2>
                         <div class="kanban-cards" id="column<?php echo $index + 1; ?>">
-                            <!-- Aqui você pode colocar cards da etapa -->
-                            <div class="kanban-card">
-                                <div class="badge medium"><span>Média prioridade</span></div>
-                                <p class="card-title">Exemplo de card</p>
-                                <div class="card-footer">
-                                    <img src="https://i.pravatar.cc/30?img=<?php echo $index + 1; ?>" alt="avatar" class="avatar">
+
+                            <?php while ($card = $cards_etapa->fetch_assoc()):
+                                $badgeClass = getBadgeClass($card['contingenciamento']);
+                            ?>
+
+                                <div class="kanban-card" data-id="<?php echo $card['id_processo']; ?>">
+                                    <div class="header_card">
+                                        <p class="ref_card">ref: <?php echo $card['referencia']; ?></p>
+                                        <div class="badge <?php echo $badgeClass; ?>">
+                                            <span><?php echo ucfirst($card['contingenciamento']); ?></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="container_card">
+                                        <div class="dados_processo">
+                                            <p class="tipo_acao"><?php echo $card['tipo_acao']; ?></p>
+                                            <p class="grupo_acao"><?php echo $card['grupo_acao']; ?></p>
+                                        </div>
+
+                                        <div class="dados_cliente">
+                                            <p class="card-subtitle"><?php echo $card['cliente_nome']; ?></p>
+                                            <img src="../..<?php echo $card['cliente_foto']; ?>" alt="" srcset="">
+                                        </div>
+
+                                    </div>
+
+                                    <div class="card-footer">
+                                        <?php if (!empty($card['valor_causa'])): ?>
+                                            <span>Causa: <?php echo $card['valor_causa']; ?></span>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($card['valor_honorarios'])): ?>
+                                            <span>Comissão: <?php echo $card['valor_honorarios']; ?></span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    
                                 </div>
-                            </div>
+
+
+
+                            <?php endwhile; ?>
+
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -285,7 +370,7 @@ include_once('../geral/topo.php');
                     onEnd: function(evt) {
                         // Aqui você pode adicionar lógica para salvar o estado
                         // Por exemplo, enviar para um backend ou salvar no localStorage
-                        saveKanbanState();
+                        // saveKanbanState();
                     }
                 });
             });
