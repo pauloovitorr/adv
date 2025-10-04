@@ -265,10 +265,15 @@ body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
 
 .crm-steps h3,
 .crm-add-step h3 {
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   font-size: 18px;
   font-weight: 600;
   color: #2c3e50;
+}
+
+.crm-steps span{
+  margin-bottom: 15px;
+  font-size: 14px;
 }
 
 .crm-steps table {

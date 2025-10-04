@@ -6,7 +6,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $sql_busca_etapas_crm = "SELECT * FROM etapas_crm WHERE usuario_config_id_usuario_config = $id_user ORDER BY ordem ASC";
     $etapas = $conexao->query($sql_busca_etapas_crm);
+
+
+    $lista_etapas_kanban = [];
+    while ($row = $etapas->fetch_assoc()) {
+        $lista_etapas_kanban[] = $row;
+    }
+
+    $conexao->close();
 }
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nova_etapa'])) {
+    $noma_etapa = $conexao->escape_string(htmlspecialchars($_POST['nova_etapa']));
+
+    $ultima_etapa = "SELECT ordem FROM etapas_crm WHERE usuario_config_id_usuario_config = $id_user ORDER BY 'ordem' DESC LIMIT 1";
+    $ultimo = $conexao->query($ultima_etapa);
+    $ultimo = $ultimo->fetch_assoc();
+
+    $ordem_nova_etapa = intval($ultimo['ordem']) + 1;
+    $sql_cadastra_etapa = "INSERT INTO etapas_crm (ordem,nome, usuario_config_id_usuario_config) 
+    VALUES ($ordem_nova_etapa, '$noma_etapa', $id_user)";
+
+    if ($conexao->query($sql_cadastra_etapa)) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Etapa cadastrada com sucesso!',
+            'data' => [
+                'id' => $conexao->insert_id,
+                'nome' => $noma_etapa
+            ]
+        ];
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Etapa cadastrada com sucesso!',
+        ];
+    }
+
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+
+    $conexao->close();
+    exit;
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($_POST['ordem'] as $indice => $valor) {
@@ -17,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['status' => 'sucesso']);
         }
     }
+
+    $conexao->close();
     exit;
 }
 
@@ -58,75 +104,22 @@ include_once('../geral/topo.php');
             </div>
 
             <div class="kanban">
-                <div class="kanban-column" data-id="1">
-                    <h2>Análise do Caso</h2>
-                    <div class="kanban-cards" id="column1">
-                        <div class="kanban-card">
-                            <div class="badge medium"><span>Média prioridade</span></div>
-                            <p class="card-title">Verificar pagamento</p>
-                            <div class="card-footer">
-                                <img src="https://i.pravatar.cc/30?img=2" alt="avatar" class="avatar">
-                            </div>
-                        </div>
-                        <div class="kanban-card">
-                            <div class="badge high"><span>Alta prioridade</span></div>
-                            <p class="card-title">Confirmar entrega</p>
-                            <div class="card-footer">
-                                <img src="https://i.pravatar.cc/30?img=6" alt="avatar" class="avatar">
-                            </div>
-                        </div>
-
-                        <div class="kanban-card">
-                            <div class="badge low"><span>Alta prioridade</span></div>
-                            <p class="card-title">Confirmar entrega</p>
-                            <div class="card-footer">
-                                <img src="https://i.pravatar.cc/30?img=6" alt="avatar" class="avatar">
+                <?php foreach ($lista_etapas_kanban as $index => $etapa): ?>
+                    <div class="kanban-column" data-id="<?php echo $index + 1; ?>">
+                        <h2><?php echo $etapa['ordem'] . ' - ' . $etapa['nome']; ?></h2>
+                        <div class="kanban-cards" id="column<?php echo $index + 1; ?>">
+                            <!-- Aqui você pode colocar cards da etapa -->
+                            <div class="kanban-card">
+                                <div class="badge medium"><span>Média prioridade</span></div>
+                                <p class="card-title">Exemplo de card</p>
+                                <div class="card-footer">
+                                    <img src="https://i.pravatar.cc/30?img=<?php echo $index + 1; ?>" alt="avatar" class="avatar">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="kanban-column" data-id="2">
-                    <h2>Negociação</h2>
-                    <div class="kanban-cards" id="column2"></div>
-                </div>
-
-                <div class="kanban-column" data-id="3">
-                    <h2>Aguardando Documentos</h2>
-                    <div class="kanban-cards" id="column3"></div>
-                </div>
-
-                <div class="kanban-column" data-id="4">
-                    <h2>Proposta</h2>
-                    <div class="kanban-cards" id="column4"></div>
-                </div>
-
-                <div class="kanban-column" data-id="5">
-                    <h2>Ação Protocolada</h2>
-                    <div class="kanban-cards" id="column5"></div>
-                </div>
-
-                <div class="kanban-column" data-id="6">
-                    <h2>Aguardando Audiência</h2>
-                    <div class="kanban-cards" id="column6"></div>
-                </div>
-
-                <div class="kanban-column" data-id="7">
-                    <h2>Aguardando Julgamento</h2>
-                    <div class="kanban-cards" id="column7"></div>
-                </div>
-
-                <div class="kanban-column" data-id="8">
-                    <h2>Desenvolvendo Recurso</h2>
-                    <div class="kanban-cards" id="column8"></div>
-                </div>
-
-                <div class="kanban-column" data-id="9">
-                    <h2>Fechamento</h2>
-                    <div class="kanban-cards" id="column9"></div>
-                </div>
+                <?php endforeach; ?>
             </div>
-
 
 
         </div>
@@ -145,25 +138,24 @@ include_once('../geral/topo.php');
                 <!-- Lista de etapas -->
                 <div class="crm-steps">
                   <h3>Etapas CRM</h3>
+                  <span>Arraste para ordenar as etapas. A lista está na ordem atual.</span>
                   <table>
                     <thead>
                       <tr>
-                        <th>#</th>
                         <th>Nome</th>
                         <th>Ações</th>
                       </tr>
                     </thead>
 
                     <tbody id="sortable-steps">
-                        <?php while ($etapa = $etapas->fetch_assoc()): ?>
+                        <?php foreach ($lista_etapas_kanban as $etapa): ?>
                             <tr class="linha_etapa" data-id="<?php echo $etapa['id_etapas_crm'] ?>">
-                            <td><?php echo $etapa['ordem'] ?></td>
-                            <td><?php echo $etapa['nome'] ?></td>
-                            <td>
-                                <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
-                            </td>
+                                <td><?php echo $etapa['nome'] ?></td>
+                                <td>
+                                    <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                                </td>
                             </tr>
-                        <?php endwhile ?>
+                        <?php endforeach; ?>
                     </tbody>
 
                   </table>
@@ -189,48 +181,69 @@ include_once('../geral/topo.php');
                     cancelButtonColor: "#d33",
                     didOpen: () => {
                         // Inicializa sortable apenas depois do SweetAlert abrir
-                        const sortable = new Sortable(document.getElementById('sortable-steps'), {
+                        new Sortable(document.getElementById('sortable-steps'), {
                             animation: 150,
-                            ghostClass: 'drag-highlight',
-                            onEnd: function(evt) {
-                                const ordemAtual = sortable.toArray();
-                                console.log("Ordem atual:", ordemAtual);
-
-                                $.ajax({
-                                    url: './crm_processo.php',
-                                    method: 'POST',
-                                    dataType: 'json',
-                                    data: {
-                                        ordem: ordemAtual
-                                    },
-                                    success: function(resposta) {
-                                        console.log("Servidor respondeu:", resposta);
-                                    }
-                                })
-
-                            }
+                            ghostClass: 'drag-highlight'
                         });
+
+                        $('.delete').on('click', function() {
+                            let id_etapa = $(this).closest('.linha_etapa').attr('data-id')
+                        })
 
                         // Captura envio do formulário dentro do Swal
                         $("#form-add-etapa").on("submit", function(e) {
                             e.preventDefault();
                             const nome = $("#etapa-nome").val();
-                            if (nome.trim() !== "") {
-                                $("#sortable-steps").append(`
-                          <tr>
-                            <td>-</td>
-                            <td>${nome}</td>
-                            <td>
 
-                              <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                          </tr>
-                        `);
+                            if (nome.trim() !== "") {
                                 $("#etapa-nome").val("");
                             }
+
+                            $.ajax({
+                                url: './crm_processo.php',
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    nova_etapa: nome
+                                },
+                                success: function(resposta) {
+
+                                    if (resposta.status == 'success') {
+                                        $("#sortable-steps").append(`
+                                    <tr class="linha_etapa" data-id="${resposta.data.id}">
+                                        <td>${nome}</td>
+                                        <td>
+                                            <button class="icon-btn delete"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `);
+                                    }
+
+
+                                }
+                            })
+
                         });
+
                     },
                     preConfirm: () => {
+
+                        const ordemAtual = [...document.querySelectorAll("#sortable-steps tr")]
+                            .map(el => el.dataset.id);
+
+                        $.ajax({
+                            url: './crm_processo.php',
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+                                ordem: ordemAtual
+                            },
+                            success: function(resposta) {
+                                console.log("Servidor respondeu:", resposta);
+                            }
+                        })
+
+
                         // coleta dados da tabela
                         const etapas = [];
                         $("#sortable-steps tr").each(function() {
@@ -243,8 +256,10 @@ include_once('../geral/topo.php');
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        console.log("Etapas salvas:", result.value.etapas);
                         Swal.fire('Configuração salva!', '', 'success');
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 1000)
                     }
                 });
             });
