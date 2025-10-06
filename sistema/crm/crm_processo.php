@@ -52,7 +52,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nova_etapa'])) {
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_etapa_exclusao'])) {
+
+    $id_etapa_exclusao = $conexao->real_escape_string(htmlspecialchars($_POST['id_etapa_exclusao']));
+    // Primeiro, verificar se existem processos nessa etapa
+    $sql_verifica_processo_etapa = "
+        SELECT id_processo 
+        FROM processo 
+        WHERE etapa_kanban = ? 
+        AND usuario_config_id_usuario_config = ?";
+
+    $stmt = $conexao->prepare($sql_verifica_processo_etapa);
+    $stmt->bind_param('ii', $id_etapa_exclusao, $id_user);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+
+    if ($resultado->num_rows > 0) {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Não é possível excluir esta etapa. Existem processos vinculados a ela.'
+        ];
+    } else {
+        $sql_excluir_etapa = "
+            DELETE FROM etapas_crm 
+            WHERE id_etapas_crm = ? 
+            AND usuario_config_id_usuario_config = ?";
+
+        $stmt_delete = $conexao->prepare($sql_excluir_etapa);
+        $stmt_delete->bind_param('ii', $id_etapa_exclusao, $id_user);
+
+        if ($stmt_delete->execute()) {
+            $res = [
+                'status' => 'success',
+                'message' => 'Etapa excluída com sucesso!'
+            ];
+        } else {
+            $res = [
+                'status' => 'erro',
+                'message' => 'Erro ao excluir a etapa.'
+            ];
+        }
+    }
+
+    echo json_encode($res);
+    $conexao->close();
+    exit;
+}
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ordem'])) {
     foreach ($_POST['ordem'] as $indice => $valor) {
 
         $ordem = $indice + 1;
@@ -66,7 +115,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_nova_etapa_kanban']) && !empty($_POST['id_card_movido'])) {
 
+    $id_nova_etapa_kanban = $conexao->real_escape_string(htmlspecialchars($_POST['id_nova_etapa_kanban']));
+    $id_card_movido = $conexao->real_escape_string(htmlspecialchars($_POST['id_card_movido']));
+
+    $sql_atualiza_etapa_processo = "UPDATE processo SET etapa_kanban = ? WHERE id_processo = ? AND usuario_config_id_usuario_config = ? ";
+
+    $stmt = $conexao->prepare($sql_atualiza_etapa_processo);
+    $stmt->bind_param('iii', $id_nova_etapa_kanban, $id_card_movido, $id_user);
+
+    if ($stmt->execute()) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Etapa atualizada com sucesso!',
+        ];
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Erro ao atualizar etapa!',
+        ];
+    }
+
+    echo json_encode($res);
+    $conexao->close();
+    exit;
+}
 
 
 // Função para mapear contingenciamento para classe CSS
@@ -85,7 +159,6 @@ function getBadgeClass($contingenciamento)
     }
 }
 
-
 ?>
 
 <!DOCTYPE html>
@@ -97,6 +170,7 @@ function getBadgeClass($contingenciamento)
     <link rel="stylesheet" href="../css/kanban/crm.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="../js/geral.js"></script>
 
     <title>ADV Conectado</title>
 </head>
@@ -155,7 +229,7 @@ include_once('../geral/topo.php');
 
                     ?>
 
-                    <div class="kanban-column" data-id="<?php echo $index + 1; ?>">
+                    <div class="kanban-column" data-id="<?php echo $index + 1; ?>" data-cod-etapa="<?php echo $etapa['id_etapas_crm']; ?>">
                         <h2><?php echo $etapa['ordem'] . ' - ' . $etapa['nome']; ?></h2>
                         <div class="kanban-cards" id="column<?php echo $index + 1; ?>">
 
@@ -163,7 +237,7 @@ include_once('../geral/topo.php');
                                 $badgeClass = getBadgeClass($card['contingenciamento']);
                             ?>
 
-                                <div class="kanban-card" data-id="<?php echo $card['id_processo']; ?>">
+                                <div class="kanban-card" data-cod-card="<?php echo $card['id_processo']; ?>">
                                     <div class="header_card">
                                         <p class="ref_card">ref: <?php echo $card['referencia']; ?></p>
                                         <div class="badge <?php echo $badgeClass; ?>">
@@ -194,7 +268,7 @@ include_once('../geral/topo.php');
                                         <?php endif; ?>
                                     </div>
 
-                                    
+
                                 </div>
 
 
@@ -272,8 +346,46 @@ include_once('../geral/topo.php');
                         });
 
                         $('.delete').on('click', function() {
-                            let id_etapa = $(this).closest('.linha_etapa').attr('data-id')
+                            let remover_linha = $(this).closest('.linha_etapa')
+                            let id_etapa_exclusao = $(this).closest('.linha_etapa').attr('data-id')
+
+                            $.ajax({
+                                url: './crm_processo.php',
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    id_etapa_exclusao: id_etapa_exclusao
+                                },
+                                success: function(res) {
+                                    if (res.status !== 'success') {
+
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Oops...",
+                                            text: res.message,
+                                        });
+
+                                        setTimeout(() => {
+                                            window.location.reload()
+                                        }, 1000)
+
+
+                                    } else {
+                                        remover_linha.fadeOut(300, function() {
+                                            $(this).remove();
+                                        });
+                                    }
+
+                                }
+
+                            })
+
                         })
+
+                        tippy('.delete', {
+                            content: "Ao clicar em excluir, a ação será realizada de forma instantânea.",
+                            placement: "top",
+                        });
 
                         // Captura envio do formulário dentro do Swal
                         $("#form-add-etapa").on("submit", function(e) {
@@ -322,22 +434,19 @@ include_once('../geral/topo.php');
                             dataType: 'json',
                             data: {
                                 ordem: ordemAtual
-                            },
-                            success: function(resposta) {
-                                console.log("Servidor respondeu:", resposta);
                             }
                         })
 
 
                         // coleta dados da tabela
-                        const etapas = [];
-                        $("#sortable-steps tr").each(function() {
-                            const nome = $(this).find("td:nth-child(2)").text();
-                            etapas.push(nome);
-                        });
-                        return {
-                            etapas
-                        };
+                        // const etapas = [];
+                        // $("#sortable-steps tr").each(function() {
+                        //     const nome = $(this).find("td:nth-child(2)").text();
+                        //     etapas.push(nome);
+                        // });
+                        // return {
+                        //     etapas
+                        // };
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -368,148 +477,40 @@ include_once('../geral/topo.php');
 
                     // Evento chamado quando um elemento é movido
                     onEnd: function(evt) {
-                        // Aqui você pode adicionar lógica para salvar o estado
-                        // Por exemplo, enviar para um backend ou salvar no localStorage
-                        // saveKanbanState();
+
+                        let id_nova_etapa_kanban = evt.to.closest('.kanban-column').dataset.codEtapa
+                        let id_card_movido = evt.item.dataset.codCard
+
+                        $.ajax({
+                            url: './crm_processo.php',
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+                                id_nova_etapa_kanban: id_nova_etapa_kanban,
+                                id_card_movido: id_card_movido
+
+                            },
+                            success: function(resposta) {
+                                if (resposta.status !== 'success') {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Erro ao atualizar etapa!",
+                                        text: "Tente novamente em alguns minutos",
+
+                                    });
+
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 1200)
+
+                                }
+                            }
+                        })
+
                     }
                 });
             });
 
-            // Função para salvar o estado do Kanban
-            function saveKanbanState() {
-                const kanbanState = {};
-
-                columns.forEach(column => {
-                    const columnId = column.id;
-                    const cards = [];
-
-                    column.querySelectorAll('.kanban-card').forEach(card => {
-                        cards.push({
-                            title: card.querySelector('.card-title').textContent,
-                            priority: card.querySelector('.badge').classList.contains('high') ? 'high' : card.querySelector('.badge').classList.contains('medium') ? 'medium' : 'low',
-                            avatar: card.querySelector('.avatar').src
-                        });
-                    });
-
-                    kanbanState[columnId] = cards;
-                });
-
-                localStorage.setItem('kanbanState', JSON.stringify(kanbanState));
-                console.log('Kanban state saved:', kanbanState);
-            }
-
-            // Função para carregar o estado do Kanban (se existir)
-            function loadKanbanState() {
-                const savedState = localStorage.getItem('kanbanState');
-                if (savedState) {
-                    const kanbanState = JSON.parse(savedState);
-
-                    for (const columnId in kanbanState) {
-                        const column = document.getElementById(columnId);
-                        if (column) {
-                            // Limpar a coluna
-                            column.innerHTML = '';
-
-                            // Adicionar os cards salvos
-                            kanbanState[columnId].forEach(cardData => {
-                                const card = document.createElement('div');
-                                card.className = 'kanban-card';
-
-                                card.innerHTML = `
-                            <div class="badge ${cardData.priority}"><span>${getPriorityText(cardData.priority)}</span></div>
-                            <p class="card-title">${cardData.title}</p>
-                            <div class="card-footer">
-                                <img src="${cardData.avatar}" alt="avatar" class="avatar">
-                            </div>
-                        `;
-
-                                column.appendChild(card);
-                            });
-                        }
-                    }
-                }
-            }
-
-            function getPriorityText(priority) {
-                switch (priority) {
-                    case 'high':
-                        return 'Alta prioridade';
-                    case 'medium':
-                        return 'Média prioridade';
-                    case 'low':
-                        return 'Baixa prioridade';
-                    default:
-                        return 'Média prioridade';
-                }
-            }
-
-            // Carregar o estado salvo (se existir)
-            // loadKanbanState();
-
-            // // Modal para adicionar novo card
-            // const modal = document.getElementById('add-card-modal');
-            // const addCardBtn = document.getElementById('add-card-btn');
-            // const closeBtn = document.querySelector('.close');
-            // const addCardForm = document.getElementById('add-card-form');
-
-            // // Abrir modal
-            // addCardBtn.addEventListener('click', function() {
-            //     modal.style.display = 'block';
-            // });
-
-            // // Fechar modal
-            // closeBtn.addEventListener('click', function() {
-            //     modal.style.display = 'none';
-            // });
-
-            // // Fechar modal ao clicar fora dele
-            // window.addEventListener('click', function(event) {
-            //     if (event.target === modal) {
-            //         modal.style.display = 'none';
-            //     }
-            // });
-
-            // Adicionar novo card
-            // addCardForm.addEventListener('submit', function(e) {
-            //     e.preventDefault();
-
-            //     const title = document.getElementById('card-title').value;
-            //     const columnId = document.getElementById('card-column').value;
-            //     const priority = document.getElementById('card-priority').value;
-
-            //     // Gerar um avatar aleatório
-            //     const avatarId = Math.floor(Math.random() * 70) + 1;
-
-            //     addNewCard(columnId, title, priority, avatarId);
-
-            //     // Fechar modal e limpar formulário
-            //     modal.style.display = 'none';
-            //     addCardForm.reset();
-
-            //     // Salvar o estado atualizado
-            //     saveKanbanState();
-            // });
-
-            //     // Função para adicionar novos cards
-            //     function addNewCard(columnId, title, priority, avatarId) {
-            //         const column = document.getElementById(`column${columnId}`);
-            //         const newCard = document.createElement('div');
-            //         newCard.className = 'kanban-card';
-
-            //         let priorityText = getPriorityText(priority);
-
-            //         newCard.innerHTML = `
-            //     <div class="badge ${priority}"><span>${priorityText}</span></div>
-            //     <p class="card-title">${title}</p>
-            //     <div class="card-footer">
-            //         <img src="https://i.pravatar.cc/30?img=${avatarId}" alt="avatar" class="avatar">
-            //     </div>
-            // `;
-
-            //         column.appendChild(newCard);
-            //     }
-
-            //     window.addNewCard = addNewCard;
         });
     </script>
 
@@ -549,6 +550,8 @@ include_once('../geral/topo.php');
             kanban.scrollLeft = scrollLeft - walk;
         });
     </script>
+
+    <script src="../js/geral.js"></script>
 </body>
 
 </html>
