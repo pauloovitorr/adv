@@ -91,7 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
         try {
             $conexao->begin_transaction();
-            $sql_busca_processo = "SELECT referencia 
+
+            $sql_busca_processo = "SELECT referencia, id_processo
                        FROM processo 
                        WHERE usuario_config_id_usuario_config = $id_user 
                          AND tk = '$token'";
@@ -99,7 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
             $processo_encontrado = $res->fetch_assoc();
             $referencia_processo = $processo_encontrado['referencia'] ?? null;
+            $id_processo = $processo_encontrado['id_processo'] ?? null;
 
+            // Paulo
+            $sql_delete_docs_processo = "DELETE FROM documento_processo WHERE id_processo = $id_processo AND usuario_config_id_usuario_config = $id_user";
+            $conexao->query($sql_delete_docs_processo);
 
             $sql_delete_processo = 'DELETE FROM processo WHERE tk = ? AND usuario_config_id_usuario_config = ?';
             $stmt = $conexao->prepare($sql_delete_processo);
@@ -107,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
 
             if ($stmt->execute()) {
-
 
                 $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -398,7 +402,7 @@ include_once('../geral/topo.php');
 
                 Swal.fire({
                     title: "Deseja realmente excluir o processo?",
-                    text: "A ação é irreversível!",
+                    text: "Todos os dados serão excluídos e a ação é irreversível!",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: " #d33",

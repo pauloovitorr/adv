@@ -3,6 +3,7 @@
 include_once('../../scripts.php');
 
 $id_user = $_SESSION['cod'];
+$ip = $_SERVER['REMOTE_ADDR'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_cliente'])) {
 
@@ -123,13 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     );
 
     if ($stmt->execute()) {
-        echo "Processo cadastrado com sucesso! ID: " . $stmt->insert_id;
-    } else {
-        echo "Erro ao cadastrar processo: " . $stmt->error;
+        if (cadastro_log('Cadastrou Processo', $referencia, $ip, $id_user)) {
+            header('Location:' . "./docs_processo.php?tkn=$token");
+            $stmt->close();
+        }
     }
-
-    $stmt->close();
-    header('Location:' . "./docs_processo.php?tkn=$token");
 }
 
 
@@ -178,24 +177,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
 
 
     $stmt->bind_param(
-        "iissssssssissssii",  
-        $cliente_id,           
-        $contrario_id,         
-        $grupo_acao,          
-        $tipo_acao,           
-        $referencia,          
-        $num_processo,        
-        $num_protocolo,       
-        $processo_originario, 
-        $valor_causa,          
-        $valor_honorarios,     
-        $etapa_kanban,         
-        $contingenciamento,   
-        $data_requerimento,    
-        $resultado_processo,  
-        $observacao,           
-        $id_user,              
-        $pro_id      
+        "iissssssssissssii",
+        $cliente_id,
+        $contrario_id,
+        $grupo_acao,
+        $tipo_acao,
+        $referencia,
+        $num_processo,
+        $num_protocolo,
+        $processo_originario,
+        $valor_causa,
+        $valor_honorarios,
+        $etapa_kanban,
+        $contingenciamento,
+        $data_requerimento,
+        $resultado_processo,
+        $observacao,
+        $id_user,
+        $pro_id
     );
 
     // Executa
@@ -796,7 +795,6 @@ include_once('../geral/topo.php');
             const dia = String(hoje.getDate()).padStart(2, '0'); // Dia atual
             const dataMaxima = `${ano}-${mes}-${dia}`;
             $('#data_requerimento').attr('max', dataMaxima);
-
             $('#numero_processo').mask('0000000-00.0000.0.00.0000');
             $('#processo_originario').mask('0000000-00.0000.0.00.0000');
             $('#valor_causa').mask('000.000.000,00', {
