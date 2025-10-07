@@ -194,7 +194,12 @@ include_once('../geral/topo.php');
 
             <div class="topo_kanban">
                 <h1>Gestão CRM</h1>
-                <button id="config_crm"><i class="fa-solid fa-gear"></i> Configurar CRM</button>
+                
+                <div style="display: flex; gap:8px">
+                    <button class="btn_adicionar" id="add_processo"> <i class="fa-solid fa-plus"></i> Novo Processo </button>
+                    <button id="config_crm"><i class="fa-solid fa-gear"></i> Configurar CRM</button>
+                </div>
+
             </div>
 
             <div class="kanban">
@@ -285,7 +290,11 @@ include_once('../geral/topo.php');
     </main>
 
 
-
+<script>
+    $('#add_processo').click(()=>{
+        window.location.href = '../processo/cadastro_processo.php'
+    })
+</script>
 
     <script>
         $(document).ready(function() {
@@ -436,17 +445,6 @@ include_once('../geral/topo.php');
                                 ordem: ordemAtual
                             }
                         })
-
-
-                        // coleta dados da tabela
-                        // const etapas = [];
-                        // $("#sortable-steps tr").each(function() {
-                        //     const nome = $(this).find("td:nth-child(2)").text();
-                        //     etapas.push(nome);
-                        // });
-                        // return {
-                        //     etapas
-                        // };
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {

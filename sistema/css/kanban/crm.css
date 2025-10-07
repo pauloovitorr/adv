@@ -13,6 +13,25 @@
   color: #2c3e50;
 }
 
+.btn_adicionar {
+  background: #4299e1;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn_adicionar:hover{
+  background: #2f81f7;;
+}
+
 #config_crm {
   width: auto;
   height: 40px;
@@ -116,7 +135,7 @@
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-.header_card{
+.header_card {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -124,7 +143,7 @@
   margin-bottom: 10px;
 }
 
-.ref_card{
+.ref_card {
   font-size: 12px;
 }
 
@@ -170,19 +189,19 @@
   color: #2c3e50;
 }
 
-.grupo_acao{
-   font-size: 14px;
+.grupo_acao {
+  font-size: 14px;
   font-weight: 500;
   color: #2c3e50;
 }
 
-.container_card{
+.container_card {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.dados_cliente{
+.dados_cliente {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -190,8 +209,8 @@
 }
 
 .dados_cliente p,
-.card-footer span{
-font-size: 12px;
+.card-footer span {
+  font-size: 12px;
 }
 
 .dados_cliente img {
@@ -208,9 +227,6 @@ font-size: 12px;
   border-top: 1px solid rgb(226, 226, 226);
   padding-top: 10px;
 }
-
-
-
 
 /* Pop-up */
 
@@ -232,7 +248,7 @@ body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
   flex: 1;
 }
 
-.crm-steps{
+.crm-steps {
   max-height: 350px;
   overflow-y: scroll;
 }
@@ -245,7 +261,7 @@ body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
   color: #2c3e50;
 }
 
-.crm-steps span{
+.crm-steps span {
   margin-bottom: 15px;
   font-size: 14px;
 }
