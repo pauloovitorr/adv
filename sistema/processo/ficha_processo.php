@@ -339,7 +339,7 @@ include_once('../geral/topo.php');
                                     <div class="lista_arquivos">
                                         <?php foreach ($documentos as $doc): ?>
                                             <?php $ext = strtolower(pathinfo($doc["caminho_arquivo"], PATHINFO_EXTENSION)); ?>
-                                            <a href="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" target="__blank">
+                                            <a href="..<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" target="__blank">
                                                 <div class="doc">
 
                                                     <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>

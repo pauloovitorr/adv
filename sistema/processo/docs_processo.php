@@ -65,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     $novo_nome_arquivo = uniqid() . date('now') . '.' . $extensao_arquivo;
 
     $caminho = '../geral/docs/processos/' . $novo_nome_arquivo;
+    $caminho_bd = '/geral/docs/processos/' . $novo_nome_arquivo;
 
     $conexao->begin_transaction();
 
@@ -102,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
                 $sql_docs = "INSERT INTO documento_processo (nome_original, caminho_arquivo, dt_criacao, id_processo, usuario_config_id_usuario_config) VALUES (?, ?, NOW(),?,?)";
 
                 $stmt = $conexao->prepare($sql_docs);
-                $stmt->bind_param("ssii", $nome_arquivo, $caminho, $id_processo, $id_user);
+                $stmt->bind_param("ssii", $nome_arquivo, $caminho_bd, $id_processo, $id_user);
 
                 if ($stmt->execute()) {
 
@@ -208,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             }
 
             $nome_original = $doc['nome_original'];
-            $caminho_server = $doc['caminho_arquivo'];
+            $caminho_server =  '../'.$doc['caminho_arquivo'];
 
             // Se existir arquivo, tenta excluir
             if (file_exists($caminho_server)) {

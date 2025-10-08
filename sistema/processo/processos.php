@@ -98,13 +98,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
                          AND tk = '$token'";
             $res = $conexao->query($sql_busca_processo);
 
+            // Encontra dados do processo necessário para exclusão
             $processo_encontrado = $res->fetch_assoc();
             $referencia_processo = $processo_encontrado['referencia'] ?? null;
             $id_processo = $processo_encontrado['id_processo'] ?? null;
 
-            // Paulo
-            $sql_delete_docs_processo = "DELETE FROM documento_processo WHERE id_processo = $id_processo AND usuario_config_id_usuario_config = $id_user";
-            $conexao->query($sql_delete_docs_processo);
+            // Pega os caminhos dos arquivos vinculados ao processo
+            $sql_busca_caminho_arquivo_processo = "SELECT id_documento, caminho_arquivo FROM documento_processo WHERE id_processo = $id_processo AND usuario_config_id_usuario_config = $id_user";
+
+            $arquivos = $conexao->query($sql_busca_caminho_arquivo_processo);
+
+            if ($arquivos->num_rows > 0) {
+                while ($arquivo = $arquivos->fetch_assoc()) {
+                    if (file_exists('..' . $arquivo['caminho_arquivo']))
+                        if (unlink('..' . $arquivo['caminho_arquivo'])) {
+                            $sql_delete_docs_processo = "DELETE FROM documento_processo WHERE id_documento = {$arquivo['id_documento']} AND usuario_config_id_usuario_config = $id_user";
+                            $conexao->query($sql_delete_docs_processo);
+                        }
+                }
+            }
 
             $sql_delete_processo = 'DELETE FROM processo WHERE tk = ? AND usuario_config_id_usuario_config = ?';
             $stmt = $conexao->prepare($sql_delete_processo);
