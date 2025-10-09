@@ -72,22 +72,46 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
 }
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == 'deletar') {
 
-if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    $input = file_get_contents("php://input");
-    $data = json_decode($input, true);
-    $token = $data['token'] ?? null;
-
-
+    $token = htmlspecialchars($conexao->real_escape_string($_POST['token']));
 
     if ($token) {
 
         try {
             $conexao->begin_transaction();
-            $sql_busca_pessoas = "SELECT nome FROM pessoas where usuario_config_id_usuario_config = $id_user and tk = '$token'";
+            $sql_busca_pessoas = "SELECT nome, id_pessoa,tipo_parte FROM pessoas where usuario_config_id_usuario_config = $id_user and tk = '$token'";
             $res = $conexao->query($sql_busca_pessoas);
-            $nome_pessoa_excluida = $res->fetch_assoc();
-            $nome_pessoa_excluida = $nome_pessoa_excluida['nome'];
+            $pessoa_exclusao = $res->fetch_assoc();
+            $pessoa_nome_exclusao = $pessoa_exclusao['nome'];
+            $pessoa_id_exclusao = $pessoa_exclusao['id_pessoa'];
+            // $pessoa_parte = $pessoa_exclusao['tipo_parte'];
+
+
+            // Pega os caminhos dos arquivos vinculados à pessoa
+            $sql_busca_caminho_arquivo_pessoa = "SELECT id_documento, caminho_arquivo FROM documento WHERE id_pessoa = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
+
+            $arquivos = $conexao->query($sql_busca_caminho_arquivo_pessoa);
+
+
+
+            if ($arquivos->num_rows > 0) {
+                while ($arquivo = $arquivos->fetch_assoc()) {
+
+                    if (file_exists('..' . $arquivo['caminho_arquivo']))
+                        if (unlink('..' . $arquivo['caminho_arquivo'])) {
+                            $sql_delete_docs_processo = "DELETE FROM documento WHERE id_documento = {$arquivo['id_documento']} AND usuario_config_id_usuario_config = $id_user";
+                            $conexao->query($sql_delete_docs_processo);
+                        }
+                }
+            }
+
+            // if ($pessoa_parte == 'cliente') {
+            //      $sql_busca_processos = "SELECT id_processo FROM processo WHERE cliente_id = $pessoa_id_exclusao ";
+            // } 
+            // elseif($pessoa_parte == 'contrário'){
+
+            // }
 
             $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
             $stmt = $conexao->prepare($sql_delete_pessoa);
@@ -99,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
                 $ip = $_SERVER['REMOTE_ADDR'];
 
-                if (cadastro_log('Excluiu Pessoa', $nome_pessoa_excluida, $ip, $id_user)) {
+                if (cadastro_log('Excluiu Pessoa', $pessoa_nome_exclusao, $ip, $id_user)) {
                     $res = [
                         'status' => 'success',
                         'message' => 'Pessoa excluída com sucesso!',
@@ -417,12 +441,11 @@ include_once('../geral/topo.php');
                     if (result.isConfirmed) {
 
                         $.ajax({
-                            url: './pessoas.php',
-                            type: 'DELETE',
-                            contentType: 'application/json',
-                            data: JSON.stringify({
+                            url: './pessoas.php?acao=deletar',
+                            type: 'POST',
+                            data: {
                                 token: tk
-                            }),
+                            },
                             dataType: 'json',
                             success: function(res) {
 
@@ -442,10 +465,10 @@ include_once('../geral/topo.php');
 
 
 
-                                setTimeout(() => {
-                                    Swal.close()
-                                    window.location.reload()
-                                }, 1000)
+                                // setTimeout(() => {
+                                //     Swal.close()
+                                //     window.location.reload()
+                                // }, 1000)
 
                             }
                         })

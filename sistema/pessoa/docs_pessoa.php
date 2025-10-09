@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     $novo_nome_arquivo = uniqid() . date('now') . '.' . $extensao_arquivo;
 
     $caminho = '../geral/docs/pessoas/' . $novo_nome_arquivo;
+    $caminho_bd = '/geral/docs/pessoas/' . $novo_nome_arquivo;
 
     $conexao->begin_transaction();
 
@@ -99,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
                 $sql_docs = "INSERT INTO documento (nome_original, caminho_arquivo, dt_criacao, id_pessoa, usuario_config_id_usuario_config) VALUES (?, ?, NOW(),?,?)";
 
                 $stmt = $conexao->prepare($sql_docs);
-                $stmt->bind_param("ssii", $nome_arquivo, $caminho, $id_pessoa, $id_user);
+                $stmt->bind_param("ssii", $nome_arquivo, $caminho_bd, $id_pessoa, $id_user);
 
                 if ($stmt->execute()) {
 
@@ -208,8 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             $caminho_server = $doc['caminho_arquivo'];
 
             // Se existir arquivo, tenta excluir
-            if (file_exists($caminho_server)) {
-                if (!unlink($caminho_server)) {
+            if (file_exists('..'.$caminho_server)) {
+                if (!unlink('..'.$caminho_server)) {
                     $res = [
                         'status' => 'error',
                         'message' => 'Erro ao excluir o arquivo do servidor.'
@@ -351,7 +352,7 @@ include_once('../geral/topo.php');
 
                                 <?php $ext = strtolower(pathinfo($doc["caminho_arquivo"], PATHINFO_EXTENSION)); ?>
 
-                                <a href="<?php echo $doc["caminho_arquivo"] ?>" target="__blank">
+                                <a href="..<?php echo $doc["caminho_arquivo"] ?>" target="__blank">
                                     <div class="doc">
                                         <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
                                             <span class="dz-remove remove_documento">X
