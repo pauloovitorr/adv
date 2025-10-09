@@ -80,12 +80,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
         try {
             $conexao->begin_transaction();
-            $sql_busca_pessoas = "SELECT nome, id_pessoa,tipo_parte FROM pessoas where usuario_config_id_usuario_config = $id_user and tk = '$token'";
+            $sql_busca_pessoas = "SELECT nome, id_pessoa,tipo_parte, foto_pessoa FROM pessoas where usuario_config_id_usuario_config = $id_user and tk = '$token'";
             $res = $conexao->query($sql_busca_pessoas);
             $pessoa_exclusao = $res->fetch_assoc();
             $pessoa_nome_exclusao = $pessoa_exclusao['nome'];
             $pessoa_id_exclusao = $pessoa_exclusao['id_pessoa'];
-            // $pessoa_parte = $pessoa_exclusao['tipo_parte'];
+            $pessoa_parte = $pessoa_exclusao['tipo_parte'];
+
+
+            // Verifico primeiramente se a pessoa excluida se encontra vinculada a um processo
+            if ($pessoa_parte == 'cliente') {
+                $sql_busca_processos = "SELECT referencia,tipo_acao FROM processo WHERE cliente_id = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
+            } elseif ($pessoa_parte == 'contrário') {
+                $sql_busca_processos = "SELECT referencia,tipo_acao FROM processo WHERE contrario_id = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
+            }
+
+            $pessoa_processo = $conexao->query($sql_busca_processos);
+            if ($pessoa_processo->num_rows > 0) {
+
+                $ref_processos = [];
+                $tipo_acao = [];
+
+                while ($processo = $pessoa_processo->fetch_assoc()) {
+                    $ref_processos[]    = $processo['referencia'];
+                    $tipo_acao[]        = $processo['tipo_acao'];
+                }
+
+                // Transforma o array em string, separado por vírgulas
+                $refs = implode(', ', $ref_processos);
+                $tipos_acao = implode(', ', $tipo_acao);
+
+                $res = [
+                    'status' => 'erro',
+                    'message' => "A exclusão não pôde ser concluída. A pessoa está vinculada a um ou mais processos. 
+                    Remova o vínculo com esses processos antes de prosseguir. 
+                    Processos vinculados: $refs.
+                    Tipo de ação: $tipos_acao.
+                    ",
+                ];
+
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            }
+
 
 
             // Pega os caminhos dos arquivos vinculados à pessoa
@@ -94,24 +134,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
             $arquivos = $conexao->query($sql_busca_caminho_arquivo_pessoa);
 
 
-
+            // Paulo
             if ($arquivos->num_rows > 0) {
                 while ($arquivo = $arquivos->fetch_assoc()) {
-
-                    if (file_exists('..' . $arquivo['caminho_arquivo']))
+                    if (file_exists('..' . $arquivo['caminho_arquivo'])) {
                         if (unlink('..' . $arquivo['caminho_arquivo'])) {
                             $sql_delete_docs_processo = "DELETE FROM documento WHERE id_documento = {$arquivo['id_documento']} AND usuario_config_id_usuario_config = $id_user";
                             $conexao->query($sql_delete_docs_processo);
                         }
+                    }
                 }
             }
 
-            // if ($pessoa_parte == 'cliente') {
-            //      $sql_busca_processos = "SELECT id_processo FROM processo WHERE cliente_id = $pessoa_id_exclusao ";
-            // } 
-            // elseif($pessoa_parte == 'contrário'){
+            if (file_exists('../..' . $pessoa_exclusao['foto_pessoa'])) {
+                unlink('../..' . $pessoa_exclusao['foto_pessoa']);
+            }
 
-            // }
 
             $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
             $stmt = $conexao->prepare($sql_delete_pessoa);
@@ -448,6 +486,8 @@ include_once('../geral/topo.php');
                             },
                             dataType: 'json',
                             success: function(res) {
+
+                                console.log(res)
 
                                 if (res.status == "success") {
                                     Swal.fire({
