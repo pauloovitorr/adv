@@ -194,7 +194,7 @@ include_once('../geral/topo.php');
 
             <div class="topo_kanban">
                 <h1>Gestão CRM</h1>
-                
+
                 <div style="display: flex; gap:8px">
                     <button class="btn_adicionar" id="add_processo"> <i class="fa-solid fa-plus"></i> Novo Processo </button>
                     <button id="config_crm"><i class="fa-solid fa-gear"></i> Configurar CRM</button>
@@ -258,7 +258,9 @@ include_once('../geral/topo.php');
 
                                         <div class="dados_cliente">
                                             <p class="card-subtitle"><?php echo $card['cliente_nome']; ?></p>
-                                            <img src="../..<?php echo $card['cliente_foto']; ?>" alt="" srcset="">
+                                            <?php if ($card['cliente_foto']): ?>
+                                                <img src="../..<?php echo $card['cliente_foto']; ?>" alt="" srcset="">
+                                            <?php endif ?>
                                         </div>
 
                                     </div>
@@ -271,6 +273,13 @@ include_once('../geral/topo.php');
                                         <?php if (!empty($card['valor_honorarios'])): ?>
                                             <span>Comissão: <?php echo $card['valor_honorarios']; ?></span>
                                         <?php endif; ?>
+                                    </div>
+
+                                    <div class="opcoes_card_processo">
+                                        <a href="../processo/ficha_processo.php?tkn=<?php echo $card['tk'] ?>" target="__blank"><i class="fa-solid fa-magnifying-glass"></i> Ficha</a>
+                                        <a href="javascript:void(0)" class="add_anotacao"><i class="fa-solid fa-plus"></i> Anotação
+                                            <input type="hidden" class="id_card" value="<?php echo $card['tk'] ?>">
+                                        </a>
                                     </div>
 
 
@@ -286,15 +295,78 @@ include_once('../geral/topo.php');
             </div>
 
 
+
+
+
+
         </div>
     </main>
 
 
-<script>
-    $('#add_processo').click(()=>{
-        window.location.href = '../processo/cadastro_processo.php'
-    })
-</script>
+
+
+
+    <script>
+        $('#add_processo').click(() => {
+            window.location.href = '../processo/cadastro_processo.php'
+        })
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(".add_anotacao").on("click", function() {
+                Swal.fire({
+                    title: 'Gerenciamento de Anotações',
+                    html: `
+                           <div class="container_anotacoes">
+              
+                <div class="container_form_anotacoes">
+                    <form id="formAnotacao" autocomplete="off">
+                        <input type="text" name="titulo_anotacao" id="titulo_anotacao" placeholder="Título" required>
+                        <textarea name="anotacao" id="anotacao" placeholder="Adicione sua anotação" rows="3" required></textarea>
+                        <button type="submit" class="btn_adicionar" style="display:flex; justify-content: center; max-width:250px; margin: 0 auto ">
+                            <i class="fa-solid fa-plus"></i> Adicionar Anotação
+                        </button>
+                    </form>
+                </div>
+                <div class="container_listagem_anotacoes" id="listagemAnotacoes">
+                    <div class="anotacao_item">
+                        <div class="delete_anotacao">
+                            X
+                            <input type="hidden" value="0000">
+                        </div>
+                        <div class="titulo">Reunião com cliente <div class="infos_anotacoes">10/08/25 às 18:50</div>
+                        </div>
+                        <div class="descricao">Agendada para segunda-feira às 15h, revisar documentos antes.</div>
+                    </div>
+
+                    <div class="anotacao_item">
+                        <div class="delete_anotacao">
+                            X
+                            <input type="hidden" value="0000">
+                        </div>
+                        <div class="titulo">Reunião com cliente <div class="infos_anotacoes">10/08/25 às 18:50</div>
+                        </div>
+                        <div class="descricao">Agendada para segunda-feira às 15h, revisar documentos antes.</div>
+                    </div>
+                    
+                </div>
+
+            </div>
+                `,
+
+                    confirmButtonText: 'Finalizar',
+                    confirmButtonColor: " #3085d6",
+
+                })
+            })
+        })
+    </script>
+
+
+
+
+
 
     <script>
         $(document).ready(function() {
@@ -376,7 +448,7 @@ include_once('../geral/topo.php');
 
                                         setTimeout(() => {
                                             window.location.reload()
-                                        }, 1000)
+                                        }, 1500)
 
 
                                     } else {
