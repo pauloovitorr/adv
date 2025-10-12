@@ -579,12 +579,10 @@ include_once('../geral/topo.php');
                                         });
 
 
-
-                                        $('.delete_anotacao').click(function() {
+                                        $(document).off('click', '.delete_anotacao').on('click', '.delete_anotacao', function() {
                                             let idAnotacao = $(this).find('input[name="id_anotacao"]').val();
                                             let idProcesso = $(this).find('input[name="id_processo"]').val();
-                                            let card_anotacao = $(this).closest('.anotacao_item')
-
+                                            let card_anotacao = $(this).closest('.anotacao_item');
 
                                             $.ajax({
                                                 url: './crm_processo.php',
@@ -597,25 +595,23 @@ include_once('../geral/topo.php');
                                                 },
                                                 success: function(res) {
                                                     if (res.status === 'success') {
-                                                        // Remove o item da tela com efeito
                                                         card_anotacao.fadeOut(300, function() {
                                                             $(this).remove();
+
                                                             if ($('#listagemAnotacoes .anotacao_item').length === 0) {
                                                                 $('#listagemAnotacoes').html(`
-                                <div class="anotacao_item" style="text-align:center; opacity:0.7;">
-                                    Nenhuma anotação cadastrada
-                                </div>
-                            `);
+                            <div class="anotacao_item" style="text-align:center; opacity:0.7;">
+                                Nenhuma anotação cadastrada
+                            </div>
+                        `);
                                                             }
                                                         });
-                                                    } 
-
+                                                    }
                                                 }
-                                            })
+                                            });
+                                        });
 
 
-
-                                        })
 
 
 
