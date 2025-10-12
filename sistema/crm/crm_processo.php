@@ -2,6 +2,31 @@
 include_once('../../scripts.php');
 $id_user = $_SESSION['cod'];
 
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['id_processo'])) {
+    $sql_busca_anotacoes = "SELECT anotacoes_crm.*, p.id_processo FROM anotacoes_crm
+    INNER JOIN processo p ON anotacoes_crm.processo_id_processo = p.id_processo
+    WHERE usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_anotacoes DESC";
+    $anotacoes = $conexao->query($sql_busca_anotacoes);
+
+    if ($anotacoes->num_rows > 0) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Etapa cadastrada com sucesso!',
+        ];
+    } else {
+        $res = [
+            'status' => 'success',
+            'message' => 'Etapa cadastrada com sucesso!',
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $sql_busca_etapas_crm = "SELECT * FROM etapas_crm WHERE usuario_config_id_usuario_config = $id_user ORDER BY ordem ASC";
@@ -46,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nova_etapa'])) {
 
 
     echo json_encode($res, JSON_UNESCAPED_UNICODE);
-
     $conexao->close();
     exit;
 }
@@ -295,14 +319,8 @@ include_once('../geral/topo.php');
             </div>
 
 
-
-
-
-
         </div>
     </main>
-
-
 
 
 
@@ -315,15 +333,40 @@ include_once('../geral/topo.php');
     <script>
         $(document).ready(function() {
             $(".add_anotacao").on("click", function() {
+                let id_card = $(this).find('.id_card').val()
+
+                // Exibe que estamos carregando os cados
                 Swal.fire({
-                    title: 'Gerenciamento de Anotações',
-                    html: `
+                    title: "Carregando Anotações",
+                    html: "Aguarde",
+                    timer: 1000,
+                    timerProgressBar: true,
+                    willClose: () => {
+                        clearInterval(timerInterval);
+                    }
+                })
+                if (id_card) {
+                    $.ajax({
+                        url: './crm_processo.php',
+                        method: 'GET',
+                        dataType: 'JSON',
+                        data: {
+                            acao: 'puxar_anotacoes_card',
+                            id_processo: id_card
+                        },
+                        success: function(res) {
+
+                            if (res.status == 'success') {
+                                Swal.fire({
+                                    title: 'Gerenciamento de Anotações',
+                                    html: `
                            <div class="container_anotacoes">
               
                 <div class="container_form_anotacoes">
                     <form id="formAnotacao" autocomplete="off">
-                        <input type="text" name="titulo_anotacao" id="titulo_anotacao" placeholder="Título" required>
-                        <textarea name="anotacao" id="anotacao" placeholder="Adicione sua anotação" rows="3" required></textarea>
+                        <input type="text" name="titulo_anotacao" id="titulo_anotacao" placeholder="Título" maxlength="60" required>
+                        <textarea name="anotacao" id="anotacao" placeholder="Adicione sua anotação" rows="3" maxlength="200"  required></textarea>
+                        <input type="hidden" name="id_cadastro_anotacao" value="${id_card}">
                         <button type="submit" class="btn_adicionar" style="display:flex; justify-content: center; max-width:250px; margin: 0 auto ">
                             <i class="fa-solid fa-plus"></i> Adicionar Anotação
                         </button>
@@ -355,10 +398,15 @@ include_once('../geral/topo.php');
             </div>
                 `,
 
-                    confirmButtonText: 'Finalizar',
-                    confirmButtonColor: " #3085d6",
+                                    confirmButtonText: 'Fechar',
+                                    confirmButtonColor: " #06112483",
 
-                })
+                                })
+                            }
+                        }
+                    })
+                }
+
             })
         })
     </script>

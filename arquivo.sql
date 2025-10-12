@@ -121,3 +121,15 @@ CREATE TABLE etapas_crm (
     CONSTRAINT pk_etapas_crm PRIMARY KEY (id_etapas_crm),
     CONSTRAINT fk_etapas_crm FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
 )
+
+CREATE TABLE anotacoes_crm (
+    id_anotacao_crm INT NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(60) NOT NULL,
+    descricao TEXT NOT NULL,
+    dt_cadastro_anotacoes DATETIME DEFAULT CURRENT_TIMESTAMP, 
+    processo_id_processo INT NOT NULL,
+        
+    CONSTRAINT pk_anotacoes PRIMARY KEY (id_anotacao_crm),    
+    CONSTRAINT fk_anotacoes_crm FOREIGN KEY (processo_id_processo) 
+    REFERENCES processo(id_processo)
+);
