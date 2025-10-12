@@ -94,7 +94,7 @@
                     <p>PAINEL</p>
                 </div>
             </a></li>
-        <li id="crm"><a href="../crm/crm_processo.php">
+        <li id="crm"><a href="/adv/sistema/crm/crm_processo.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/crm.png" alt="">
                     <p>CRM</p>
                 </div>
@@ -104,14 +104,14 @@
                     <p>PESSOAS</p>
                 </div>
             </a></li>
-        <li id="processos"><a href="../processo/processos.php">
+        <li id="processos"><a href="/adv/sistema/processo/processos.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/processos.png" alt="">
                     <p>PROCESSOS</p>
                 </div>
             </a></li>
-        <li id="atividades"><a href="">
+        <li id="agenda"><a href="/adv/sistema/agenda/agenda.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/atividades.png" alt="">
-                    <p>ATIVIDADES</p>
+                    <p>AGENDA</p>
                 </div>
             </a></li>
         <li id="site"><a href="">

@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "crm",
     "pessoas",
     "processos",
-    "atividades",
+    "agenda",
     "site",
     "leads",
     "financeiro",
