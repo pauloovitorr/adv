@@ -2,22 +2,31 @@
 include_once('../../scripts.php');
 $id_user = $_SESSION['cod'];
 
+// Listagem de anotações
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && $_GET['acao'] == 'puxar_anotacoes_card' && !empty($_GET['id_processo'])) {
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GET['id_processo'])) {
+    $id_processo = $conexao->escape_string(htmlspecialchars($_GET['id_processo']));
+
     $sql_busca_anotacoes = "SELECT anotacoes_crm.*, p.id_processo FROM anotacoes_crm
     INNER JOIN processo p ON anotacoes_crm.processo_id_processo = p.id_processo
-    WHERE usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_anotacoes DESC";
+    WHERE usuario_config_id_usuario_config = $id_user AND p.id_processo = $id_processo ORDER BY dt_cadastro_anotacoes DESC";
     $anotacoes = $conexao->query($sql_busca_anotacoes);
 
     if ($anotacoes->num_rows > 0) {
+        $lista_anotacoes = [];
+
+        while ($anotacao = $anotacoes->fetch_assoc()) {
+            array_push($lista_anotacoes, $anotacao);
+        }
+
         $res = [
             'status' => 'success',
-            'message' => 'Etapa cadastrada com sucesso!',
+            'anotacoes' => $lista_anotacoes
         ];
     } else {
         $res = [
             'status' => 'success',
-            'message' => 'Etapa cadastrada com sucesso!',
+            'anotacoes' => ''
         ];
     }
 
@@ -167,6 +176,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_nova_etapa_kanban
 }
 
 
+// Cadastro de anotações
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['titulo_anotacao']) && !empty($_POST['anotacao']) && !empty($_POST['id_cadastro_anotacao'])) {
+
+    $titulo_anotacao        = $conexao->real_escape_string(htmlspecialchars($_POST['titulo_anotacao']));
+    $anotacao               = $conexao->real_escape_string(htmlspecialchars($_POST['anotacao']));
+    $id_processo            = $conexao->real_escape_string(htmlspecialchars($_POST['id_cadastro_anotacao']));
+
+    $sql_cadastra_anotacao  = "INSERT INTO anotacoes_crm (titulo, descricao,processo_id_processo, dt_cadastro_anotacoes) VALUES (?,?,?, NOW())";
+    $stmt = $conexao->prepare($sql_cadastra_anotacao);
+    $stmt->bind_param('ssi', $titulo_anotacao, $anotacao, $id_processo);
+
+    if ($stmt->execute()) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Anotação cadastrada com sucesso!',
+            'id_anotacao' => $conexao->insert_id
+        ];
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Erro ao cadastrada anotação!',
+        ];
+    }
+
+    echo json_encode($res);
+    $conexao->close();
+    exit;
+}
+
+
+// Excluir anotação
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['acao']) && $_POST['acao'] === 'delete_anotacao' && !empty($_POST['id_anotacao']) && !empty($_POST['id_processo'])
+) {
+
+    $id_anotacao = $conexao->real_escape_string(htmlspecialchars($_POST['id_anotacao']));
+    $id_processo = $conexao->real_escape_string(htmlspecialchars($_POST['id_processo']));
+
+    // Monta o SQL de exclusão garantindo que a anotação pertence ao processo
+    $sql_delete_anotacao = "DELETE FROM anotacoes_crm WHERE id_anotacao_crm = ? AND processo_id_processo = ?";
+    $stmt = $conexao->prepare($sql_delete_anotacao);
+    $stmt->bind_param('ii', $id_anotacao, $id_processo);
+
+    if ($stmt->execute()) {
+        // Sucesso
+        $res = [
+            'status' => 'success',
+            'message' => 'Anotação excluída com sucesso!',
+        ];
+    } else {
+        // Falha ao excluir
+        $res = [
+            'status' => 'error',
+            'message' => 'Erro ao excluir anotação. Tente novamente.'
+        ];
+    }
+
+    echo json_encode($res);
+    $stmt->close();
+    $conexao->close();
+    exit;
+}
+
+
+
+
 // Função para mapear contingenciamento para classe CSS
 function getBadgeClass($contingenciamento)
 {
@@ -302,7 +377,7 @@ include_once('../geral/topo.php');
                                     <div class="opcoes_card_processo">
                                         <a href="../processo/ficha_processo.php?tkn=<?php echo $card['tk'] ?>" target="__blank"><i class="fa-solid fa-magnifying-glass"></i> Ficha</a>
                                         <a href="javascript:void(0)" class="add_anotacao"><i class="fa-solid fa-plus"></i> Anotação
-                                            <input type="hidden" class="id_card" value="<?php echo $card['tk'] ?>">
+                                            <input type="hidden" class="id_card" value="<?php echo $card['id_processo'] ?>">
                                         </a>
                                     </div>
 
@@ -316,6 +391,11 @@ include_once('../geral/topo.php');
                         </div>
                     </div>
                 <?php endforeach; ?>
+
+
+
+
+
             </div>
 
 
@@ -330,6 +410,8 @@ include_once('../geral/topo.php');
         })
     </script>
 
+
+    <!-- Lógica do CRUD de anotações -->
     <script>
         $(document).ready(function() {
             $(".add_anotacao").on("click", function() {
@@ -373,26 +455,7 @@ include_once('../geral/topo.php');
                     </form>
                 </div>
                 <div class="container_listagem_anotacoes" id="listagemAnotacoes">
-                    <div class="anotacao_item">
-                        <div class="delete_anotacao">
-                            X
-                            <input type="hidden" value="0000">
-                        </div>
-                        <div class="titulo">Reunião com cliente <div class="infos_anotacoes">10/08/25 às 18:50</div>
-                        </div>
-                        <div class="descricao">Agendada para segunda-feira às 15h, revisar documentos antes.</div>
-                    </div>
-
-                    <div class="anotacao_item">
-                        <div class="delete_anotacao">
-                            X
-                            <input type="hidden" value="0000">
-                        </div>
-                        <div class="titulo">Reunião com cliente <div class="infos_anotacoes">10/08/25 às 18:50</div>
-                        </div>
-                        <div class="descricao">Agendada para segunda-feira às 15h, revisar documentos antes.</div>
-                    </div>
-                    
+                                        
                 </div>
 
             </div>
@@ -400,6 +463,164 @@ include_once('../geral/topo.php');
 
                                     confirmButtonText: 'Fechar',
                                     confirmButtonColor: " #06112483",
+                                    didOpen: () => {
+
+
+                                        $('#listagemAnotacoes').empty();
+
+                                        // Verifica se existe o array de anotações e se ele contém itens
+                                        if (res.anotacoes && res.anotacoes.length > 0) {
+
+                                            res.anotacoes.forEach(function(anotacao) {
+                                                // Formatar data para dd/mm/yy às hh:mm
+                                                let data = new Date(anotacao.dt_cadastro_anotacoes);
+                                                let dataFormatada = data.toLocaleDateString('pt-BR', {
+                                                    year: '2-digit',
+                                                    month: '2-digit',
+                                                    day: '2-digit'
+                                                });
+                                                let horaFormatada = data.toLocaleTimeString('pt-BR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                });
+
+                                                // Monta o HTML da anotação
+                                                let item = `
+                    <div class="anotacao_item">
+                        <div class="delete_anotacao">
+                            X
+                            <input type="hidden" name="id_anotacao" value="${anotacao.id_anotacao_crm}">
+                            <input type="hidden" name="id_processo" value="${id_card}">
+                        </div>
+                        <div class="titulo">
+                            ${anotacao.titulo}
+                            <div class="infos_anotacoes">${dataFormatada} às ${horaFormatada}</div>
+                        </div>
+                        <div class="descricao">${anotacao.descricao}</div>
+                    </div>
+                `;
+
+                                                // Adiciona no container
+                                                $('#listagemAnotacoes').append(item);
+                                            });
+
+                                        } else {
+                                            // Se não houver anotações, exibe mensagem amigável
+                                            $('#listagemAnotacoes').html(`
+                <div class="anotacao_item" style="text-align:center; opacity:0.7;">
+                    Nenhuma anotação cadastrada
+                </div>
+            `);
+                                        }
+
+
+                                        $('#formAnotacao').submit(function(e) {
+                                            e.preventDefault();
+
+                                            let form = $(this).serialize();
+
+                                            $.ajax({
+                                                url: './crm_processo.php',
+                                                method: 'POST',
+                                                dataType: 'json',
+                                                data: form,
+                                                success: function(res) {
+
+                                                    if (res.status === 'success') {
+                                                        // Captura os campos diretamente do formulário
+                                                        let titulo = $('#formAnotacao [name="titulo_anotacao"]').val();
+                                                        let descricao = $('#formAnotacao [name="anotacao"]').val();
+                                                        let id_anotacao = res.id_anotacao; // vem do backend
+
+                                                        // Pega a data/hora atual
+                                                        let agora = new Date();
+                                                        let dataFormatada = agora.toLocaleDateString('pt-BR', {
+                                                            year: '2-digit',
+                                                            month: '2-digit',
+                                                            day: '2-digit'
+                                                        });
+                                                        let horaFormatada = agora.toLocaleTimeString('pt-BR', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        });
+
+                                                        // Monta o HTML da nova anotação
+                                                        let novaAnotacao = `
+                    <div class="anotacao_item">
+                        <div class="delete_anotacao">
+                            X
+                            <input type="hidden" name="id_anotacao" value="${id_anotacao}">
+                            <input type="hidden" name="id_processo" value="${id_card}">
+                        </div>
+                        <div class="titulo">
+                            ${titulo}
+                            <div class="infos_anotacoes">${dataFormatada} às ${horaFormatada}</div>
+                        </div>
+                        <div class="descricao">${descricao}</div>
+                    </div>
+                `;
+
+                                                        // Remove a mensagem "Nenhuma anotação cadastrada", se existir
+                                                        $('#listagemAnotacoes .anotacao_item').first().text().trim() === 'Nenhuma anotação cadastrada' ?
+                                                            $('#listagemAnotacoes').empty() :
+                                                            null;
+
+                                                        // Adiciona a nova anotação no topo da lista
+                                                        $('#listagemAnotacoes').prepend(novaAnotacao);
+
+                                                        // (Opcional) Limpa o formulário
+                                                        $('#formAnotacao')[0].reset();
+                                                    }
+                                                },
+                                                error: function(err) {
+                                                    console.error('Erro no AJAX:', err);
+                                                }
+                                            });
+                                        });
+
+
+
+                                        $('.delete_anotacao').click(function() {
+                                            let idAnotacao = $(this).find('input[name="id_anotacao"]').val();
+                                            let idProcesso = $(this).find('input[name="id_processo"]').val();
+                                            let card_anotacao = $(this).closest('.anotacao_item')
+
+
+                                            $.ajax({
+                                                url: './crm_processo.php',
+                                                method: 'POST',
+                                                dataType: 'json',
+                                                data: {
+                                                    acao: 'delete_anotacao',
+                                                    id_anotacao: idAnotacao,
+                                                    id_processo: idProcesso
+                                                },
+                                                success: function(res) {
+                                                    if (res.status === 'success') {
+                                                        // Remove o item da tela com efeito
+                                                        card_anotacao.fadeOut(300, function() {
+                                                            $(this).remove();
+                                                            if ($('#listagemAnotacoes .anotacao_item').length === 0) {
+                                                                $('#listagemAnotacoes').html(`
+                                <div class="anotacao_item" style="text-align:center; opacity:0.7;">
+                                    Nenhuma anotação cadastrada
+                                </div>
+                            `);
+                                                            }
+                                                        });
+                                                    } 
+
+                                                }
+                                            })
+
+
+
+                                        })
+
+
+
+
+                                    }
 
                                 })
                             }
