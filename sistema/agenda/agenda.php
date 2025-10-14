@@ -103,24 +103,33 @@ include_once('../geral/topo.php');
                 select: function(info) {
                     // info.startStr → data inicial
                     // info.endStr → data final (exclusiva — termina no dia seguinte)
-                    alert(
-                        'Selecionado de ' +
-                        info.startStr + ' até ' + info.endStr
-                    );
+                    Swal.fire({
+                        title: 'Adicinar Compromisso',
+                        html: `
+                           oi`,
+                        confirmButtonText: 'Fechar',
+                        confirmButtonColor: " #06112483"
+                    })
+
                 },
 
                 // Callback quando clicar em um dia
-                dateClick: function(info) {
-                    console.log(info)
-                    alert('Data clicada: ' + info.dateStr);
-                },
+                // dateClick: function(info) {
+                //     console.log(info)
+                //     alert('Data clicada: ' + info.dateStr);
+                // },
 
                 // Callback quando clicar em um evento
                 eventClick: function(info) {
-                    alert(
-                        'Evento: ' + info.event.title + '\nDescrição: ' +
-                        (info.event.extendedProps.descricao || 'Sem descrição.')
-                    );
+
+                    Swal.fire({
+                        title: info.event.title,
+                        text: (info.event.extendedProps.descricao || 'Sem descrição.'),
+                        confirmButtonText: 'Fechar',
+                        confirmButtonColor: " #06112483"
+                    });
+
+
                 },
 
                 // Callback ao arrastar evento

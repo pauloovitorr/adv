@@ -11,31 +11,5 @@
   overflow: inherit !important;
 }
 
-   /* Card do tooltip */
-    .tooltip-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      padding: 12px 16px;
-      width: 220px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
 
-    .tooltip-card h4 {
-      margin: 0 0 6px;
-      font-size: 15px;
-      color: #333;
-    }
-
-    .tooltip-card p {
-      margin: 0;
-      color: #555;
-    }
-
-    .tooltip-time {
-      font-weight: 600;
-      color: #3788d8;
-      font-size: 13px;
-    }
 
