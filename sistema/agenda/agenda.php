@@ -31,6 +31,9 @@ include_once('../geral/topo.php');
     <main class="container_principal">
         <div class="pai_conteudo">
             <div id='calendar'></div>
+
+
+
         </div>
     </main>
 
@@ -38,11 +41,15 @@ include_once('../geral/topo.php');
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var calendarEl = document.getElementById("calendar");
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                // Configuração de idioma
-                locale: 'pt-br',
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                // Configurações básicas
+                initialView: 'dayGridMonth', // Visualização inicial
+                locale: 'pt-br', // Idioma
+                timeZone: 'America/Sao_Paulo', // Fuso horário
+                themeSystem: 'standard', // Pode usar "bootstrap5" também
 
                 // Configuração do cabeçalho com textos personalizados
                 headerToolbar: {
@@ -60,117 +67,80 @@ include_once('../geral/topo.php');
                     list: 'Lista'
                 },
 
-                // Vista inicial
-                initialView: "dayGridMonth",
-
-                // Configurações de data e hora brasileiras
-                firstDay: 0, // Domingo como primeiro dia da semana
-                weekNumbers: true,
-                weekNumberFormat: {
-                    week: 'numeric'
-                },
-
-                // Formato de data brasileiro
-                dayHeaderFormat: {
-                    weekday: 'short'
-                },
-
-                // Configurações de horário
-                slotMinTime: '07:00:00',
-                slotMaxTime: '22:00:00',
-                slotDuration: '00:30:00',
-
-                // Configurações de navegação
-                navLinks: true,
-
-                // Permitir seleção
+                //  Interação
                 selectable: true,
-                selectMirror: true,
-
-                // Permitir arrastar eventos
                 editable: true,
-                dayMaxEvents: true,
+                nowIndicator: true,
+                dayMaxEvents: true, // mostra "+x mais" se muitos eventos
 
-                // Textos em português
-                allDayText: 'Todo o dia',
-                noEventsText: 'Nenhum evento para exibir',
-
-                // Eventos de exemplo
+                // Eventos
                 events: [{
+                        id: '1',
                         title: 'Reunião de Equipe',
                         start: '2025-10-15T09:00:00',
                         end: '2025-10-15T10:30:00',
-                        color: '#3788d8'
+                        color: '#3788d8',
+                        extendedProps: {
+                            descricao: 'Revisar metas e andamento dos projetos.'
+                        }
+                    },
+                    {
+                        id: '2',
+                        title: 'Entrega de Projeto',
+                        start: '2025-10-20',
+                        allDay: true,
+                        color: '#d83a3a'
+                    },
+                    {
+                        id: '3',
+                        title: 'Aniversário da Maria',
+                        start: '2025-10-22',
+                        allDay: true,
+                        color: '#f6c23e'
                     }
                 ],
 
-                // Callbacks para interação
-                select: function(arg) {
-                    var title = prompt('Título do evento:');
-                    if (title) {
-                        calendar.addEvent({
-                            title: title,
-                            start: arg.start,
-                            end: arg.end,
-                            allDay: arg.allDay
-                        });
-                    }
-                    calendar.unselect();
+                select: function(info) {
+                    // info.startStr → data inicial
+                    // info.endStr → data final (exclusiva — termina no dia seguinte)
+                    alert(
+                        'Selecionado de ' +
+                        info.startStr + ' até ' + info.endStr
+                    );
                 },
 
-                eventClick: function(arg) {
-                    if (confirm('Deseja excluir este evento: "' + arg.event.title + '"?')) {
-                        arg.event.remove();
-                    }
+                // Callback quando clicar em um dia
+                dateClick: function(info) {
+                    console.log(info)
+                    alert('Data clicada: ' + info.dateStr);
                 },
 
-                // Formatação customizada para datas
-                eventTimeFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false // Formato 24h
+                // Callback quando clicar em um evento
+                eventClick: function(info) {
+                    alert(
+                        'Evento: ' + info.event.title + '\nDescrição: ' +
+                        (info.event.extendedProps.descricao || 'Sem descrição.')
+                    );
                 },
 
-                // Formatação de título de data
-                titleFormat: {
-                    year: 'numeric',
-                    month: 'long'
+                // Callback ao arrastar evento
+                eventDrop: function(info) {
+                    alert(
+                        'Evento "' + info.event.title + '" movido para ' +
+                        info.event.start.toLocaleString()
+                    );
                 },
 
-                // Configurações de hora em português
-                slotLabelFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false
-                },
-
-                // Tooltip nos eventos
-                eventMouseEnter: function(info) {
-                    var startTime = info.event.start ? info.event.start.toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }) : '';
-
-                    var endTime = info.event.end ? info.event.end.toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }) : '';
-
-                    info.el.title = info.event.title +
-                        (startTime ? '\nInício: ' + startTime : '') +
-                        (endTime ? '\nFim: ' + endTime : '');
+                // Callback ao redimensionar evento
+                eventResize: function(info) {
+                    alert('Evento redimensionado: ' + info.event.title);
                 }
             });
 
             calendar.render();
         });
     </script>
+
 </body>
 
 </html>
