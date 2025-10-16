@@ -133,3 +133,20 @@ CREATE TABLE anotacoes_crm (
     CONSTRAINT fk_anotacoes_crm FOREIGN KEY (processo_id_processo) 
     REFERENCES processo(id_processo)
 );
+
+
+CREATE TABLE eventos_crm (
+
+    id_evento_crm INT NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(100) NOT NULL,
+    descricao TEXT NOT NULL,
+    all_day TINYINT(1) DEFAULT 0,
+    data_inicio DATETIME NOT NULL,
+    data_fim DATETIME NOT NULL,
+    cor VARCHAR(20) DEFAULT '#007bff',
+    usuario_config_id_usuario_config INT NOT NULL,
+
+    CONSTRAINT pk_eventos_crm PRIMARY KEY (id_evento_crm),
+    CONSTRAINT fk_eventos_crm FOREIGN KEY (usuario_config_id_usuario_config)
+    REFERENCES usuario_config(id_usuario_config)
+);

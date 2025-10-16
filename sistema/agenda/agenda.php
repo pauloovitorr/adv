@@ -2,6 +2,54 @@
 include_once('../../scripts.php');
 $id_user = $_SESSION['cod'];
 
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($_POST['description']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['color'])
+) {
+    $title       = $conexao->real_escape_string(htmlspecialchars($_POST['title']));
+    $description = $conexao->real_escape_string(htmlspecialchars($_POST['description']));
+    $allDay      = isset($_POST['allDay']) ? 1 : 0;
+    $start       = $conexao->real_escape_string(htmlspecialchars($_POST['start']));
+    $end         = $conexao->real_escape_string(htmlspecialchars($_POST['end']));
+    $color       = $conexao->real_escape_string(htmlspecialchars($_POST['color']));
+    
+
+    // Query preparada
+    $sql = "INSERT INTO eventos_crm 
+                (titulo, descricao, all_day, data_inicio, data_fim, cor, usuario_config_id_usuario_config)
+            VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    if ($stmt = $conexao->prepare($sql)) {
+        $stmt->bind_param("ssisssi", $title, $description, $allDay, $start, $end, $color, $id_user);
+
+        if ($stmt->execute()) {
+            $res = [
+                'status' => 'success',
+                'msg'    => 'Evento salvo com sucesso!',
+                'id'     => $stmt->insert_id
+            ];
+        } else {
+            $res = [
+                'status' => 'error',
+                'msg'    => 'Erro ao salvar evento: ' . $stmt->error
+            ];
+        }
+    } else {
+        $res = [
+            'status' => 'error',
+            'msg'    => 'Erro ao preparar statement: ' . $conexao->error
+        ];
+    }
+
+    // Retorna resposta em JSON
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+}
+
+
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -31,9 +79,6 @@ include_once('../geral/topo.php');
     <main class="container_principal">
         <div class="pai_conteudo">
             <div id='calendar'></div>
-
-
-
         </div>
     </main>
 
@@ -104,11 +149,106 @@ include_once('../geral/topo.php');
                     // info.startStr → data inicial
                     // info.endStr → data final (exclusiva — termina no dia seguinte)
                     Swal.fire({
-                        title: 'Adicinar Compromisso',
                         html: `
-                           oi`,
+                           <form id="eventForm" method="post">
+                <h2>Novo Compromisso</h2>
+
+                <label for="title">Título</label>
+                <input type="text" id="title" name="title" maxlength="40" required>
+
+                <label for="description">Descrição</label>
+                <textarea id="description" name="description" placeholder="Descreva o compromisso..."></textarea>
+
+                 <div class="checkbox-group">
+                    <input type="checkbox" id="allDay" name="allDay">
+                    <label for="allDay">Evento o dia todo</label>
+                </div>
+
+                <div class="data_evento">
+                    <div>
+                        <label for="start">Início</label>
+                        <input type="datetime-local" id="start" name="start" required>
+                    </div>
+                    <div>
+                        <label for="end">Fim</label>
+                        <input type="datetime-local" id="end" name="end" required>
+                    </div>
+                </div>
+
+                <label>Cor da Etiqueta</label>
+                <div class="color-options">
+                    <div class="color-choice" data-color="#007bff" style="background-color:#007bff;"></div>
+                    <div class="color-choice" data-color="#28a745" style="background-color:#28a745;"></div>
+                    <div class="color-choice" data-color="#dc3545" style="background-color:#dc3545;"></div>
+                </div>
+
+                <input type="hidden" id="eventColor" name="color" value="#007bff">
+
+                <button type="submit" class="btn">Salvar Evento</button>
+            </form>
+                           `,
                         confirmButtonText: 'Fechar',
-                        confirmButtonColor: " #06112483"
+                        confirmButtonColor: " #06112483",
+                        didOpen: () => {
+                            $(document).ready(function() {
+
+                                const allDayCheckbox = document.getElementById('allDay');
+                                const startInput = document.getElementById('start');
+                                const endInput = document.getElementById('end');
+
+                                allDayCheckbox.addEventListener('change', () => {
+                                    if (allDayCheckbox.checked) {
+                                        startInput.type = endInput.type = 'date';
+                                    } else {
+                                        startInput.type = endInput.type = 'datetime-local';
+                                    }
+                                });
+
+                                startInput.addEventListener('change', function() {
+                                    endInput.setAttribute('min', startInput.value)
+                                })
+
+
+
+                                const colorChoices = document.querySelectorAll('.color-choice');
+                                const colorInput = document.getElementById('eventColor');
+
+                                colorChoices.forEach(choice => {
+                                    choice.addEventListener('click', () => {
+                                        colorChoices.forEach(c => c.classList.remove('selected'));
+                                        choice.classList.add('selected');
+                                        colorInput.value = choice.getAttribute('data-color');
+                                    });
+                                });
+
+                                // Define a primeira cor como selecionada por padrão
+                                colorChoices[0].classList.add('selected');
+
+
+
+
+                                // !--Ajax do crud de eventos-- >
+                                $('#eventForm').on('submit', function(e) {
+                                    e.preventDefault()
+
+                                    $.ajax({
+                                        url: './agenda.php',
+                                        method: 'POST',
+                                        dataType: 'JSON',
+                                        data: $(this).serialize(),
+                                        success: function(res){
+                                            console.log(res)
+                                        }
+                                    })
+
+                                })
+                                // !-- FIM Ajax do crud de eventos-- >
+
+
+
+
+                            })
+                        }
                     })
 
                 },
@@ -121,6 +261,9 @@ include_once('../geral/topo.php');
 
                 // Callback quando clicar em um evento
                 eventClick: function(info) {
+
+                    // console.log(info.el.fcSeg.eventRange.def['publicId'])
+
 
                     Swal.fire({
                         title: info.event.title,
@@ -149,6 +292,10 @@ include_once('../geral/topo.php');
             calendar.render();
         });
     </script>
+
+
+
+
 
 </body>
 
