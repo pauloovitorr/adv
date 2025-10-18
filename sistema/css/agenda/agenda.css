@@ -40,10 +40,10 @@ label {
   color: #444;
 }
 
-input[type="text"],
-input[type="datetime-local"],
-input[type="date"],
-textarea {
+#eventForm input[type="text"],
+#eventForm input[type="datetime-local"],
+#eventForm input[type="date"],
+#eventForm textarea {
   width: 100%;
   padding: 0.6rem;
   border: 1px solid #ccc;
@@ -61,7 +61,13 @@ textarea {
 .checkbox-group {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 1rem;
+}
+
+.checkbox-group div{
+  display: flex;
+  align-items: center;
 }
 
 .checkbox-group label {
@@ -85,8 +91,22 @@ textarea {
 }
 
 .color-choice.selected {
-  border-color: #333;
+  border-color: #333333;
+  position: relative;
 }
+
+.color-choice.selected::after {
+  content: '✔'; 
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #333333;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+
 
 .btn {
   width: 100%;

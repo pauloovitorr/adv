@@ -7,11 +7,10 @@ if (
 ) {
     $title       = $conexao->real_escape_string(htmlspecialchars($_POST['title']));
     $description = $conexao->real_escape_string(htmlspecialchars($_POST['description']));
-    $allDay      = isset($_POST['allDay']) ? 1 : 0;
+    $allDay      = $conexao->real_escape_string(htmlspecialchars($_POST['allDay']));
     $start       = $conexao->real_escape_string(htmlspecialchars($_POST['start']));
     $end         = $conexao->real_escape_string(htmlspecialchars($_POST['end']));
     $color       = $conexao->real_escape_string(htmlspecialchars($_POST['color']));
-    
 
     // Query preparada
     $sql = "INSERT INTO eventos_crm 
@@ -24,19 +23,19 @@ if (
         if ($stmt->execute()) {
             $res = [
                 'status' => 'success',
-                'msg'    => 'Evento salvo com sucesso!',
+                'message'    => 'Evento salvo com sucesso!',
                 'id'     => $stmt->insert_id
             ];
         } else {
             $res = [
                 'status' => 'error',
-                'msg'    => 'Erro ao salvar evento: ' . $stmt->error
+                'message'    => 'Erro ao salvar evento: ' . $stmt->error
             ];
         }
     } else {
         $res = [
             'status' => 'error',
-            'msg'    => 'Erro ao preparar statement: ' . $conexao->error
+            'message'    => 'Erro ao preparar statement: ' . $conexao->error
         ];
     }
 
@@ -81,6 +80,8 @@ include_once('../geral/topo.php');
             <div id='calendar'></div>
         </div>
     </main>
+
+
 
 
 
@@ -160,8 +161,15 @@ include_once('../geral/topo.php');
                 <textarea id="description" name="description" placeholder="Descreva o compromisso..."></textarea>
 
                  <div class="checkbox-group">
-                    <input type="checkbox" id="allDay" name="allDay">
-                    <label for="allDay">Evento o dia todo</label>
+                    <div>
+                        <input type="radio" id="allDay" value="sim" name="allDay">
+                        <label for="allDay">Evento o dia todo</label>
+                    </div>
+                    
+                    <div>
+                        <input type="radio" id="partDay" value="nao" name="allDay" checked>
+                        <label for="partDay">Considerar horário</label>
+                    </div>
                 </div>
 
                 <div class="data_evento">
@@ -178,7 +186,7 @@ include_once('../geral/topo.php');
                 <label>Cor da Etiqueta</label>
                 <div class="color-options">
                     <div class="color-choice" data-color="#007bff" style="background-color:#007bff;"></div>
-                    <div class="color-choice" data-color="#28a745" style="background-color:#28a745;"></div>
+                    <div class="color-choice" data-color="#f6c23e" style="background-color:#f6c23e;"></div>
                     <div class="color-choice" data-color="#dc3545" style="background-color:#dc3545;"></div>
                 </div>
 
@@ -192,17 +200,28 @@ include_once('../geral/topo.php');
                         didOpen: () => {
                             $(document).ready(function() {
 
-                                const allDayCheckbox = document.getElementById('allDay');
+                                const allDayRadio = document.getElementById('allDay');
+                                const partDayRadio = document.getElementById('partDay');
                                 const startInput = document.getElementById('start');
                                 const endInput = document.getElementById('end');
 
-                                allDayCheckbox.addEventListener('change', () => {
-                                    if (allDayCheckbox.checked) {
+                                allDayRadio.addEventListener('change', () => {
+                                    if (allDayRadio.checked) {
                                         startInput.type = endInput.type = 'date';
                                     } else {
                                         startInput.type = endInput.type = 'datetime-local';
                                     }
                                 });
+
+                                partDayRadio.addEventListener('change', () => {
+                                    if (partDayRadio.checked) {
+                                        startInput.type = endInput.type = 'datetime-local';
+                                    } else {
+
+                                        startInput.type = endInput.type = 'date';
+                                    }
+                                });
+
 
                                 startInput.addEventListener('change', function() {
                                     endInput.setAttribute('min', startInput.value)
@@ -236,8 +255,23 @@ include_once('../geral/topo.php');
                                         method: 'POST',
                                         dataType: 'JSON',
                                         data: $(this).serialize(),
-                                        success: function(res){
-                                            console.log(res)
+                                        success: function(res) {
+                                            if (res.status == 'error') {
+                                                Swal.fire({
+                                                    icon: "error",
+                                                    title: "Erro ao cadastrar evento!",
+                                                    text: res.message
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: "Sucesso",
+                                                    text: "Evento cadastrado com sucesso!",
+                                                    icon: "success"
+                                                });
+                                            }
+
+                                            setTimeout(()=>{ window.location.reload()},1500)
+                                        
                                         }
                                     })
 
