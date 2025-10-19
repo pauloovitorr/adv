@@ -2,9 +2,57 @@
 include_once('../../scripts.php');
 $id_user = $_SESSION['cod'];
 
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($_POST['description']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['color'])
-) {
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['start']) && !empty($_GET['end'])) {
+
+    // Converte as datas de GET para formato datetime do MySQL
+    $dt_start = date('Y-m-d H:i:s', strtotime($_GET['start']));
+    $dt_end   = date('Y-m-d H:i:s', strtotime($_GET['end']));
+
+    // Consulta os eventos do usuário no intervalo
+    $sql_busca_eventos = "
+        SELECT * 
+        FROM eventos_crm 
+        WHERE data_inicio <= '$dt_end'  
+          AND data_fim >= '$dt_start' 
+          AND usuario_config_id_usuario_config = $id_user
+    ";
+
+    $datas_eventos = $conexao->query($sql_busca_eventos);
+
+    $eventos = [];
+
+    if ($datas_eventos && $datas_eventos->num_rows > 0) {
+        while ($evento = $datas_eventos->fetch_assoc()) {
+
+            // Ajusta o end para eventos all-day (FullCalendar trata end como exclusivo)
+            $end = $evento["data_fim"];
+            if (strtolower($evento["all_day"]) === 'sim') {
+                // Adiciona 1 dia para que o último dia seja exibido corretamente
+                $end = date('Y-m-d', strtotime($end . ' +1 day'));
+            }
+
+            $eventos[] = [
+                "id" => $evento["id_evento_crm"],
+                "title" => $evento["titulo"],
+                "start" => str_replace(' ', 'T', $evento["data_inicio"]),
+                "end"   => str_replace(' ', 'T', $end),
+                "allDay" => strtolower($evento["all_day"]) === 'sim',
+                "color"  => $evento["cor"],
+                "extendedProps" => [
+                    "descricao" => $evento["descricao"]
+                ]
+            ];
+        }
+    }
+
+    // Retorna JSON para o FullCalendar
+    echo json_encode($eventos, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($_POST['description']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['color'])) {
     $title       = $conexao->real_escape_string(htmlspecialchars($_POST['title']));
     $description = $conexao->real_escape_string(htmlspecialchars($_POST['description']));
     $allDay      = $conexao->real_escape_string(htmlspecialchars($_POST['allDay']));
@@ -18,7 +66,7 @@ if (
             VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt = $conexao->prepare($sql)) {
-        $stmt->bind_param("ssisssi", $title, $description, $allDay, $start, $end, $color, $id_user);
+        $stmt->bind_param("ssssssi", $title, $description, $allDay, $start, $end, $color, $id_user);
 
         if ($stmt->execute()) {
             $res = [
@@ -120,37 +168,12 @@ include_once('../geral/topo.php');
                 dayMaxEvents: true, // mostra "+x mais" se muitos eventos
 
                 // Eventos
-                events: [{
-                        id: '1',
-                        title: 'Reunião de Equipe',
-                        start: '2025-10-15T09:00:00',
-                        end: '2025-10-15T10:30:00',
-                        color: '#3788d8',
-                        extendedProps: {
-                            descricao: 'Revisar metas e andamento dos projetos.'
-                        }
-                    },
-                    {
-                        id: '2',
-                        title: 'Entrega de Projeto',
-                        start: '2025-10-20',
-                        allDay: true,
-                        color: '#d83a3a'
-                    },
-                    {
-                        id: '3',
-                        title: 'Aniversário da Maria',
-                        start: '2025-10-22',
-                        allDay: true,
-                        color: '#f6c23e'
-                    }
-                ],
+                events: './agenda.php',
 
                 select: function(info) {
-                    // info.startStr → data inicial
-                    // info.endStr → data final (exclusiva — termina no dia seguinte)
-                    Swal.fire({
-                        html: `
+
+                        Swal.fire({
+                            html: `
                            <form id="eventForm" method="post">
                 <h2>Novo Compromisso</h2>
 
@@ -162,12 +185,12 @@ include_once('../geral/topo.php');
 
                  <div class="checkbox-group">
                     <div>
-                        <input type="radio" id="allDay" value="sim" name="allDay">
+                        <input type="radio" id="allDay" value="sim" name="allDay" checked>
                         <label for="allDay">Evento o dia todo</label>
                     </div>
                     
                     <div>
-                        <input type="radio" id="partDay" value="nao" name="allDay" checked>
+                        <input type="radio" id="partDay" value="nao" name="allDay" >
                         <label for="partDay">Considerar horário</label>
                     </div>
                 </div>
@@ -175,11 +198,11 @@ include_once('../geral/topo.php');
                 <div class="data_evento">
                     <div>
                         <label for="start">Início</label>
-                        <input type="datetime-local" id="start" name="start" required>
+                        <input type="date" id="start" name="start" required>
                     </div>
                     <div>
                         <label for="end">Fim</label>
-                        <input type="datetime-local" id="end" name="end" required>
+                        <input type="date" id="end" name="end"  required>
                     </div>
                 </div>
 
@@ -192,100 +215,135 @@ include_once('../geral/topo.php');
 
                 <input type="hidden" id="eventColor" name="color" value="#007bff">
 
-                <button type="submit" class="btn">Salvar Evento</button>
+                <button type="submit" class="btn" id="salvarEvento">Salvar Evento</button>
             </form>
                            `,
-                        confirmButtonText: 'Fechar',
-                        confirmButtonColor: " #06112483",
-                        didOpen: () => {
-                            $(document).ready(function() {
+                            confirmButtonText: 'Fechar',
+                            confirmButtonColor: " #06112483",
+                            didOpen: () => {
+                                $(document).ready(function() {
 
-                                const allDayRadio = document.getElementById('allDay');
-                                const partDayRadio = document.getElementById('partDay');
-                                const startInput = document.getElementById('start');
-                                const endInput = document.getElementById('end');
+                                    const allDayRadio = document.getElementById('allDay');
+                                    const partDayRadio = document.getElementById('partDay');
+                                    const startInput = document.getElementById('start');
+                                    const endInput = document.getElementById('end');
 
-                                allDayRadio.addEventListener('change', () => {
-                                    if (allDayRadio.checked) {
-                                        startInput.type = endInput.type = 'date';
-                                    } else {
-                                        startInput.type = endInput.type = 'datetime-local';
+                                    const startDate = new Date(info.startStr);
+                                    const endDate = new Date(info.endStr);
+                                    const displayEndDate = new Date(endDate);
+                                    displayEndDate.setDate(endDate.getDate() - 1);
+
+                                    // Funções de formatação
+                                    const formatDate = (d) => d.toISOString().slice(0, 10); // YYYY-MM-DD
+                                    const formatDateTime = (d) => {
+                                        const pad = (n) => n.toString().padStart(2, '0');
+                                        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
                                     }
-                                });
 
-                                partDayRadio.addEventListener('change', () => {
-                                    if (partDayRadio.checked) {
-                                        startInput.type = endInput.type = 'datetime-local';
-                                    } else {
+                                    // Preenche os inputs inicialmente como date
+                                    startInput.type = endInput.type = 'date';
+                                    startInput.value = formatDate(startDate);
+                                    endInput.value = formatDate(displayEndDate);
 
-                                        startInput.type = endInput.type = 'date';
-                                    }
-                                });
-
-
-                                startInput.addEventListener('change', function() {
-                                    endInput.setAttribute('min', startInput.value)
-                                })
-
-
-
-                                const colorChoices = document.querySelectorAll('.color-choice');
-                                const colorInput = document.getElementById('eventColor');
-
-                                colorChoices.forEach(choice => {
-                                    choice.addEventListener('click', () => {
-                                        colorChoices.forEach(c => c.classList.remove('selected'));
-                                        choice.classList.add('selected');
-                                        colorInput.value = choice.getAttribute('data-color');
-                                    });
-                                });
-
-                                // Define a primeira cor como selecionada por padrão
-                                colorChoices[0].classList.add('selected');
-
-
-
-
-                                // !--Ajax do crud de eventos-- >
-                                $('#eventForm').on('submit', function(e) {
-                                    e.preventDefault()
-
-                                    $.ajax({
-                                        url: './agenda.php',
-                                        method: 'POST',
-                                        dataType: 'JSON',
-                                        data: $(this).serialize(),
-                                        success: function(res) {
-                                            if (res.status == 'error') {
-                                                Swal.fire({
-                                                    icon: "error",
-                                                    title: "Erro ao cadastrar evento!",
-                                                    text: res.message
-                                                });
-                                            } else {
-                                                Swal.fire({
-                                                    title: "Sucesso",
-                                                    text: "Evento cadastrado com sucesso!",
-                                                    icon: "success"
-                                                });
+                                    // Função para alternar tipo mantendo valor
+                                    function toggleInputType(isAllDay) {
+                                        if (isAllDay) {
+                                            // Muda para date mantendo somente a data
+                                            const start = new Date(startInput.value);
+                                            const end = new Date(endInput.value);
+                                            startInput.type = endInput.type = 'date';
+                                            startInput.value = formatDate(start);
+                                            endInput.value = formatDate(end);
+                                        } else {
+                                            // Muda para datetime-local mantendo a hora
+                                            // Se já era date, adiciona hora 00:00
+                                            const parseDateTime = (val) => {
+                                                const d = new Date(val);
+                                                return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0);
                                             }
-
-                                            setTimeout(()=>{ window.location.reload()},1500)
-                                        
+                                            const start = parseDateTime(startInput.value);
+                                            const end = parseDateTime(endInput.value);
+                                            startInput.type = endInput.type = 'datetime-local';
+                                            startInput.value = formatDateTime(start);
+                                            endInput.value = formatDateTime(end);
                                         }
+                                    }
+
+                                    // Listeners
+                                    allDayRadio.addEventListener('change', () => toggleInputType(allDayRadio.checked));
+                                    partDayRadio.addEventListener('change', () => toggleInputType(!partDayRadio.checked));
+
+
+                                    startInput.addEventListener('change', function() {
+                                        endInput.setAttribute('min', startInput.value)
                                     })
 
+
+
+                                    const colorChoices = document.querySelectorAll('.color-choice');
+                                    const colorInput = document.getElementById('eventColor');
+
+                                    colorChoices.forEach(choice => {
+                                        choice.addEventListener('click', () => {
+                                            colorChoices.forEach(c => c.classList.remove('selected'));
+                                            choice.classList.add('selected');
+                                            colorInput.value = choice.getAttribute('data-color');
+                                        });
+                                    });
+
+                                    // Define a primeira cor como selecionada por padrão
+                                    colorChoices[0].classList.add('selected');
+
+
+
+
+                                    // !--Ajax do crud de eventos-- >
+                                    $('#eventForm').on('submit', function(e) {
+                                        e.preventDefault()
+
+                                        $('#salvarEvento').attr('disabled', 'true')
+
+                                        $.ajax({
+                                            url: './agenda.php',
+                                            method: 'POST',
+                                            dataType: 'JSON',
+                                            data: $(this).serialize(),
+                                            success: function(res) {
+                                                if (res.status == 'error') {
+                                                    Swal.fire({
+                                                        icon: "error",
+                                                        title: "Erro ao cadastrar evento!",
+                                                        text: res.message
+                                                    });
+                                                } else {
+                                                    Swal.fire({
+                                                        title: "Sucesso",
+                                                        text: "Evento cadastrado com sucesso!",
+                                                        icon: "success"
+                                                    });
+                                                }
+
+                                                setTimeout(() => {
+                                                    window.location.reload()
+                                                }, 1500)
+
+                                            }
+                                        })
+
+
+                                    })
+                                    // !-- FIM Ajax do crud de eventos-- >
+
+
+
+
                                 })
-                                // !-- FIM Ajax do crud de eventos-- >
+                            }
+                        })
 
+                    }
 
-
-
-                            })
-                        }
-                    })
-
-                },
+                    ,
 
                 // Callback quando clicar em um dia
                 // dateClick: function(info) {
@@ -295,19 +353,112 @@ include_once('../geral/topo.php');
 
                 // Callback quando clicar em um evento
                 eventClick: function(info) {
+                        const evento = info.event;
 
-                    // console.log(info.el.fcSeg.eventRange.def['publicId'])
+                        console.log(evento)
+
+                        const descricao = evento.extendedProps.descricao || 'Sem descrição.';
+
+                        let detalhes = '';
+
+                        if (evento.allDay) {
+
+                            const inicioDate = new Date(evento.start.getUTCFullYear(), evento.start.getUTCMonth(), evento.start.getUTCDate());
+
+                            let fimDate;
+                            if (evento.end) {
+                                fimDate = new Date(evento.end.getUTCFullYear(), evento.end.getUTCMonth(), evento.end.getUTCDate() - 1);
+                            } else {
+                                fimDate = inicioDate;
+                            }
+
+                            const inicio = inicioDate.toLocaleDateString('pt-BR', {
+                                weekday: 'long',
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            });
+
+                            const fim = fimDate.toLocaleDateString('pt-BR', {
+                                weekday: 'long',
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            });
+
+                            detalhes = `
+        <div class="detalhe-linha"><span class="icone">📅</span> <strong>Início:</strong> ${inicio}</div>
+        <div class="detalhe-linha"><span class="icone">📅</span> <strong>Fim:</strong> ${fim}</div>
+    `;
+                        } else {
+                            
+                            const inicioDate = new Date(evento.start.getTime() + evento.start.getTimezoneOffset() * 60000);
+                            let fimDate = evento.end ? new Date(evento.end.getTime() + evento.end.getTimezoneOffset() * 60000) : null;
+
+                            const inicio = inicioDate.toLocaleString('pt-BR', {
+                                weekday: 'long',
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            const fim = fimDate ? fimDate.toLocaleString('pt-BR', {
+                                weekday: 'long',
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : '—';
+
+                            detalhes = `
+        <div class="detalhe-linha"><span class="icone">🕒</span> <strong>Início:</strong> ${inicio}</div>
+        <div class="detalhe-linha"><span class="icone">🕒</span> <strong>Fim:</strong> ${fim}</div>
+    `;
+                        }
 
 
-                    Swal.fire({
-                        title: info.event.title,
-                        text: (info.event.extendedProps.descricao || 'Sem descrição.'),
-                        confirmButtonText: 'Fechar',
-                        confirmButtonColor: " #06112483"
-                    });
+                        Swal.fire({
+                            title: `<strong>${evento.title}</strong>`,
+                            html: `
+            <div style="
+                text-align: left;
+                font-size: 15px;
+                background: #ffffff;
+                border-radius: 12px;
+                padding: 15px 20px;
+                box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+                color: #1e293b;
+                line-height: 1.6;
+            ">
+                <p style="
+                    margin-bottom: 12px;
+                    font-size: 15px;
+                    background: #ffffffff;
+                    padding: 10px 12px;
+                    border-radius: 8px;
+                ">
+                    ${descricao}
+                </p>
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+                <div style="font-size: 14px;">
+                    ${detalhes}
+                </div>
+            </div>
+        `,
+                            confirmButtonText: 'Fechar',
+                            confirmButtonColor: '#06112483',
+                            background: '#f8fafc',
+                            width: 450,
+                            customClass: {
+                                popup: 'rounded-2xl shadow-xl'
+                            }
+                        });
+                    }
 
-
-                },
+                    ,
 
                 // Callback ao arrastar evento
                 eventDrop: function(info) {
