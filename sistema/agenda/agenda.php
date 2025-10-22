@@ -94,7 +94,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($
 }
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&  !empty($_POST['start']) && !empty($_POST['end']) && isset($_POST['all_day'])) {
 
+    $id_compromisso = (int) $_POST['id_compromisso'];
+    $allDay         = ($_POST['all_day'] == 'true') ? 'sim' : 'nao';
+    $start = $conexao->real_escape_string($_POST['start']);
+    $end   = $conexao->real_escape_string($_POST['end']);
+
+    // Converte para o formato correto do MySQL
+    $start = date('Y-m-d H:i:s', strtotime($start));
+    $end   = date('Y-m-d H:i:s', strtotime($end));
+
+    $sql = "
+        UPDATE eventos_crm
+        SET 
+            data_inicio = '$start',
+            data_fim = '$end'
+        WHERE id_evento_crm = $id_compromisso
+    ";
+
+    if ($conexao->query($sql)) {
+        $res = [
+            'status' => 'success',
+            'message'    => 'Evento atualizado com sucesso!'
+        ];
+    } else {
+        $res = [
+            'status' => 'error',
+            'message'    => 'Erro ao atualizar evento: '
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+}
 
 
 ?>
@@ -355,8 +389,6 @@ include_once('../geral/topo.php');
                 eventClick: function(info) {
                         const evento = info.event;
 
-                        console.log(evento)
-
                         const descricao = evento.extendedProps.descricao || 'Sem descrição.';
 
                         let detalhes = '';
@@ -391,7 +423,7 @@ include_once('../geral/topo.php');
         <div class="detalhe-linha"><span class="icone">📅</span> <strong>Fim:</strong> ${fim}</div>
     `;
                         } else {
-                            
+
                             const inicioDate = new Date(evento.start.getTime() + evento.start.getTimezoneOffset() * 60000);
                             let fimDate = evento.end ? new Date(evento.end.getTime() + evento.end.getTimezoneOffset() * 60000) : null;
 
@@ -462,16 +494,42 @@ include_once('../geral/topo.php');
 
                 // Callback ao arrastar evento
                 eventDrop: function(info) {
-                    alert(
-                        'Evento "' + info.event.title + '" movido para ' +
-                        info.event.start.toLocaleString()
-                    );
-                },
+                        const evento = info.event;
 
-                // Callback ao redimensionar evento
-                eventResize: function(info) {
-                    alert('Evento redimensionado: ' + info.event.title);
-                }
+                        // Captura os dados formatados no padrão do backend (Y-m-d H:i:s)
+                        const formatDateTime = (date) => {
+                            return date.toISOString().slice(0, 19).replace('T', ' ');
+                        };
+
+
+                        const dados = {
+                            id_compromisso: evento.id,
+                            start: formatDateTime(evento.start),
+                            end: evento.end ? formatDateTime(evento.end) : formatDateTime(evento.start),
+                            all_day: evento.allDay ? 'true' : 'false'
+                        };
+
+                        $.ajax({
+                            url: './agenda.php',
+                            method: 'POST',
+                            dataType: 'JSON',
+                            data: dados,
+
+                            success: function(res) {
+
+                                console.log(res)
+
+                                // setTimeout(() => {
+                                //     window.location.reload()
+                                // }, 1500)
+                            }
+
+
+                        })
+                    }
+
+                    ,
+
             });
 
             calendar.render();
