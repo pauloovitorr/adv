@@ -102,8 +102,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&
     $end   = $conexao->real_escape_string($_POST['end']);
 
     // Converte para o formato correto do MySQL
-    $start = date('Y-m-d H:i:s', strtotime($start));
-    $end   = date('Y-m-d H:i:s', strtotime($end));
+
+    if ($allDay == 'sim') {
+        $start = date('Y-m-d H:i:s', strtotime($start));
+        $end = date('Y-m-d H:i:s', strtotime($end . ' -1 day'));
+    }
+    else{
+        $start = date('Y-m-d H:i:s', strtotime($start));
+        $end = date('Y-m-d H:i:s', strtotime($end));
+    }
 
     $sql = "
         UPDATE eventos_crm
