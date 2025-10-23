@@ -933,9 +933,9 @@ include_once('../geral/topo.php');
 
 
 
-            // ===============================
-            // INJETA VALORES PRÉ-SELECIONADOS
-            // ===============================
+            
+            // INJETA VALORES PRÉ-SELECIONADOS caso a ação seja de update
+          
             var cliente_id = "<?php echo $dados_processo['cliente_id'] ?? '' ?>";
             var cliente_nome = "<?php echo $dados_processo['cliente_nome'] ?? '' ?>";
             var optionCliente = new Option(cliente_nome, cliente_id, true, true);

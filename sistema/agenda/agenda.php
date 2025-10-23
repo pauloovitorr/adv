@@ -106,8 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&
     if ($allDay == 'sim') {
         $start = date('Y-m-d H:i:s', strtotime($start));
         $end = date('Y-m-d H:i:s', strtotime($end . ' -1 day'));
-    }
-    else{
+    } else {
         $start = date('Y-m-d H:i:s', strtotime($start));
         $end = date('Y-m-d H:i:s', strtotime($end));
     }
@@ -129,6 +128,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&
         $res = [
             'status' => 'error',
             'message'    => 'Erro ao atualizar evento: '
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&  !empty($_POST['acao']) && $_POST['acao'] == 'excluir') {
+
+    $id_compromisso = $conexao->real_escape_string($_POST['id_compromisso']);
+    $sql_delete_compromisso = "DELETE FROM eventos_crm WHERE id_evento_crm = $id_compromisso AND usuario_config_id_usuario_config = $id_user";
+
+    if ($conexao->query($sql_delete_compromisso)) {
+        $res = [
+            'status' => 'success',
+            'message'    => 'Evento excluído com sucesso!'
+        ];
+    } else {
+        $res = [
+            'status' => 'error',
+            'message'    => 'Erro ao excluir evento: '
         ];
     }
 
@@ -167,6 +189,7 @@ include_once('../geral/topo.php');
     <main class="container_principal">
         <div class="pai_conteudo">
             <div id='calendar'></div>
+
         </div>
     </main>
 
@@ -184,13 +207,18 @@ include_once('../geral/topo.php');
                 initialView: 'dayGridMonth', // Visualização inicial
                 locale: 'pt-br', // Idioma
                 timeZone: 'America/Sao_Paulo', // Fuso horário
-                themeSystem: 'standard', // Pode usar "bootstrap5" também
+                themeSystem: 'standard',
 
                 // Configuração do cabeçalho com textos personalizados
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                views: {
+                    listWeek: {
+                        allDayText: 'Dia inteiro'
+                    }
                 },
 
                 // Textos personalizados dos botões
@@ -394,74 +422,76 @@ include_once('../geral/topo.php');
 
                 // Callback quando clicar em um evento
                 eventClick: function(info) {
-                        const evento = info.event;
+                    const evento = info.event;
 
-                        const descricao = evento.extendedProps.descricao || 'Sem descrição.';
+                    let id_evento = evento._def.publicId
 
-                        let detalhes = '';
+                    const descricao = evento.extendedProps.descricao || 'Sem descrição.';
 
-                        if (evento.allDay) {
+                    let detalhes = '';
 
-                            const inicioDate = new Date(evento.start.getUTCFullYear(), evento.start.getUTCMonth(), evento.start.getUTCDate());
+                    if (evento.allDay) {
 
-                            let fimDate;
-                            if (evento.end) {
-                                fimDate = new Date(evento.end.getUTCFullYear(), evento.end.getUTCMonth(), evento.end.getUTCDate() - 1);
-                            } else {
-                                fimDate = inicioDate;
-                            }
+                        const inicioDate = new Date(evento.start.getUTCFullYear(), evento.start.getUTCMonth(), evento.start.getUTCDate());
 
-                            const inicio = inicioDate.toLocaleDateString('pt-BR', {
-                                weekday: 'long',
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            });
+                        let fimDate;
+                        if (evento.end) {
+                            fimDate = new Date(evento.end.getUTCFullYear(), evento.end.getUTCMonth(), evento.end.getUTCDate() - 1);
+                        } else {
+                            fimDate = inicioDate;
+                        }
 
-                            const fim = fimDate.toLocaleDateString('pt-BR', {
-                                weekday: 'long',
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            });
+                        const inicio = inicioDate.toLocaleDateString('pt-BR', {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
 
-                            detalhes = `
+                        const fim = fimDate.toLocaleDateString('pt-BR', {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+
+                        detalhes = `
         <div class="detalhe-linha"><span class="icone">📅</span> <strong>Início:</strong> ${inicio}</div>
         <div class="detalhe-linha"><span class="icone">📅</span> <strong>Fim:</strong> ${fim}</div>
     `;
-                        } else {
+                    } else {
 
-                            const inicioDate = new Date(evento.start.getTime() + evento.start.getTimezoneOffset() * 60000);
-                            let fimDate = evento.end ? new Date(evento.end.getTime() + evento.end.getTimezoneOffset() * 60000) : null;
+                        const inicioDate = new Date(evento.start.getTime() + evento.start.getTimezoneOffset() * 60000);
+                        let fimDate = evento.end ? new Date(evento.end.getTime() + evento.end.getTimezoneOffset() * 60000) : null;
 
-                            const inicio = inicioDate.toLocaleString('pt-BR', {
-                                weekday: 'long',
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
+                        const inicio = inicioDate.toLocaleString('pt-BR', {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
 
-                            const fim = fimDate ? fimDate.toLocaleString('pt-BR', {
-                                weekday: 'long',
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }) : '—';
+                        const fim = fimDate ? fimDate.toLocaleString('pt-BR', {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) : '—';
 
-                            detalhes = `
+                        detalhes = `
         <div class="detalhe-linha"><span class="icone">🕒</span> <strong>Início:</strong> ${inicio}</div>
         <div class="detalhe-linha"><span class="icone">🕒</span> <strong>Fim:</strong> ${fim}</div>
     `;
-                        }
+                    }
 
 
-                        Swal.fire({
-                            title: `<strong>${evento.title}</strong>`,
-                            html: `
+                    Swal.fire({
+                        title: `<strong>${evento.title}</strong>`,
+                        html: `
             <div style="
                 text-align: left;
                 font-size: 15px;
@@ -471,7 +501,11 @@ include_once('../geral/topo.php');
                 box-shadow: 0 1px 1px rgba(0,0,0,0.08);
                 color: #1e293b;
                 line-height: 1.6;
+                position: relative
             ">
+            <a class="dz-remove" href="javascript:undefined;" data-dz-remove="">X
+                <input type="hidden" class="codigo_evento" value="${id_evento}">
+            </a>
                 <p style="
                     margin-bottom: 12px;
                     font-size: 15px;
@@ -487,17 +521,61 @@ include_once('../geral/topo.php');
                 </div>
             </div>
         `,
-                            confirmButtonText: 'Fechar',
-                            confirmButtonColor: '#06112483',
-                            background: '#f8fafc',
-                            width: 450,
-                            customClass: {
-                                popup: 'rounded-2xl shadow-xl'
-                            }
-                        });
-                    }
+                        confirmButtonText: 'Fechar',
+                        confirmButtonColor: '#06112483',
+                        background: '#f8fafc',
+                        width: 450,
+                        customClass: {
+                            popup: 'rounded-2xl shadow-xl'
+                        },
+                        didOpen: () => {
 
-                    ,
+                            tippy(`.dz-remove`, {
+                                content: "Excluir Compromisso!",
+                                placement: "right",
+                            });
+
+                            $(document).ready(function() {
+                                $('.dz-remove').on('click', function() {
+                                    dados = {
+                                        id_compromisso: $(this).find('.codigo_evento').val(),
+                                        acao: 'excluir'
+                                    }
+
+                                    $.ajax({
+                                        url: './agenda.php',
+                                        method: 'POST',
+                                        dataType: 'json',
+                                        data: dados,
+                                        success: function(res) {
+                                            if (res.status == 'error') {
+                                                Swal.fire({
+                                                    icon: "error",
+                                                    title: "Erro na exclusão",
+                                                    text: res.message
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: "Sucesso",
+                                                    text: "Evento excluído",
+                                                    icon: "success"
+                                                });
+                                            }
+
+                                            setTimeout(() => {
+                                                window.location.reload()
+                                            }, 1500)
+
+                                        }
+
+                                    })
+
+                                })
+                            })
+
+                        }
+                    });
+                },
 
                 // Callback ao arrastar evento
                 eventDrop: function(info) {

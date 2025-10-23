@@ -130,6 +130,31 @@ textarea {
   width: 100%;
 }
 
+.dz-remove {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  right: 0px !important;
+  top: 0px !important;
+  width: 31px !important;
+  height: 31px !important;
+  font-size: 19px !important;
+  border-radius: 50% !important;
+  background-color: #fff !important;
+  z-index: 999 !important;
+  cursor: pointer !important;
+  box-shadow: 1px 1px 0px 0px rgba(0, 0, 0, 0.2) !important;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 15px;
+  text-decoration: none !important;
+  color: rgb(172, 49, 49);
+  transition: 0.3s;
+}
+
+
+
 @media (min-width: 1300px) {
   body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
     width: 40% !important;
