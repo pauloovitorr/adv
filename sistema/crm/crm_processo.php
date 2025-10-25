@@ -379,6 +379,10 @@ include_once('../geral/topo.php');
                                         <a href="javascript:void(0)" class="add_anotacao"><i class="fa-solid fa-plus"></i> Anotação
                                             <input type="hidden" class="id_card" value="<?php echo $card['id_processo'] ?>">
                                         </a>
+                                        <a href="javascript:void(0)" class="finalizar_processo">
+                                            <i class="fa-solid fa-check"></i> Encerrar
+                                            <input type="hidden" class="id_card" value="<?php echo $card['id_processo'] ?>">
+                                        </a>
                                     </div>
 
 
@@ -624,6 +628,54 @@ include_once('../geral/topo.php');
                     })
                 }
 
+            })
+        })
+    </script>
+
+
+    <!-- Formulário para finalizar processo -->
+    <script>
+        $(document).ready(function() {
+            $('.finalizar_processo').on('click', function() {
+                let id_finalizar = $(this).closest('.kanban-card').attr('data-cod-card')
+
+                Swal.fire({
+                    title: 'Finalizar Processo',
+                    html: `
+              <div class="container_encerra">
+              
+                <div class="container_form_encerra">
+                    <form id="formAnotacao" autocomplete="off">
+
+                        <label for="resultado">Causa Foi Ganha?</label>
+                        <select id="resultado" name="resultado" required>
+                            <option value="">Selecione</option>
+                            <option value="sim">Sim</option>
+                            <option value="nao">Não</option>
+                        </select>
+
+                        <label for="resultado">Observações:</label>
+                        <textarea name="anotacao" id="anotacao" placeholder="Anotações sobre o processo" rows="3" maxlength="200"  required></textarea>
+                        <input type="hidden" name="id_cadastro_anotacao" value="${id_finalizar}">
+                        <button type="submit" class="btn_adicionar" style="display:flex; justify-content: center; max-width:250px; margin: 0 auto ">
+                            <i class="fa-solid fa-check"></i> Encerrar Processo
+                        </button>
+                    </form>
+                </div>
+                
+
+            </div>
+            `,
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: " #3085d6",
+                    cancelButtonColor: "#d33",
+                    didOpen: () => {
+
+                    }
+
+
+                })
             })
         })
     </script>
