@@ -269,7 +269,9 @@ function getBadgeClass($contingenciamento)
     <link rel="stylesheet" href="../css/kanban/crm.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
     <script src="../js/geral.js"></script>
+
 
     <title>ADV Conectado</title>
 </head>
@@ -366,11 +368,11 @@ include_once('../geral/topo.php');
 
                                     <div class="card-footer">
                                         <?php if (!empty($card['valor_causa'])): ?>
-                                            <span>Causa: <?php echo $card['valor_causa']; ?></span>
+                                            <span class="causa">Causa: <span class="causa"><?php echo $card['valor_causa']; ?></span></span>
                                         <?php endif; ?>
 
                                         <?php if (!empty($card['valor_honorarios'])): ?>
-                                            <span>Comissão: <?php echo $card['valor_honorarios']; ?></span>
+                                            <span >Honorários: <span class="honorario"><?php echo $card['valor_honorarios']; ?></span></span>
                                         <?php endif; ?>
                                     </div>
 
@@ -638,6 +640,8 @@ include_once('../geral/topo.php');
         $(document).ready(function() {
             $('.finalizar_processo').on('click', function() {
                 let id_finalizar = $(this).closest('.kanban-card').attr('data-cod-card')
+                let honorarios = $(this).closest('.kanban-card').find('.honorario').text()
+                
 
                 Swal.fire({
                     title: 'Finalizar Processo',
@@ -654,9 +658,9 @@ include_once('../geral/topo.php');
                             <option value="nao">Não</option>
                         </select>
 
-                        <label for="resultado">Observações:</label>
-                        <textarea name="anotacao" id="anotacao" placeholder="Anotações sobre o processo" rows="3" maxlength="200"  required></textarea>
-                        <input type="hidden" name="id_cadastro_anotacao" value="${id_finalizar}">
+                        <label for="resultado">Honorário</label>
+                        <input type="text" name="valor_honorarios" id="valor_honorarios" value="${honorarios}" placeholder="Ex: 30.000,00" maxlength="14">
+                        <input type="hidden" name="id_processo" value="${id_finalizar}">
                         <button type="submit" class="btn_adicionar" style="display:flex; justify-content: center; max-width:250px; margin: 0 auto ">
                             <i class="fa-solid fa-check"></i> Encerrar Processo
                         </button>
@@ -667,11 +671,14 @@ include_once('../geral/topo.php');
             </div>
             `,
                     showCancelButton: true,
+                    showConfirmButton: false,
                     cancelButtonText: 'Cancelar',
                     confirmButtonColor: " #3085d6",
                     cancelButtonColor: "#d33",
                     didOpen: () => {
-
+                        $('#valor_honorarios').mask('000.000.000,00', {
+                            reverse: true
+                        });
                     }
 
 
@@ -939,6 +946,7 @@ include_once('../geral/topo.php');
     </script>
 
     <script src="../js/geral.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
 </body>
 
 </html>

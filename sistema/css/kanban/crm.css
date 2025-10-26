@@ -407,7 +407,7 @@ body > div.swal2-container.swal2-center.swal2-backdrop-show > div {
 .container_form_anotacoes input,
 .container_form_anotacoes textarea,
 .container_form_encerra select,
-.container_form_encerra textarea{
+.container_form_encerra input{
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #e6e6e6;
