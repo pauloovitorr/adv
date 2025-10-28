@@ -240,7 +240,13 @@ if (
 }
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resultado']) && !empty($_POST['honorarios']) && !empty($_POST['status'])) {
 
+    $resultado      = $conexao->real_escape_string(htmlspecialchars($_POST['resultado']));
+    $honorarios     = $conexao->real_escape_string(htmlspecialchars($_POST['honorarios']));
+
+    exit;
+}
 
 // Função para mapear contingenciamento para classe CSS
 function getBadgeClass($contingenciamento)
@@ -269,7 +275,7 @@ function getBadgeClass($contingenciamento)
     <link rel="stylesheet" href="../css/kanban/crm.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    
+
     <script src="../js/geral.js"></script>
 
 
@@ -372,7 +378,7 @@ include_once('../geral/topo.php');
                                         <?php endif; ?>
 
                                         <?php if (!empty($card['valor_honorarios'])): ?>
-                                            <span >Honorários: <span class="honorario"><?php echo $card['valor_honorarios']; ?></span></span>
+                                            <span>Honorários: <span class="honorario"><?php echo $card['valor_honorarios']; ?></span></span>
                                         <?php endif; ?>
                                     </div>
 
@@ -641,7 +647,7 @@ include_once('../geral/topo.php');
             $('.finalizar_processo').on('click', function() {
                 let id_finalizar = $(this).closest('.kanban-card').attr('data-cod-card')
                 let honorarios = $(this).closest('.kanban-card').find('.honorario').text()
-                
+
 
                 Swal.fire({
                     title: 'Finalizar Processo',
@@ -649,7 +655,7 @@ include_once('../geral/topo.php');
               <div class="container_encerra">
               
                 <div class="container_form_encerra">
-                    <form id="formAnotacao" autocomplete="off">
+                    <form id="formEncerrarProcesso" autocomplete="off">
 
                         <label for="resultado">Causa Foi Ganha?</label>
                         <select id="resultado" name="resultado" required>
@@ -679,6 +685,32 @@ include_once('../geral/topo.php');
                         $('#valor_honorarios').mask('000.000.000,00', {
                             reverse: true
                         });
+
+                        $('#formEncerrarProcesso').on('submit', function(e) {
+                            e.preventDefault()
+
+                            let resultado = $('#resultado').val()
+                            let valor_honorarios = $('#valor_honorarios').val()
+                            let status = 'inativo'
+
+                            $.ajax({
+                                url: './crm_processo.php',
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    "resultado": resultado,
+                                    "honorarios": valor_honorarios,
+                                    "status": status
+                                },
+                                success: function(res) {
+                                    console.log(res)
+                                }
+
+                            })
+
+
+                        })
+
                     }
 
 
