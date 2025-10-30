@@ -547,15 +547,29 @@ include_once('../geral/topo.php');
 
                                     <div class="container_input">
                                         <label for="resultado_processo">Resultado Processo</label>
-                                        <input
-                                            type="text"
-                                            name="resultado_processo"
-                                            id="resultado_processo"
-                                            value="<?php echo htmlspecialchars($dados_processo['resultado_processo'] ?? '') ?>"
-                                            minlength="4"
-                                            maxlength="100"
-                                            placeholder="Ex: Sentença favorável, acordo homologado, improcedente...">
+                                        <select name="resultado_processo" id="resultado_processo" required>
+                                            <option></option>
+                                            <option value="Sentença favorável" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Sentença favorável' ? 'selected' : ''; ?>>
+                                                Sentença favorável
+                                            </option>
+                                            <option value="Acordo homologado" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Acordo homologado' ? 'selected' : ''; ?>>
+                                                Acordo homologado
+                                            </option>
+                                            <option value="Improcedente" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Improcedente' ? 'selected' : ''; ?>>
+                                                Improcedente
+                                            </option>
+                                            <option value="Parcialmente procedente" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Parcialmente procedente' ? 'selected' : ''; ?>>
+                                                Parcialmente procedente
+                                            </option>
+                                            <option value="Extinto sem julgamento do mérito" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Extinto sem julgamento do mérito' ? 'selected' : ''; ?>>
+                                                Extinto sem julgamento do mérito
+                                            </option>
+                                            <option value="Recurso interposto" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Recurso interposto' ? 'selected' : ''; ?>>
+                                                Recurso interposto
+                                            </option>
+                                        </select>
                                     </div>
+
 
                                     <div class="container_input">
                                         <label for="observacao">Observação</label>
@@ -933,9 +947,9 @@ include_once('../geral/topo.php');
 
 
 
-            
+
             // INJETA VALORES PRÉ-SELECIONADOS caso a ação seja de update
-          
+
             var cliente_id = "<?php echo $dados_processo['cliente_id'] ?? '' ?>";
             var cliente_nome = "<?php echo $dados_processo['cliente_nome'] ?? '' ?>";
             var optionCliente = new Option(cliente_nome, cliente_id, true, true);

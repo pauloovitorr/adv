@@ -207,9 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['titulo_anotacao']) &
 
 
 // Excluir anotação
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['acao']) && $_POST['acao'] === 'delete_anotacao' && !empty($_POST['id_anotacao']) && !empty($_POST['id_processo'])
-) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['acao']) && $_POST['acao'] === 'delete_anotacao' && !empty($_POST['id_anotacao']) && !empty($_POST['id_processo'])) {
 
     $id_anotacao = $conexao->real_escape_string(htmlspecialchars($_POST['id_anotacao']));
     $id_processo = $conexao->real_escape_string(htmlspecialchars($_POST['id_processo']));
@@ -240,11 +238,32 @@ if (
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resultado']) && !empty($_POST['honorarios']) && !empty($_POST['status'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['resultado']) && !empty($_POST['status']) && !empty($_POST['id_processo'])) {
 
     $resultado      = $conexao->real_escape_string(htmlspecialchars($_POST['resultado']));
     $honorarios     = $conexao->real_escape_string(htmlspecialchars($_POST['honorarios']));
+    $id_processo     = $conexao->real_escape_string(htmlspecialchars($_POST['id_processo']));
+    $status_proc         = $conexao->real_escape_string(htmlspecialchars($_POST['status']));
 
+
+    $sql_update_status = "UPDATE processo SET status = '$status_proc', valor_honorarios = '$honorarios', resultado_processo = '$resultado'  WHERE id_processo = $id_processo AND usuario_config_id_usuario_config = $id_user";
+
+    if ($conexao->query($sql_update_status)) {
+        // Sucesso
+        $res = [
+            'status' => 'success',
+            'message' => 'Processo finalizado com sucesso!',
+        ];
+    } else {
+        // Falha encerrar
+        $res = [
+            'status' => 'error',
+            'message' => 'Erro ao finalizar processo. Tente novamente!'
+        ];
+    }
+
+    echo json_encode($res);
+    $conexao->close();
     exit;
 }
 
@@ -318,6 +337,7 @@ include_once('../geral/topo.php');
                     $sql_busca_processo_etapa = "SELECT 
                                 p.id_processo,
                                 p.tk,
+                                p.status,
                                 p.grupo_acao,
                                 p.tipo_acao,
                                 p.referencia,
@@ -333,7 +353,7 @@ include_once('../geral/topo.php');
 
                             FROM processo p
                             LEFT JOIN pessoas c     ON p.cliente_id         = c.id_pessoa
-                            where p.etapa_kanban = $id_etapa and p.usuario_config_id_usuario_config = $id_user";
+                            where p.etapa_kanban = $id_etapa and p.usuario_config_id_usuario_config = $id_user AND p.status = 'ativo'";
 
                     $cards_etapa = $conexao->query($sql_busca_processo_etapa);
 
@@ -657,16 +677,20 @@ include_once('../geral/topo.php');
                 <div class="container_form_encerra">
                     <form id="formEncerrarProcesso" autocomplete="off">
 
-                        <label for="resultado">Causa Foi Ganha?</label>
-                        <select id="resultado" name="resultado" required>
-                            <option value="">Selecione</option>
-                            <option value="sim">Sim</option>
-                            <option value="nao">Não</option>
+                        <label for="resultado">Resultado do Processo</label>
+                        <select name="resultado_processo" id="resultado" required>
+                            <option value=""></option>
+                            <option value="Sentença favorável">Sentença favorável</option>
+                            <option value="Acordo homologado">Acordo homologado</option>
+                            <option value="Improcedente">Improcedente</option>
+                            <option value="Parcialmente Procedente">Parcialmente procedente</option>
+                            <option value="Extinto sem julgamento do mérito">Extinto sem julgamento do mérito</option>
+                            <option value="Recurso interposto">Recurso interposto</option>
                         </select>
 
                         <label for="resultado">Honorário</label>
-                        <input type="text" name="valor_honorarios" id="valor_honorarios" value="${honorarios}" placeholder="Ex: 30.000,00" maxlength="14">
-                        <input type="hidden" name="id_processo" value="${id_finalizar}">
+                        <input type="text" name="valor_honorarios" id="valor_honorarios" value="${honorarios}" placeholder="Ex: 30.000,00" maxlength="14" required>
+                        <input type="hidden" name="id_processo" id="id_processo" value="${id_finalizar}">
                         <button type="submit" class="btn_adicionar" style="display:flex; justify-content: center; max-width:250px; margin: 0 auto ">
                             <i class="fa-solid fa-check"></i> Encerrar Processo
                         </button>
@@ -691,6 +715,7 @@ include_once('../geral/topo.php');
 
                             let resultado = $('#resultado').val()
                             let valor_honorarios = $('#valor_honorarios').val()
+                            let id_processo = $('#id_processo').val()
                             let status = 'inativo'
 
                             $.ajax({
@@ -700,10 +725,31 @@ include_once('../geral/topo.php');
                                 data: {
                                     "resultado": resultado,
                                     "honorarios": valor_honorarios,
+                                    "id_processo": id_processo,
                                     "status": status
                                 },
                                 success: function(res) {
-                                    console.log(res)
+                                    if (res.status !== 'success') {
+
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Oops...",
+                                            text: res.message,
+                                        });
+
+                                    } else {
+                                        Swal.fire({
+                                            title: "Encerrado!",
+                                            text: res.message,
+                                            icon: "success"
+                                        });
+                                    }
+
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 1500)
+
+
                                 }
 
                             })

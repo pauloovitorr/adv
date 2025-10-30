@@ -73,10 +73,10 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $res = $stmt->get_result();
     } else {
 
-        $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+        $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.status, p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
 FROM processo as p 
 INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
-WHERE p.usuario_config_id_usuario_config = $id_user ORDER BY p.dt_cadastro_processo DESC";
+WHERE p.usuario_config_id_usuario_config = $id_user AND p.status = 'ativo' ORDER BY p.dt_cadastro_processo DESC";
         $res = $conexao->query($sql_busca_pessoas);
     }
 }
@@ -352,7 +352,7 @@ include_once('../geral/topo.php');
                             <tr>
                                 <td colspan="5">
                                     <div class="sem_pessoas">
-                                        <p>Nenhuma Processo Cadastrado</p>
+                                        <p>Nenhuma Processo Cadastrado ou Ativo</p>
                                         <img src="../../img/listagem_processo.png" alt="" style="max-width: 200px;">
                                     </div>
                                 </td>
