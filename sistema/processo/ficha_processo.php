@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
     p.tk,
     p.grupo_acao,
     p.tipo_acao,
+    p.status,
     p.referencia,
     p.num_processo,
     p.num_protocolo,
@@ -72,6 +73,7 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
                     'id_processo'                  => $row['id_processo'],
                     'tk'                           => $row['tk'],
                     'grupo_acao'                   => $row['grupo_acao'],
+                    'status'                       => $row['status'],
                     'tipo_acao'                    => $row['tipo_acao'],
                     'referencia'                   => $row['referencia'],
                     'num_processo'                 => $row['num_processo'],
@@ -113,6 +115,7 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
         header('location: ./processos.php');
         exit;
     }
+
 }
 
 
@@ -126,6 +129,12 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pessoas/ficha_pessoa.css">
     <title>ADV Conectado</title>
+
+    <style>
+        .inativo{
+            color: #b51010 !important;
+        }
+    </style>
 </head>
 
 <?php
@@ -173,8 +182,8 @@ include_once('../geral/topo.php');
                                 </span>
 
 
-                                <span class="profile-status active">
-                                    <i class="fas fa-circle"></i> Ativo
+                                <span class="profile-status <?php echo $dados_processo["status"] == 'ativo' ? 'active': 'inativo' ?>">
+                                    <i class="fas fa-circle"></i> <?php echo ucfirst($dados_processo["status"])?>
                                 </span>
                             </div>
 

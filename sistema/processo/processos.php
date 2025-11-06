@@ -4,6 +4,12 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
+    // Páginação
+    $limite = 20;
+    $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    if ($pagina < 1) $pagina = 1;
+    $offset = ($pagina - 1) * $limite;
+
     $sql_quantidade_processos = "SELECT 
     COUNT(*) AS total_processo,
     COUNT( CASE WHEN contingenciamento = 'provável/chance alta' THEN 1 END ) AS chance_alta,
@@ -63,6 +69,7 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
                 break;
         }
 
+        $sql_filtros .= " LIMIT $limite OFFSET $offset";
         $stmt = $conexao->prepare($sql_filtros);
 
         if (!empty($params)) {
@@ -76,9 +83,13 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.status, p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
 FROM processo as p 
 INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
-WHERE p.usuario_config_id_usuario_config = $id_user AND p.status = 'ativo' ORDER BY p.dt_cadastro_processo DESC";
+WHERE p.usuario_config_id_usuario_config = $id_user  ORDER BY p.dt_cadastro_processo DESC LIMIT $limite OFFSET $offset";
         $res = $conexao->query($sql_busca_pessoas);
     }
+
+    // Total de páginas
+    $total_paginas = ceil($total / $limite);
+
 }
 
 
@@ -162,6 +173,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pessoas/pessoas.css">
     <title>ADV Conectado</title>
+
+    <style>
+        .inativo{
+            background-color: #d5d5d53b;
+        }
+    </style>
+
 </head>
 
 <?php
@@ -288,7 +306,9 @@ include_once('../geral/topo.php');
                                         }
                                         ?>
 
-                                        <div class="dados_processo <?php echo $classeChance ?>" onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'">
+                                        
+
+                                        <div class="dados_processo <?php echo $classeChance?> <?php echo $proceso['status'] == 'inativo' ? 'inativo': 'ativo' ?> " onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'  ">
                                             <div class="conteudo_pessoa container_tipo_acao">
                                                 <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?></div>
                                                 <div class="nome_pessoa">
@@ -368,6 +388,26 @@ include_once('../geral/topo.php');
                 </table>
 
             </section>
+
+            <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
+                <?php if ($pagina > 1): ?>
+                    <a href="?pagina=<?php echo $pagina - 1; ?>"
+                        class="pagination-btn">← Anterior</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                    <?php if ($i == $pagina): ?>
+                        <span class="pagination-btn active"><?php echo $i; ?></span>
+                    <?php else: ?>
+                        <a href="?pagina=<?php echo $i; ?>" class="pagination-btn"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($pagina < $total_paginas): ?>
+                    <a href="?pagina=<?php echo $pagina + 1; ?>"
+                        class="pagination-btn">Próxima →</a>
+                <?php endif; ?>
+            </div>
 
 
         </div>
