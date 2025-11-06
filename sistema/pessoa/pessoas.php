@@ -4,6 +4,12 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
+    // Páginação
+    $limite = 20;
+    $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    if ($pagina < 1) $pagina = 1;
+    $offset = ($pagina - 1) * $limite;
+
     $sql_quantidade_pessoas = "SELECT 
     COUNT(*) AS total_pessoas,
     COUNT(CASE WHEN tipo_parte = 'cliente' THEN 1 END) AS total_clientes,
@@ -56,6 +62,7 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
                 break;
         }
 
+        $sql_filtros .= " LIMIT $limite OFFSET $offset";
         $stmt = $conexao->prepare($sql_filtros);
 
         if (!empty($params)) {
@@ -66,9 +73,17 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
         $res = $stmt->get_result();
     } else {
 
-        $sql_busca_pessoas = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro_pessoa DESC";
+        $sql_busca_pessoas = "SELECT id_pessoa, tk, nome, tipo_parte, dt_cadastro_pessoa, telefone_principal, logradouro, bairro 
+        FROM pessoas 
+        WHERE usuario_config_id_usuario_config = $id_user 
+        ORDER BY dt_cadastro_pessoa DESC 
+        LIMIT $limite OFFSET $offset";
+
         $res = $conexao->query($sql_busca_pessoas);
     }
+
+    // Total de páginas
+    $total_paginas = ceil($total / $limite);
 }
 
 
@@ -423,6 +438,27 @@ include_once('../geral/topo.php');
                 </table>
 
             </section>
+
+            <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
+                <?php if ($pagina > 1): ?>
+                    <a href="?pagina=<?php echo $pagina - 1; ?>"
+                        class="pagination-btn">← Anterior</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                    <?php if ($i == $pagina): ?>
+                        <span class="pagination-btn active"><?php echo $i; ?></span>
+                    <?php else: ?>
+                        <a href="?pagina=<?php echo $i; ?>" class="pagination-btn"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($pagina < $total_paginas): ?>
+                    <a href="?pagina=<?php echo $pagina + 1; ?>"
+                        class="pagination-btn">Próxima →</a>
+                <?php endif; ?>
+            </div>
+
 
 
         </div>
