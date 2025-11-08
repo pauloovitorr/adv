@@ -31,12 +31,12 @@
         /* Transição suave */
     }
 
-    #painel{
+    #painel {
         height: 90px;
         border-bottom: 1px solid #7070708f;
     }
 
-    #painel > a > div > img{
+    #painel>a>div>img {
         width: 30px;
     }
 
@@ -95,6 +95,58 @@
                 </div>
             </a></li>
         <li id="crm"><a href="/adv/sistema/crm/crm_processo.php">
+                 <div class="div_opcao_menu_lat"><img src="../../img/crm.png" alt="">
+                    <p>CRM</p>
+                </div>
+            </a></li>
+        <li id="pessoas"><a href="/adv/sistema/pessoa/pessoas.php">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-users" aria-hidden="true"></i>
+                    <p>PESSOAS</p>
+                </div>
+            </a></li>
+        <li id="processos"><a href="/adv/sistema/processo/processos.php">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+                    <p>PROCESSOS</p>
+                </div>
+            </a></li>
+        <li id="agenda"><a href="/adv/sistema/agenda/agenda.php">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                    <p>AGENDA</p>
+                </div>
+            </a></li>
+        <li id="site"><a href="/adv/sistema/site/modelos.php">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-globe" aria-hidden="true"></i>
+                    <p>SITE</p>
+                </div>
+            </a></li>
+        <li id="leads"><a href="">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                    <p>LEADS</p>
+                </div>
+            </a></li>
+        <li id="financeiro"><a href="">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-sack-dollar" aria-hidden="true"></i>
+                    <p>FINANCEIRO</p>
+                </div>
+            </a></li>
+        <li id="relatorios"><a href="">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+                    <p>RELATÓRIOS</p>
+                </div>
+            </a></li>
+        <li id="configuracoes"><a href="">
+                <div class="div_opcao_menu_lat"><i class="fa-solid fa-gear" aria-hidden="true"></i>
+                    <p>CONFIGURAÇÕES</p>
+                </div>
+            </a></li>
+    </ul>
+    <!-- <ul>
+        <li id="painel"><a href="/adv/sistema/geral/home.php">
+                <div class="div_opcao_menu_lat"><img src="../../img/painel.png" alt="">
+                    <p>PAINEL</p>
+                </div>
+            </a></li>
+        <li id="crm"><a href="/adv/sistema/crm/crm_processo.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/crm.png" alt="">
                     <p>CRM</p>
                 </div>
@@ -139,9 +191,7 @@
                     <p>CONFIGURAÇÕES</p>
                 </div>
             </a></li>
-    </ul>
+    </ul> -->
 
-    
+
 </nav>
-
-
