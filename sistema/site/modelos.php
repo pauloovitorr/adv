@@ -325,7 +325,7 @@ include_once('../geral/topo.php');
             const radios = grid.querySelectorAll('input[type="radio"][name="template"]');
             const chooseBtn = document.getElementById('chooseBtn');
             const previewBtn = document.getElementById('previewBtn');
-            const toastTpl = document.getElementById('toastTpl');
+            // const toastTpl = document.getElementById('toastTpl');
 
             // Marca visualmente o card selecionado e habilita ações
             function updateSelection() {
@@ -359,31 +359,31 @@ include_once('../geral/topo.php');
             // Botões de ação
             previewBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
-                toast(`Pré-visualizando ${val}…`);
-                // Navegue para rota de preview, ex.: /site/preview.php?template=val
-                // window.location.href = `/site/preview.php?template=${encodeURIComponent(val)}`;
+                
+                window.open('./modelo1/index.html', '_blank')
+                
             });
 
             chooseBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
                 if (!val) return;
-                toast(`Modelo ${val} selecionado, avançando para personalização.`);
+                // toast(`Modelo ${val} selecionado, avançando para personalização.`);
                 // Exemplo de post para PHP procedural
                 // fetch('salvar-escolha.php', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`template=${encodeURIComponent(val)}`})
                 //   .then(()=> window.location.href = `/site/personalizar.php?template=${encodeURIComponent(val)}`);
             });
 
             // Toast simples
-            let t;
+            // let t;
 
-            function toast(msg) {
-                clearTimeout(t);
-                document.querySelectorAll('.toast').forEach(n => n.remove());
-                const node = toastTpl.content.firstElementChild.cloneNode(true);
-                node.textContent = msg;
-                document.body.appendChild(node);
-                t = setTimeout(() => node.remove(), 2400);
-            }
+            // function toast(msg) {
+            //     clearTimeout(t);
+            //     document.querySelectorAll('.toast').forEach(n => n.remove());
+            //     const node = toastTpl.content.firstElementChild.cloneNode(true);
+            //     node.textContent = msg;
+            //     document.body.appendChild(node);
+            //     t = setTimeout(() => node.remove(), 2400);
+            // }
         })();
     </script>
 
