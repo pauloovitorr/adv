@@ -150,3 +150,31 @@ CREATE TABLE eventos_crm (
     CONSTRAINT fk_eventos_crm FOREIGN KEY (usuario_config_id_usuario_config)
     REFERENCES usuario_config(id_usuario_config)
 );
+
+
+
+CREATE TABLE configuracao_modelo (
+
+    id_configuracao_modelo INT NOT NULL AUTO_INCREMENT,
+    modelo INT NOT NULL,
+    fonte1 VARCHAR(100),
+    fonte2 VARCHAR(100),
+    area_atuacao VARCHAR(50),
+    banner VARCHAR(200),
+    frase_inicial  VARCHAR(150),
+    frase_secundária  VARCHAR(150),
+    telefone_whatsapp tell VARCHAR(14) NOT NULL,
+    email VARCHAR(80) NOT NULL,
+    sobre VARCHAR(200) NOT NULL,
+    foto_adv VARCHAR(200) NOT NULL,
+    areas_atuacao VARCHAR(200) NOT NULL,
+    endereco VARCHAR(200) NOT NULL,
+    
+
+    CONSTRAINT pk_id_configuracao_modelo PRIMARY KEY (id_configuracao_modelo)
+);
+
+
+CREATE TABLE depoimentos(
+
+)

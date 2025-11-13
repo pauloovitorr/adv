@@ -367,23 +367,10 @@ include_once('../geral/topo.php');
             chooseBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
                 if (!val) return;
-                // toast(`Modelo ${val} selecionado, avançando para personalização.`);
-                // Exemplo de post para PHP procedural
-                // fetch('salvar-escolha.php', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`template=${encodeURIComponent(val)}`})
-                //   .then(()=> window.location.href = `/site/personalizar.php?template=${encodeURIComponent(val)}`);
+                
             });
 
-            // Toast simples
-            // let t;
-
-            // function toast(msg) {
-            //     clearTimeout(t);
-            //     document.querySelectorAll('.toast').forEach(n => n.remove());
-            //     const node = toastTpl.content.firstElementChild.cloneNode(true);
-            //     node.textContent = msg;
-            //     document.body.appendChild(node);
-            //     t = setTimeout(() => node.remove(), 2400);
-            // }
+           
         })();
     </script>
 

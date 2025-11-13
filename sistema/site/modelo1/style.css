@@ -3,7 +3,7 @@
 :root {
     --bg-main: #121212;
     --color-gold: #C6A664;
-    --color-white: #F9F9F9;
+    --color-white: #ebe8e8;
     --color-grey: #B5B5B5;
     --color-whatsapp: #25D366;
     --font-serif: 'Playfair Display', serif;
@@ -246,7 +246,7 @@ section {
 
 /* --- TESTIMONIALS --- */
 .testimonials-section {
-    background-color: #f4f2f0; /* Bege suave */
+    background-color: var(--color-white); /* Bege suave */
     color: #333;
 }
 
