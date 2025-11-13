@@ -154,27 +154,33 @@ CREATE TABLE eventos_crm (
 
 
 CREATE TABLE configuracao_modelo (
-
     id_configuracao_modelo INT NOT NULL AUTO_INCREMENT,
     modelo INT NOT NULL,
     fonte1 VARCHAR(100),
     fonte2 VARCHAR(100),
     area_atuacao VARCHAR(50),
     banner VARCHAR(200),
-    frase_inicial  VARCHAR(150),
-    frase_secundária  VARCHAR(150),
-    telefone_whatsapp tell VARCHAR(14) NOT NULL,
+    frase_inicial VARCHAR(150),
+    frase_secundaria VARCHAR(150),
+    telefone_whatsapp VARCHAR(14) NOT NULL,
     email VARCHAR(80) NOT NULL,
     sobre VARCHAR(200) NOT NULL,
     foto_adv VARCHAR(200) NOT NULL,
     areas_atuacao VARCHAR(200) NOT NULL,
+    frase_chamada_cta VARCHAR(150) NOT NULL,
+    frase_chamada_cta_secundaria VARCHAR(150) NOT NULL,
     endereco VARCHAR(200) NOT NULL,
-    
-
+    estilizacao TEXT,
+    dt_cadastro_modelo DATETIME DEFAULT CURRENT_TIMESTAMP,
+    dt_atualizacao_modelo DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT pk_id_configuracao_modelo PRIMARY KEY (id_configuracao_modelo)
 );
 
+CREATE TABLE depoimentos (
+    id_depoimento INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    texto TEXT NOT NULL,
+    dt_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_id_depoimento PRIMARY KEY (id_depoimento)
+);
 
-CREATE TABLE depoimentos(
-
-)

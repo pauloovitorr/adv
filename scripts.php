@@ -32,7 +32,7 @@ $pag = basename($_SERVER['REQUEST_URI']);
 
 if ($pag !== 'cadastro.php' && $pag !== 'index.php' && $pag !== 'recupera_senha.php') {
 
-    if (!isset($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'])) {
+    if (!isset($_SESSION['nome']) || empty($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'])) {
         session_unset();
         session_destroy();
         header('Location: /adv/index.php');
