@@ -1,8 +1,26 @@
 <?php
 include_once('../../scripts.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['modelo'])){
-    
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['modelo'])) {
+
+    $num_modelo = $conexao->escape_string(htmlspecialchars($_POST['modelo']));
+
+    $sql_adiciona_modelo = "UPDATE usuario_config SET modelo = $num_modelo WHERE id_usuario_config = $id_user";
+    if ($conexao->query($sql_adiciona_modelo)) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Modelo atualizado com sucesso!',
+        ];
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Ao adicionar modelo'
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
 }
 
 ?>
@@ -171,6 +189,8 @@ include_once('../geral/topo.php');
         $(document).ready(function() {
             $('#chooseBtn').on('click', function() {
                 let modelo = $('.selected').find('input[type=radio]').val()
+                $('#chooseBtn').prop('disabled', true);
+
 
 
                 $.ajax({
@@ -182,7 +202,17 @@ include_once('../geral/topo.php');
                     dataType: 'json',
                     success: function(res) {
 
-                        console.log(res)
+                        if (res.status == 'success') {
+                            window.open('./configuracao_modelo.php')
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: res.message
+                            });
+
+                              $('#chooseBtn').prop('disabled', false);
+                        }
 
                     }
                 })
