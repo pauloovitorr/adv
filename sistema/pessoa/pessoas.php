@@ -494,6 +494,12 @@ include_once('../geral/topo.php');
             $('#add_pessoa').click(function() {
                 window.open('./cadastro_pessoa.php', '_self');
             })
+
+            $('.whatsapp').click(function(e){
+                e.stopPropagation()
+            })
+
+
         })
     </script>
 
@@ -523,7 +529,7 @@ include_once('../geral/topo.php');
                             dataType: 'json',
                             success: function(res) {
 
-                                console.log(res)
+                                // console.log(res)
 
                                 if (res.status == "success") {
                                     Swal.fire({

@@ -71,3 +71,6 @@ function cadastro_log( string $acao, string $identificador ,string $ip, int $id_
     $stmt->bind_param('sssi',$acao, $identificador, $ip, $id_user);
     return $stmt->execute();
 }
+
+
+$id_user = $_SESSION['cod'];

@@ -1,6 +1,9 @@
 <?php
 include_once('../../scripts.php');
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['modelo'])){
+    
+}
 
 ?>
 
@@ -59,7 +62,7 @@ include_once('../geral/topo.php');
             <form id="templateForm" class="card-grid" aria-label="Galeria de modelos">
                 <!-- Card 1 -->
                 <label class="template-card" tabindex="0">
-                    <input type="radio" name="template" value="modelo-1" class="visually-hidden" />
+                    <input type="radio" name="template" value="1" class="visually-hidden" />
                     <div class="card-media">
                         <img src="https://picsum.photos/seed/law1/640/360" alt="Prévia do Modelo 1" loading="lazy" />
                         <span class="badge">Modelo 1</span>
@@ -72,7 +75,7 @@ include_once('../geral/topo.php');
 
                 <!-- Card 2 -->
                 <label class="template-card" tabindex="0">
-                    <input type="radio" name="template" value="modelo-2" class="visually-hidden" />
+                    <input type="radio" name="template" value="2" class="visually-hidden" />
                     <div class="card-media">
                         <img src="https://picsum.photos/seed/law2/640/360" alt="Prévia do Modelo 2" loading="lazy" />
                         <span class="badge">Modelo 2</span>
@@ -85,7 +88,7 @@ include_once('../geral/topo.php');
 
                 <!-- Card 3 -->
                 <label class="template-card" tabindex="0">
-                    <input type="radio" name="template" value="modelo-3" class="visually-hidden" />
+                    <input type="radio" name="template" value="3" class="visually-hidden" />
                     <div class="card-media">
                         <img src="https://picsum.photos/seed/law3/640/360" alt="Prévia do Modelo 3" loading="lazy" />
                         <span class="badge">Modelo 3</span>
@@ -149,19 +152,44 @@ include_once('../geral/topo.php');
             // Botões de ação
             previewBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
-                
-                window.open('./modelo1/index.html', '_blank')
-                
+
+                window.open('./modelo1/index.php', '_blank')
+
             });
 
             chooseBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
                 if (!val) return;
-                
+
             });
 
-           
+
         })();
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#chooseBtn').on('click', function() {
+                let modelo = $('.selected').find('input[type=radio]').val()
+
+
+                $.ajax({
+                    url: './modelos.php',
+                    type: 'POST',
+                    data: {
+                        modelo: modelo,
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+
+                        console.log(res)
+
+                    }
+                })
+
+            })
+
+        })
     </script>
 
 </body>
