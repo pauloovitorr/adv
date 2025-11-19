@@ -155,7 +155,6 @@ CREATE TABLE eventos_crm (
 
 CREATE TABLE configuracao_modelo (
     id_configuracao_modelo INT NOT NULL AUTO_INCREMENT,
-    modelo INT NOT NULL,
     fonte1 VARCHAR(100),
     fonte2 VARCHAR(100),
     area_atuacao VARCHAR(50),

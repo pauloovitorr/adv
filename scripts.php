@@ -74,3 +74,5 @@ function cadastro_log( string $acao, string $identificador ,string $ip, int $id_
 
 
 $id_user = $_SESSION['cod'];
+$ip =  $_SERVER['REMOTE_ADDR'];
+$identificador_log =  $_SESSION["nome"];

@@ -7,10 +7,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['modelo'])) {
 
     $sql_adiciona_modelo = "UPDATE usuario_config SET modelo = $num_modelo WHERE id_usuario_config = $id_user";
     if ($conexao->query($sql_adiciona_modelo)) {
-        $res = [
-            'status' => 'success',
-            'message' => 'Modelo atualizado com sucesso!',
-        ];
+
+        if (cadastro_log("Escolheu o modelo de site $num_modelo", $identificador_log, $ip, $id_user)) {
+            $res = [
+                'status' => 'success',
+                'message' => 'Modelo atualizado com sucesso!',
+            ];
+        }
     } else {
         $res = [
             'status' => 'erro',
@@ -211,7 +214,7 @@ include_once('../geral/topo.php');
                                 text: res.message
                             });
 
-                              $('#chooseBtn').prop('disabled', false);
+                            $('#chooseBtn').prop('disabled', false);
                         }
 
                     }
