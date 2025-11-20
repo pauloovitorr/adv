@@ -26,6 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['modelo'])) {
     exit;
 }
 
+
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+
+    $sql_modelo = "SELECT modelo FROM usuario_config WHERE id_usuario_config = $id_user";
+    $retorno_sql = $conexao->query($sql_modelo);
+    $num_modelo = '';
+
+    if ($retorno_sql->num_rows > 0) {
+        $num_modelo = $retorno_sql->fetch_assoc()['modelo'];
+    }
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -123,28 +136,32 @@ include_once('../geral/topo.php');
 
             <div class="actions">
                 <button id="previewBtn" class="btn ghost" type="button" disabled>Pré-visualizar</button>
-                <button id="chooseBtn" class="btn primary" type="button" disabled>Escolher modelo</button>
+                <button id="chooseBtn" class="btn primary" type="button" disabled>Configurar modelo</button>
             </div>
 
         </div>
     </main>
 
 
-
-
     <script>
-        // app.js
-        (function() {
+        $(function() {
+
             const grid = document.querySelector('.card-grid');
-            const radios = grid.querySelectorAll('input[type="radio"][name="template"]');
             const chooseBtn = document.getElementById('chooseBtn');
             const previewBtn = document.getElementById('previewBtn');
-            // const toastTpl = document.getElementById('toastTpl');
+            const radios = grid.querySelectorAll('input[type="radio"][name="template"]');
 
-            // Marca visualmente o card selecionado e habilita ações
+            // 1) PEGA O VALOR DO BANCO
+            let valor_modelo = <?php echo $num_modelo ?>;
+
+            // 2) Função de seleção visual + habilitação dos botões
             function updateSelection() {
-                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+
+                document.querySelectorAll('.template-card')
+                    .forEach(card => card.classList.remove('selected'));
+
                 const checked = grid.querySelector('input[type="radio"]:checked');
+
                 if (checked) {
                     checked.closest('.template-card').classList.add('selected');
                     chooseBtn.disabled = false;
@@ -155,42 +172,52 @@ include_once('../geral/topo.php');
                 }
             }
 
-            // Permite selecionar com Enter/Espaço no label focado (acessível)
+            // 3) Se o modelo vier do banco, marca o radio
+            if (valor_modelo !== '') {
+                const radio = $(`input[type="radio"][name="template"][value="${valor_modelo}"]`);
+                if (radio.length) {
+                    radio.prop('checked', true);
+                }
+            }
+
+            // 4) Atualiza seleção ao mudar o radio
+            radios.forEach(radio =>
+                radio.addEventListener('change', updateSelection)
+            );
+
+            // 5) Atualiza ao carregar a página (inclui o caso vindo do banco)
+            updateSelection();
+
+            // 6) Acessibilidade (Enter/Espaço)
             grid.addEventListener('keydown', (e) => {
-                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('template-card')) {
+                if ((e.key === 'Enter' || e.key === ' ') &&
+                    e.target.classList.contains('template-card')) {
+
                     e.preventDefault();
                     const radio = e.target.querySelector('input[type="radio"]');
-                    radio.checked = true;
-                    radio.dispatchEvent(new Event('change', {
-                        bubbles: true
-                    }));
+
+                    if (radio) {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
+                    }
                 }
             });
 
-            radios.forEach(r => r.addEventListener('change', updateSelection));
-            updateSelection();
-
-            // Botões de ação
+            // 7) Botão Preview
             previewBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
+                if (!val) return;
 
-                window.open('./modelo1/index.php', '_blank')
-
+                window.open('./modelo1/index.php', '_blank');
             });
 
+            // 8) Botão Escolher
             chooseBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
                 if (!val) return;
 
-            });
-
-
-        })();
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            $('#chooseBtn').on('click', function() {
                 let modelo = $('.selected').find('input[type=radio]').val()
                 $('#chooseBtn').prop('disabled', true);
 
@@ -206,7 +233,7 @@ include_once('../geral/topo.php');
                     success: function(res) {
 
                         if (res.status == 'success') {
-                            window.open('./configuracao_modelo.php')
+                            window.open('./configuracao_modelo.php','_self')
                         } else {
                             Swal.fire({
                                 icon: "error",
@@ -220,10 +247,11 @@ include_once('../geral/topo.php');
                     }
                 })
 
-            })
+            });
 
-        })
+        });
     </script>
+
 
 </body>
 

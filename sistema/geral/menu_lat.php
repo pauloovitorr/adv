@@ -88,7 +88,7 @@
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
 
 <nav class="menu_lateral">
-    <ul>
+    <!-- <ul>
         <li id="painel"><a href="/adv/sistema/geral/home.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/painel.png" alt="">
                     <p>PAINEL</p>
@@ -139,8 +139,8 @@
                     <p>CONFIGURAÇÕES</p>
                 </div>
             </a></li>
-    </ul>
-    <!-- <ul>
+    </ul> -->
+    <ul>
         <li id="painel"><a href="/adv/sistema/geral/home.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/painel.png" alt="">
                     <p>PAINEL</p>
@@ -166,7 +166,7 @@
                     <p>AGENDA</p>
                 </div>
             </a></li>
-        <li id="site"><a href="">
+        <li id="site"><a href="/adv/sistema/site/modelos.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/site.png" alt="">
                     <p>SITE</p>
                 </div>
@@ -191,7 +191,7 @@
                     <p>CONFIGURAÇÕES</p>
                 </div>
             </a></li>
-    </ul> -->
+    </ul>
 
 
 </nav>

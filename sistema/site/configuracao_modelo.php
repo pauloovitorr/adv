@@ -82,6 +82,50 @@ include_once('../geral/topo.php');
                                         </select>
                                     </div>
 
+
+
+                                    <div class="form-field" id="campo-banner">
+                                        <label for="banner_arquivo">Banner (imagem)</label>
+
+                                        <input
+                                            type="file"
+                                            name="banner_arquivo"
+                                            id="banner_arquivo"
+                                            accept=".jpg,.jpeg,.png"
+                                            class="custom-file-input">
+
+                                        <div class="custo_add_arquivo" onclick="document.getElementById('banner_arquivo').click()">
+                                            <p id="nome-arquivo-banner">Selecione o arquivo</p>
+                                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-field" id="campo-foto-advogado">
+                                        <label for="foto_adv_arquivo">Foto do advogado</label>
+
+                                        <input
+                                            type="file"
+                                            name="foto_adv_arquivo"
+                                            id="foto_adv_arquivo"
+                                            accept=".jpg,.jpeg,.png"
+                                            class="custom-file-input">
+
+                                        <div class="custo_add_arquivo" onclick="document.getElementById('foto_adv_arquivo').click()">
+                                            <p id="nome-arquivo-foto-adv">Selecione o arquivo</p>
+                                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+
+
+                                <!-- Linha: frases inicial e secundária -->
+                                <div class="form-row">
+
+
                                     <div class="form-field">
                                         <label for="area_atuacao">Área principal</label>
                                         <input
@@ -92,30 +136,7 @@ include_once('../geral/topo.php');
                                             maxlength="50">
                                     </div>
 
-                                    <div class="form-field" id="campo-banner">
-                                        <label for="banner_arquivo">Banner (imagem)</label>
-                                        <input
-                                            type="file"
-                                            name="banner_arquivo"
-                                            id="banner_arquivo"
-                                            accept=".jpg,.jpeg,.png">
-                                    </div>
-
-                                    <div class="form-field" id="campo-foto-advogado">
-                                        <label for="foto_adv_arquivo">Foto do advogado</label>
-                                        <input
-                                            type="file"
-                                            name="foto_adv_arquivo"
-                                            id="foto_adv_arquivo"
-                                            accept=".jpg,.jpeg,.png">
-                                    </div>
-                                </div>
-
-                        
-
-                                <!-- Linha: frases inicial e secundária -->
-                                <div class="form-row">
-                                    <div class="form-field">
+                                    <div class="form-field" id="container_frase_inicial">
                                         <label for="frase_inicial">Frase inicial</label>
                                         <input
                                             type="text"
@@ -125,7 +146,7 @@ include_once('../geral/topo.php');
                                             maxlength="150">
                                     </div>
 
-                                    <div class="form-field">
+                                    <div class="form-field" id="container_frase_secundaria">
                                         <label for="frase_secundaria">Frase secundária</label>
                                         <input
                                             type="text"
@@ -160,35 +181,26 @@ include_once('../geral/topo.php');
                                             maxlength="80"
                                             required>
                                     </div>
-                                </div>
 
-                                <!-- Linha: sobre e áreas de atuação (campos grandes) -->
-                                <div class="form-row">
-                                    <div class="form-field form-field--wide" id="campo-sobre">
-                                        <label for="sobre">Sobre o advogado / escritório <span style="color: red;">*</span></label>
-                                        <textarea
-                                            name="sobre"
-                                            id="sobre"
-                                            rows="4"
-                                            maxlength="200"
-                                            required
-                                            placeholder="Breve descrição que aparecerá no site"></textarea>
-                                    </div>
-
-                                    <div class="form-field form-field--wide" id="campo-areas-atuacao">
-                                        <label for="areas_atuacao">Áreas de atuação (resumo) <span style="color: red;">*</span></label>
-                                        <textarea
-                                            name="areas_atuacao"
-                                            id="areas_atuacao"
+                                    <div class="form-field form-field--wide" id="campo-endereco">
+                                        <label for="endereco">Endereço <span style="color: red;">*</span></label>
+                                        <input
+                                            type="text"
+                                            name="endereco"
+                                            id="endereco"
                                             rows="3"
+
                                             maxlength="200"
                                             required
-                                            placeholder="EX: Trabalhista, Cível, Previdenciário"></textarea>
+                                            placeholder="Rua, número, bairro, cidade - UF"></input>
                                     </div>
                                 </div>
+
+
 
                                 <!-- Linha: chamadas CTA -->
                                 <div class="form-row">
+
                                     <div class="form-field form-field--wide" id="campo-cta-principal">
                                         <label for="frase_chamada_cta">Chamada principal do CTA <span style="color: red;">*</span></label>
                                         <input
@@ -212,25 +224,47 @@ include_once('../geral/topo.php');
                                     </div>
                                 </div>
 
-                                <!-- Linha: endereço e estilização -->
+
+                                <!-- Linha: sobre e áreas de atuação (campos grandes) -->
                                 <div class="form-row">
-                                    <div class="form-field form-field--wide" id="campo-endereco">
-                                        <label for="endereco">Endereço <span style="color: red;">*</span></label>
+
+                                    <div class="form-field form-field--wide" id="campo-sobre">
+                                        <label for="sobre">Sobre o advogado / escritório <span style="color: red;">*</span></label>
                                         <textarea
-                                            name="endereco"
-                                            id="endereco"
+                                            name="sobre"
+                                            id="sobre"
                                             rows="3"
+
                                             maxlength="200"
                                             required
-                                            placeholder="Rua, número, bairro, cidade - UF"></textarea>
+                                            placeholder="Breve descrição que aparecerá no site"></textarea>
                                     </div>
+
+                                    <div class="form-field form-field--wide" id="campo-areas-atuacao">
+                                        <label for="areas_atuacao">Áreas de atuação (resumo) <span style="color: red;">*</span></label>
+                                        <textarea
+                                            name="areas_atuacao"
+                                            id="areas_atuacao"
+                                            rows="3"
+
+                                            maxlength="200"
+                                            required
+                                            placeholder="EX: Trabalhista, Cível, Previdenciário"></textarea>
+                                    </div>
+
+                                </div>
+
+                                <!-- Linha: endereço e estilização -->
+                                <div class="form-row">
+
 
                                     <div class="form-field form-field--wide" id="campo-estilizacao">
                                         <label for="estilizacao">Estilização (JSON / CSS opcional)</label>
                                         <textarea
                                             name="estilizacao"
                                             id="estilizacao"
-                                            rows="4"
+                                            rows="3"
+
                                             placeholder='EX: {"cor_primaria":"#123456","layout":"modelo1"}'></textarea>
                                     </div>
                                 </div>

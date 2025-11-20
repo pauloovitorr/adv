@@ -120,9 +120,9 @@
   width: 100%;
   min-height: 90px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
   gap: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 /* Campo individual */
@@ -183,17 +183,18 @@
 }
 
 /* Campos “largos” (sobre, áreas, endereço, CTA etc.) */
-.form-field--wide {
+.form-field--wide,
+#container_frase_inicial,
+#campo-endereco{
   grid-column: span 2;
 }
 
 /* Ajuste fino para IDs específicos se quiser forçar ainda mais largura */
 #campo-sobre,
 #campo-areas-atuacao,
-#campo-endereco,
 #campo-cta-principal,
 #campo-cta-secundaria {
-  grid-column: span 3;
+  grid-column: span 2;
 }
 
 /* INPUT FILE NATIVO (se for esconder para usar botão customizado) */
@@ -218,6 +219,33 @@
   width: 200px;
   display: block;
 }
+
+
+.custom-file-input {
+    display: none; /* esconde o input nativo */
+}
+
+.custo_add_arquivo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+    cursor: pointer;
+    /* aqui você mantém o restante do estilo que já usa
+       (borda, background, radius, etc.) */
+}
+
+#nome-arquivo,
+#nome-arquivo-banner,
+#nome-arquivo-foto-adv,
+#nome-arquivo-foto {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 200px;
+    display: block;
+}
+
 
 /* RESPONSIVO */
 @media (max-width: 1024px) {

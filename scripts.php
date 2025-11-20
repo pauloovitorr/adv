@@ -32,6 +32,11 @@ $pag = basename($_SERVER['REQUEST_URI']);
 
 if ($pag !== 'cadastro.php' && $pag !== 'index.php' && $pag !== 'recupera_senha.php') {
 
+    $id_user = $_SESSION['cod'];
+    $ip =  $_SERVER['REMOTE_ADDR'];
+    $identificador_log =  $_SESSION["nome"];
+
+
     if (!isset($_SESSION['nome']) || empty($_SESSION['nome']) ||  !isset($_SESSION['email']) ||  !isset($_SESSION['cod'])) {
         session_unset();
         session_destroy();
@@ -62,17 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') { // Ignorar requisições automá
 }
 
 
-function cadastro_log( string $acao, string $identificador ,string $ip, int $id_user)
+function cadastro_log(string $acao, string $identificador, string $ip, int $id_user)
 {
     global $conexao;
 
     $sql_insert_log = "INSERT INTO log (acao_log, identificador, ip_log, dt_acao_log, usuario_config_id_usuario_config) VALUES (?, ?,?,  NOW(), ? ) ";
     $stmt = $conexao->prepare($sql_insert_log);
-    $stmt->bind_param('sssi',$acao, $identificador, $ip, $id_user);
+    $stmt->bind_param('sssi', $acao, $identificador, $ip, $id_user);
     return $stmt->execute();
 }
-
-
-$id_user = $_SESSION['cod'];
-$ip =  $_SERVER['REMOTE_ADDR'];
-$identificador_log =  $_SESSION["nome"];
