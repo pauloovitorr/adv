@@ -172,7 +172,10 @@ CREATE TABLE configuracao_modelo (
     estilizacao TEXT,
     dt_cadastro_modelo DATETIME DEFAULT CURRENT_TIMESTAMP,
     dt_atualizacao_modelo DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT pk_id_configuracao_modelo PRIMARY KEY (id_configuracao_modelo)
+    usuario_config_id_usuario_config INT NOT NULL,
+
+    CONSTRAINT pk_id_configuracao_modelo PRIMARY KEY (id_configuracao_modelo),
+    CONSTRAINT fk_configuracao_modelo FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
 );
 
 CREATE TABLE depoimentos (
@@ -180,6 +183,8 @@ CREATE TABLE depoimentos (
     nome VARCHAR(100) NOT NULL,
     texto TEXT NOT NULL,
     dt_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_id_depoimento PRIMARY KEY (id_depoimento)
+    usuario_config_id_usuario_config INT NOT NULL,
+    CONSTRAINT pk_id_depoimento PRIMARY KEY (id_depoimento),
+    CONSTRAINT fk_depoimentos FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
 );
 

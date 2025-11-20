@@ -3,10 +3,15 @@
 
 include_once('../../scripts.php');
 
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre'])
-    && !empty($_FILES['foto_adv_arquivo']) && !empty($_FILES['banner_arquivo'])
-) {
+if ($_SERVER['REQUEST_METHOD'] === 'GET'){
+
+    $sql_busca_configuracoes = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
+
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre']) && !empty($_FILES['foto_adv_arquivo']) && !empty($_FILES['banner_arquivo'])) {
+
+    // var_dump($_POST);
 
     $fonte1                          = $conexao->escape_string(htmlspecialchars($_POST['fonte1'] ?? ''));
     $fonte2                          = $conexao->escape_string(htmlspecialchars($_POST['fonte2'] ?? ''));
@@ -71,16 +76,134 @@ if (
                 $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
 
                 if ($retorno_img_movida) {
-                    $banner_arquivo_pessoa = '/geral/docs/site' . $novo_nome_arquivo;
+                    $caminho_banner_adv = '/geral/docs/site/' . $novo_nome_arquivo;
+                }
+            }
+        }
+
+        if ($foto_adv_arquivo['name']) {
+
+            $nomeArquivo = $foto_adv_arquivo['name'];
+            $tmpArquivo = $foto_adv_arquivo['tmp_name'];
+            $tamanhoArquivo = $foto_adv_arquivo['size'];
+
+            $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+            $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+
+            // Validação de tamanho — usa 5MB como limite real
+            if ($tamanhoArquivo > 5 * 1024 * 1024) {
+
+                $res = [
+                    'status' => "erro",
+                    'message' => "Arquivo $nomeArquivo muito grande! Tamanho máximo permitido de 3MB"
+                ];
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            } elseif ($foto_adv_arquivo['error'] !== 0) {
+
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Imagem com erro'
+                ];
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            } else {
+
+                $caminho = '../geral/docs/site';
+
+                $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+                $retorno_img_movida = move_uploaded_file($tmpArquivo, $novo_caminho);
+
+                if ($retorno_img_movida) {
+
+                    $caminho_foto_adv = '/geral/docs/site/' . $novo_nome_arquivo;
                 }
             }
         }
 
 
-        $conexao->close();
-        exit;
+
+        $sql_configura_modelo = "INSERT INTO configuracao_modelo (
+            fonte1,
+            fonte2,
+            area_atuacao_principal,
+            banner,
+            frase_inicial,
+            frase_secundaria,
+            telefone_whatsapp,
+            email,
+            sobre,
+            foto_adv,
+            areas_atuacao,
+            frase_chamada_cta,
+            frase_chamada_cta_secundaria,
+            endereco,
+            estilizacao,
+            usuario_config_id_usuario_config
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+
+        $stmt = $conexao->prepare($sql_configura_modelo);
+
+        $stmt->bind_param(
+            "sssssssssssssssi",
+            $fonte1,
+            $fonte2,
+            $area_atuacao,
+            $caminho_banner_adv,          // banner
+            $frase_inicial,
+            $frase_secundaria,
+            $telefone_whatsapp,
+            $email,
+            $sobre,
+            $caminho_foto_adv,        // foto_adv
+            $areas_atuacao,
+            $frase_chamada_cta,
+            $frase_chamada_cta_secundaria,
+            $endereco,
+            $estilizacao,
+            $id_user
+        );
+
+        if ($stmt->execute()) {
+
+            if (cadastro_log('Configurou modelo ', $identificador_log, $ip, $id_user)) {
+
+                $conexao->commit();
+                $conexao->close();
+
+                $res = [
+                    'status' => 'success',
+                    'message' => 'Modelo configurado com sucesso!',
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
+            } else {
+                $conexao->rollback();
+                $conexao->close();
+
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Erro ao configurar modelo!'
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
+            }
+        }
     } catch (Exception $err) {
-        echo "Erro: " . $err->getMessage();
+        $res = [
+            'status' => 'erro',
+            'message' => $err->getMessage()
+        ];
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
         $conexao->rollback();
         $conexao->close();
         exit;

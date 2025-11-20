@@ -127,10 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['tipo_pessoa']) && !e
                     'message' => 'Erro ao cadastrar pessoa!'
                 ];
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
             }
         }
     } catch (Exception $err) {
-        echo "Erro: " . $err->getMessage();
+         $res = [
+            'status' => 'erro',
+            'message' => $err->getMessage()
+        ];
         $conexao->rollback();
         $conexao->close();
     }
