@@ -136,32 +136,31 @@ include_once('../geral/topo.php');
 
             <div class="actions">
                 <button id="previewBtn" class="btn ghost" type="button" disabled>Pré-visualizar</button>
-                <button id="chooseBtn" class="btn primary" type="button" disabled>Configurar modelo</button>
+                <button id="chooseBtn" class="btn primary" type="button" disabled>Escolher modelo</button>
             </div>
 
         </div>
     </main>
 
 
+
+
+
     <script>
         $(function() {
 
             const grid = document.querySelector('.card-grid');
+            const radios = grid.querySelectorAll('input[type="radio"][name="template"]');
             const chooseBtn = document.getElementById('chooseBtn');
             const previewBtn = document.getElementById('previewBtn');
-            const radios = grid.querySelectorAll('input[type="radio"][name="template"]');
 
-            // 1) PEGA O VALOR DO BANCO
-            let valor_modelo = <?php echo $num_modelo ?>;
+            let valor_modelo = <?php echo json_encode($num_modelo) ?>
 
-            // 2) Função de seleção visual + habilitação dos botões
+            // Marca visual e habilita botões
             function updateSelection() {
-
-                document.querySelectorAll('.template-card')
-                    .forEach(card => card.classList.remove('selected'));
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
 
                 const checked = grid.querySelector('input[type="radio"]:checked');
-
                 if (checked) {
                     checked.closest('.template-card').classList.add('selected');
                     chooseBtn.disabled = false;
@@ -172,30 +171,19 @@ include_once('../geral/topo.php');
                 }
             }
 
-            // 3) Se o modelo vier do banco, marca o radio
+            //  SE VIER DO BANCO, MARCA O RADIO ANTES DE TUDO
             if (valor_modelo !== '') {
-                const radio = $(`input[type="radio"][name="template"][value="${valor_modelo}"]`);
+                const radio = $(`input[type=radio][name=template][value="${valor_modelo}"]`);
                 if (radio.length) {
                     radio.prop('checked', true);
                 }
             }
 
-            // 4) Atualiza seleção ao mudar o radio
-            radios.forEach(radio =>
-                radio.addEventListener('change', updateSelection)
-            );
-
-            // 5) Atualiza ao carregar a página (inclui o caso vindo do banco)
-            updateSelection();
-
-            // 6) Acessibilidade (Enter/Espaço)
-            grid.addEventListener('keydown', (e) => {
-                if ((e.key === 'Enter' || e.key === ' ') &&
-                    e.target.classList.contains('template-card')) {
-
-                    e.preventDefault();
-                    const radio = e.target.querySelector('input[type="radio"]');
-
+            //  Permitir selecionar o card inteiro com clique
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.template-card');
+                if (card) {
+                    const radio = card.querySelector('input[type="radio"]');
                     if (radio) {
                         radio.checked = true;
                         radio.dispatchEvent(new Event('change', {
@@ -205,52 +193,66 @@ include_once('../geral/topo.php');
                 }
             });
 
-            // 7) Botão Preview
+            // Acessibilidade Enter/Espaço
+            grid.addEventListener('keydown', (e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('template-card')) {
+                    e.preventDefault();
+                    const radio = e.target.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', {
+                        bubbles: true
+                    }));
+                }
+            });
+
+            // Atualizar sempre que trocar o radio
+            radios.forEach(r => r.addEventListener('change', updateSelection));
+
+            // Chamar depois de tudo (incluindo banco)
+            updateSelection();
+
+            // Preview
             previewBtn.addEventListener('click', () => {
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
                 if (!val) return;
 
-                window.open('./modelo1/index.php', '_blank');
+                window.open('./modelo1/index.php', '_self');
             });
 
-            // 8) Botão Escolher
-            chooseBtn.addEventListener('click', () => {
-                const val = grid.querySelector('input[type="radio"]:checked')?.value;
-                if (!val) return;
+            // Escolher modelo
+            chooseBtn.addEventListener('click', function() {
 
-                let modelo = $('.selected').find('input[type=radio]').val()
+                let modelo = $('.selected').find('input[type=radio]').val();
                 $('#chooseBtn').prop('disabled', true);
-
-
 
                 $.ajax({
                     url: './modelos.php',
                     type: 'POST',
                     data: {
-                        modelo: modelo,
+                        modelo
                     },
                     dataType: 'json',
                     success: function(res) {
-
                         if (res.status == 'success') {
-                            window.open('./configuracao_modelo.php','_self')
+                            window.open('./configuracao_modelo.php', '_self');
                         } else {
                             Swal.fire({
                                 icon: "error",
                                 title: "Oops...",
                                 text: res.message
                             });
-
                             $('#chooseBtn').prop('disabled', false);
                         }
-
                     }
-                })
+                });
 
             });
 
         });
     </script>
+
+
+
 
 
 </body>

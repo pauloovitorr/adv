@@ -169,20 +169,21 @@
             color: white
         }
 
-        .btn.primary:disabled {
+        .btn.primary:disabled,
+        .ghost:disabled {
             opacity: .4;
             cursor: not-allowed
         }
 
         .btn.ghost {
-            background: #06112483;
+             background: #061124;
             color: white;
             border: 1px solid rgba(255, 255, 255, .12)
         }
 
-        .btn.ghost:hover {
+        /* .btn.ghost:hover {
             background: #061124;
-        }
+        } */
 
         .btn:active {
             transform: translateY(1px)
