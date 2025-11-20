@@ -157,7 +157,7 @@ CREATE TABLE configuracao_modelo (
     id_configuracao_modelo INT NOT NULL AUTO_INCREMENT,
     fonte1 VARCHAR(100),
     fonte2 VARCHAR(100),
-    area_atuacao VARCHAR(50),
+    area_atuacao_principal VARCHAR(50),
     banner VARCHAR(200),
     frase_inicial VARCHAR(150),
     frase_secundaria VARCHAR(150),

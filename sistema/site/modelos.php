@@ -216,7 +216,7 @@ include_once('../geral/topo.php');
                 const val = grid.querySelector('input[type="radio"]:checked')?.value;
                 if (!val) return;
 
-                window.open('./modelo1/index.php', '_self');
+                window.open('./modelo1/index.php', '_blank');
             });
 
             // Escolher modelo

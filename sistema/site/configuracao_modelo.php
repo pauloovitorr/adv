@@ -1,7 +1,90 @@
 <?php
+
+
 include_once('../../scripts.php');
 
-if ($_SERVER['REQUEST_METHOD'] == "GET") {
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre'])
+    && !empty($_FILES['foto_adv_arquivo']) && !empty($_FILES['banner_arquivo'])
+) {
+
+    $fonte1                          = $conexao->escape_string(htmlspecialchars($_POST['fonte1'] ?? ''));
+    $fonte2                          = $conexao->escape_string(htmlspecialchars($_POST['fonte2'] ?? ''));
+    $area_atuacao                    = $conexao->escape_string(htmlspecialchars($_POST['area_atuacao'] ?? ''));
+    $frase_inicial                   = $conexao->escape_string(htmlspecialchars($_POST['frase_inicial'] ?? ''));
+    $frase_secundaria                = $conexao->escape_string(htmlspecialchars($_POST['frase_secundaria'] ?? ''));
+    $telefone_whatsapp               = $conexao->escape_string(htmlspecialchars($_POST['telefone_whatsapp'] ?? ''));
+    $email                           = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
+    $endereco                        = $conexao->escape_string(htmlspecialchars($_POST['endereco'] ?? ''));
+    $frase_chamada_cta               = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta'] ?? ''));
+    $frase_chamada_cta_secundaria    = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta_secundaria'] ?? ''));
+    $sobre                           = $conexao->escape_string(htmlspecialchars($_POST['sobre'] ?? ''));
+    $areas_atuacao                   = $conexao->escape_string(htmlspecialchars($_POST['areas_atuacao'] ?? ''));
+    $estilizacao                     = htmlspecialchars($_POST['estilizacao'] ?? '');
+
+
+    $banner_arquivo       = $_FILES['banner_arquivo'];
+    $foto_adv_arquivo     = $_FILES['foto_adv_arquivo'];
+
+
+    try {
+        $conexao->begin_transaction();
+
+        if ($banner_arquivo['name']) {
+            $nomeArquivo = $banner_arquivo['name'];
+            $tmpArquivo = $banner_arquivo['tmp_name'];
+            $tamanhoArquivo = $banner_arquivo['size'];
+
+            $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+            $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+
+            if ($tamanhoArquivo > 5 * 1024 * 1024) {
+
+                // Apesar de aceitar 5 mb eu informo que é até 3mb
+                $res = [
+                    'status' => "erro",
+                    'message' => "Arquivo $nomeArquivo muito grande! Tamanho máximo permitido de 3MB"
+                ];
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+
+                exit;
+            } elseif ($banner_arquivo['error'] !== 0) {
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Imagem com erro'
+                ];
+
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+
+                exit;
+            } else {
+                $caminho = '../geral/docs/site';
+
+                $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+                $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+
+                if ($retorno_img_movida) {
+                    $banner_arquivo_pessoa = '/geral/docs/site' . $novo_nome_arquivo;
+                }
+            }
+        }
+
+
+        $conexao->close();
+        exit;
+    } catch (Exception $err) {
+        echo "Erro: " . $err->getMessage();
+        $conexao->rollback();
+        $conexao->close();
+        exit;
+    }
 }
 
 // var_dump($_SESSION);
@@ -44,8 +127,8 @@ include_once('../geral/topo.php');
             <section class="cadastro-modelo">
 
                 <div class="cadastro-modelo__header">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <p>Nova Pessoa</p>
+                    <i class="fa-solid fa-display"></i>
+                    <p>Informações da Landing Page</p>
                 </div>
 
                 <hr>
@@ -60,39 +143,75 @@ include_once('../geral/topo.php');
 
                                 <!-- Linha: fontes e área principal -->
                                 <div class="form-row">
+
+
                                     <div class="form-field">
                                         <label for="fonte1">Fonte 1</label>
                                         <select name="fonte1" id="fonte1">
                                             <option value="">Selecione a fonte</option>
-                                            <option value="Roboto" style="font-family: Roboto;">Roboto</option>
+
+                                            <option value="Barlow" style="font-family: 'Barlow';">Barlow</option>
+                                            <option value="Hind" style="font-family: 'Hind';">Hind</option>
+                                            <option value="IBM Plex Sans" style="font-family: 'IBM Plex Sans';">IBM Plex Sans</option>
+                                            <option value="Inter" style="font-family: 'Inter';">Inter</option>
+                                            <option value="Lato" style="font-family: 'Lato';">Lato</option>
+                                            <option value="Libre Baskerville" style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
+                                            <option value="Merriweather" style="font-family: 'Merriweather';">Merriweather</option>
+                                            <option value="Montserrat" style="font-family: 'Montserrat';">Montserrat</option>
+                                            <option value="Nunito" style="font-family: 'Nunito';">Nunito</option>
                                             <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
-                                            <option value="Lato" style="font-family: Lato;">Lato</option>
-                                            <option value="Montserrat" style="font-family: Montserrat;">Montserrat</option>
+                                            <option value="Playfair Display" style="font-family: 'Playfair Display';">Playfair Display</option>
+                                            <option value="Poppins" style="font-family: 'Poppins';">Poppins</option>
+                                            <option value="PT Sans" style="font-family: 'PT Sans';">PT Sans</option>
+                                            <option value="Questrial" style="font-family: 'Questrial';">Questrial</option>
+                                            <option value="Roboto" style="font-family: 'Roboto';">Roboto</option>
+                                            <option value="Source Serif Pro" style="font-family: 'Source Serif Pro';">Source Serif Pro</option>
+                                            <option value="Ubuntu" style="font-family: 'Ubuntu';">Ubuntu</option>
+
                                         </select>
                                     </div>
+
 
                                     <div class="form-field">
                                         <label for="fonte2">Fonte 2</label>
                                         <select name="fonte2" id="fonte2">
                                             <option value="">Selecione a fonte</option>
-                                            <option value="Roboto" style="font-family: Roboto;">Roboto</option>
+
+                                            <option value="Barlow" style="font-family: 'Barlow';">Barlow</option>
+                                            <option value="Hind" style="font-family: 'Hind';">Hind</option>
+                                            <option value="IBM Plex Sans" style="font-family: 'IBM Plex Sans';">IBM Plex Sans</option>
+                                            <option value="Inter" style="font-family: 'Inter';">Inter</option>
+                                            <option value="Lato" style="font-family: 'Lato';">Lato</option>
+                                            <option value="Libre Baskerville" style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
+                                            <option value="Merriweather" style="font-family: 'Merriweather';">Merriweather</option>
+                                            <option value="Montserrat" style="font-family: 'Montserrat';">Montserrat</option>
+                                            <option value="Nunito" style="font-family: 'Nunito';">Nunito</option>
                                             <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
-                                            <option value="Lato" style="font-family: Lato;">Lato</option>
-                                            <option value="Montserrat" style="font-family: Montserrat;">Montserrat</option>
+                                            <option value="Playfair Display" style="font-family: 'Playfair Display';">Playfair Display</option>
+                                            <option value="Poppins" style="font-family: 'Poppins';">Poppins</option>
+                                            <option value="PT Sans" style="font-family: 'PT Sans';">PT Sans</option>
+                                            <option value="Questrial" style="font-family: 'Questrial';">Questrial</option>
+                                            <option value="Roboto" style="font-family: 'Roboto';">Roboto</option>
+                                            <option value="Source Serif Pro" style="font-family: 'Source Serif Pro';">Source Serif Pro</option>
+                                            <option value="Ubuntu" style="font-family: 'Ubuntu';">Ubuntu</option>
+
                                         </select>
                                     </div>
 
 
 
+
+
                                     <div class="form-field" id="campo-banner">
-                                        <label for="banner_arquivo">Banner (imagem)</label>
+                                        <label for="banner_arquivo">Banner (imagem) <span style="color: red;">*</span></label>
 
                                         <input
                                             type="file"
                                             name="banner_arquivo"
                                             id="banner_arquivo"
                                             accept=".jpg,.jpeg,.png"
-                                            class="custom-file-input">
+                                            class="custom-file-input"
+                                            required>
 
                                         <div class="custo_add_arquivo" onclick="document.getElementById('banner_arquivo').click()">
                                             <p id="nome-arquivo-banner">Selecione o arquivo</p>
@@ -101,14 +220,15 @@ include_once('../geral/topo.php');
                                     </div>
 
                                     <div class="form-field" id="campo-foto-advogado">
-                                        <label for="foto_adv_arquivo">Foto do advogado</label>
+                                        <label for="foto_adv_arquivo">Foto do advogado <span style="color: red;">*</span></label>
 
                                         <input
                                             type="file"
                                             name="foto_adv_arquivo"
                                             id="foto_adv_arquivo"
                                             accept=".jpg,.jpeg,.png"
-                                            class="custom-file-input">
+                                            class="custom-file-input"
+                                            required>
 
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto_adv_arquivo').click()">
                                             <p id="nome-arquivo-foto-adv">Selecione o arquivo</p>
@@ -241,7 +361,7 @@ include_once('../geral/topo.php');
                                     </div>
 
                                     <div class="form-field form-field--wide" id="campo-areas-atuacao">
-                                        <label for="areas_atuacao">Áreas de atuação (resumo) <span style="color: red;">*</span></label>
+                                        <label for="areas_atuacao">Áreas de atuação (Separe por virgula, para ser um card diferente) <span style="color: red;">*</span></label>
                                         <textarea
                                             name="areas_atuacao"
                                             id="areas_atuacao"
@@ -287,7 +407,128 @@ include_once('../geral/topo.php');
     </main>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
+    <script>
+        $(function() {
 
+            $('#telefone_whatsapp').mask('(99) 99999-9999')
+
+
+            function atualizarNomeArquivo(inputId, textoId) {
+                const input = document.getElementById(inputId);
+                const texto = document.getElementById(textoId);
+
+                input.addEventListener("change", function() {
+                    if (this.files.length > 0) {
+                        texto.textContent = this.files[0].name;
+                    } else {
+                        texto.textContent = "Selecione o arquivo";
+                    }
+                });
+            }
+
+            atualizarNomeArquivo("banner_arquivo", "nome-arquivo-banner");
+            atualizarNomeArquivo("foto_adv_arquivo", "nome-arquivo-foto-adv");
+        })
+    </script>
+
+
+
+    <!-- Ajax para cadastro das infos landing pages -->
+    <script>
+        $(document).ready(function() {
+
+
+            // Validação ao submeter o formulário
+            $('#form-configuracao-modelo').on('submit', function(e) {
+
+                const foto_adv = $('#foto_adv_arquivo')[0].files.length;
+                const banner_adv = $('#banner_arquivo')[0].files.length;
+
+                if (foto_adv === 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Atenção",
+                        text: "Você precisa selecionar a foto do advogado antes de continuar."
+                    });
+
+                    return; // impede o envio
+                }
+
+                if (banner_adv === 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Atenção",
+                        text: "Você precisa selecionar um banner antes de continuar."
+                    });
+
+                    return; // impede o envio
+                }
+
+                $('.btn_cadastrar').prop('disabled', true)
+
+                Swal.fire({
+                    title: "Carregando...",
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                e.preventDefault();
+
+
+                // Ajax para realizar o cadastro
+                let dados_form = new FormData(this);
+                $.ajax({
+                    url: './configuracao_modelo.php',
+                    type: 'POST',
+                    data: dados_form,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.status === 'erro') {
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Erro",
+                                text: res.message
+                            });
+
+                            $('.btn_cadastrar').attr('disabled', false)
+
+
+                        } else if (res.status === 'success') {
+                            Swal.close();
+
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: "Sucesso!",
+                                    text: res.message,
+                                    icon: "success"
+                                }).then((result) => {
+                                    // window.location.href = "./docs_pessoa.php?tkn=" + res.token;
+                                });
+                            }, 300);
+                        }
+
+
+                    },
+                    error: function(err) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erro",
+                            text: err.message,
+                        });
+                        $('.btn_cadastrar').attr('disabled', false)
+                    }
+                })
+
+
+
+            });
+        })
+    </script>
 
 </body>
 
