@@ -141,8 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
         }
 
 
-
-        $sql_configura_modelo = "INSERT INTO configuracao_modelo (
+        if ($_POST['acao'] == 'cadastrar_configuracao') {
+            $sql_configura_modelo = "INSERT INTO configuracao_modelo (
             fonte1,
             fonte2,
             area_atuacao_principal,
@@ -163,29 +163,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             usuario_config_id_usuario_config
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
 
-        $stmt = $conexao->prepare($sql_configura_modelo);
+            $stmt = $conexao->prepare($sql_configura_modelo);
 
-        $stmt->bind_param(
-            "sssssssssssssssssi",
-            $fonte1,
-            $fonte2,
-            $area_atuacao,
-            $caminho_banner_adv,          // banner
-            $banner_nome_origem,
-            $frase_inicial,
-            $frase_secundaria,
-            $telefone_whatsapp,
-            $email,
-            $sobre,
-            $caminho_foto_adv,        // foto_adv
-            $ftadv_nome_origem,
-            $areas_atuacao,
-            $frase_chamada_cta,
-            $frase_chamada_cta_secundaria,
-            $endereco,
-            $estilizacao,
-            $id_user
-        );
+            $stmt->bind_param(
+                "sssssssssssssssssi",
+                $fonte1,
+                $fonte2,
+                $area_atuacao,
+                $caminho_banner_adv,          // banner
+                $banner_nome_origem,
+                $frase_inicial,
+                $frase_secundaria,
+                $telefone_whatsapp,
+                $email,
+                $sobre,
+                $caminho_foto_adv,        // foto_adv
+                $ftadv_nome_origem,
+                $areas_atuacao,
+                $frase_chamada_cta,
+                $frase_chamada_cta_secundaria,
+                $endereco,
+                $estilizacao,
+                $id_user
+            );
+        } elseif ($_POST['acao'] == 'atualizar_configuracao') {
+
+            $sql_configura_modelo = "
+        UPDATE configuracao_modelo SET
+            fonte1 = ?,
+            fonte2 = ?,
+            area_atuacao_principal = ?,
+            banner = ?,
+            nome_origem_banner = ?,
+            frase_inicial = ?,
+            frase_secundaria = ?,
+            telefone_whatsapp = ?,
+            email = ?,
+            sobre = ?,
+            foto_adv = ?,
+            nome_origem_ftadv = ?,
+            areas_atuacao = ?,
+            frase_chamada_cta = ?,
+            frase_chamada_cta_secundaria = ?,
+            endereco = ?,
+            estilizacao = ?,
+            dt_atualizacao_modelo = NOW()
+        WHERE usuario_config_id_usuario_config = ?
+    ";
+
+            $stmt = $conexao->prepare($sql_configura_modelo);
+
+            $stmt->bind_param(
+                "sssssssssssssssssi",
+                $fonte1,
+                $fonte2,
+                $area_atuacao,
+                $caminho_banner_adv,
+                $banner_nome_origem,
+                $frase_inicial,
+                $frase_secundaria,
+                $telefone_whatsapp,
+                $email,
+                $sobre,
+                $caminho_foto_adv,
+                $ftadv_nome_origem,
+                $areas_atuacao,
+                $frase_chamada_cta,
+                $frase_chamada_cta_secundaria,
+                $endereco,
+                $estilizacao,
+                $id_user   // WHERE
+            );
+        }
+
+
+
 
         if ($stmt->execute()) {
 
@@ -224,6 +276,217 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
         exit;
     }
 }
+
+
+
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre']) && !empty($_FILES['foto_adv_arquivo']) && !empty($_FILES['banner_arquivo']) && $_POST['acao'] == 'atualizar_configuracao') {
+
+//     // var_dump($_POST);
+
+//     $fonte1                          = $conexao->escape_string(htmlspecialchars($_POST['fonte1'] ?? ''));
+//     $fonte2                          = $conexao->escape_string(htmlspecialchars($_POST['fonte2'] ?? ''));
+//     $area_atuacao                    = $conexao->escape_string(htmlspecialchars($_POST['area_atuacao'] ?? ''));
+//     $frase_inicial                   = $conexao->escape_string(htmlspecialchars($_POST['frase_inicial'] ?? ''));
+//     $frase_secundaria                = $conexao->escape_string(htmlspecialchars($_POST['frase_secundaria'] ?? ''));
+//     $telefone_whatsapp               = $conexao->escape_string(htmlspecialchars($_POST['telefone_whatsapp'] ?? ''));
+//     $email                           = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
+//     $endereco                        = $conexao->escape_string(htmlspecialchars($_POST['endereco'] ?? ''));
+//     $frase_chamada_cta               = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta'] ?? ''));
+//     $frase_chamada_cta_secundaria    = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta_secundaria'] ?? ''));
+//     $sobre                           = $conexao->escape_string(htmlspecialchars($_POST['sobre'] ?? ''));
+//     $areas_atuacao                   = $conexao->escape_string(htmlspecialchars($_POST['areas_atuacao'] ?? ''));
+//     $estilizacao                     = $_POST['estilizacao'] ?? '';
+
+
+//     $banner_arquivo       = $_FILES['banner_arquivo'];
+//     $foto_adv_arquivo     = $_FILES['foto_adv_arquivo'];
+
+
+//     $banner_nome_origem = $banner_arquivo['name'];
+//     $ftadv_nome_origem = $foto_adv_arquivo['name'];
+
+//     try {
+//         $conexao->begin_transaction();
+
+//         if ($banner_arquivo['name']) {
+//             $nomeArquivo = $banner_arquivo['name'];
+//             $tmpArquivo = $banner_arquivo['tmp_name'];
+//             $tamanhoArquivo = $banner_arquivo['size'];
+
+//             $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+//             $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+
+//             if ($tamanhoArquivo > 5 * 1024 * 1024) {
+
+//                 // Apesar de aceitar 5 mb eu informo que é até 3mb
+//                 $res = [
+//                     'status' => "erro",
+//                     'message' => "Arquivo $nomeArquivo muito grande! Tamanho máximo permitido de 3MB"
+//                 ];
+
+//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//                 $conexao->rollback();
+//                 $conexao->close();
+
+//                 exit;
+//             } elseif ($banner_arquivo['error'] !== 0) {
+//                 $res = [
+//                     'status' => 'erro',
+//                     'message' => 'Imagem com erro'
+//                 ];
+
+//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//                 $conexao->rollback();
+//                 $conexao->close();
+
+//                 exit;
+//             } else {
+//                 $caminho = '../geral/docs/site';
+
+//                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+//                 $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
+
+//                 if ($retorno_img_movida) {
+//                     $caminho_banner_adv = '/geral/docs/site/' . $novo_nome_arquivo;
+//                 }
+//             }
+//         }
+
+//         if ($foto_adv_arquivo['name']) {
+
+//             $nomeArquivo = $foto_adv_arquivo['name'];
+//             $tmpArquivo = $foto_adv_arquivo['tmp_name'];
+//             $tamanhoArquivo = $foto_adv_arquivo['size'];
+
+//             $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+//             $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
+
+//             // Validação de tamanho — usa 5MB como limite real
+//             if ($tamanhoArquivo > 5 * 1024 * 1024) {
+
+//                 $res = [
+//                     'status' => "erro",
+//                     'message' => "Arquivo $nomeArquivo muito grande! Tamanho máximo permitido de 3MB"
+//                 ];
+
+//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//                 $conexao->rollback();
+//                 $conexao->close();
+//                 exit;
+//             } elseif ($foto_adv_arquivo['error'] !== 0) {
+
+//                 $res = [
+//                     'status' => 'erro',
+//                     'message' => 'Imagem com erro'
+//                 ];
+
+//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//                 $conexao->rollback();
+//                 $conexao->close();
+//                 exit;
+//             } else {
+
+//                 $caminho = '../geral/docs/site';
+
+//                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
+
+//                 $retorno_img_movida = move_uploaded_file($tmpArquivo, $novo_caminho);
+
+//                 if ($retorno_img_movida) {
+
+//                     $caminho_foto_adv = '/geral/docs/site/' . $novo_nome_arquivo;
+//                 }
+//             }
+//         }
+
+
+
+//         $sql_configura_modelo = "INSERT INTO configuracao_modelo (
+//             fonte1,
+//             fonte2,
+//             area_atuacao_principal,
+//             banner,
+//             nome_origem_banner,
+//             frase_inicial,
+//             frase_secundaria,
+//             telefone_whatsapp,
+//             email,
+//             sobre,
+//             foto_adv,
+//             nome_origem_ftadv,
+//             areas_atuacao,
+//             frase_chamada_cta,
+//             frase_chamada_cta_secundaria,
+//             endereco,
+//             estilizacao,
+//             usuario_config_id_usuario_config
+//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
+
+//         $stmt = $conexao->prepare($sql_configura_modelo);
+
+//         $stmt->bind_param(
+//             "sssssssssssssssssi",
+//             $fonte1,
+//             $fonte2,
+//             $area_atuacao,
+//             $caminho_banner_adv,          // banner
+//             $banner_nome_origem,
+//             $frase_inicial,
+//             $frase_secundaria,
+//             $telefone_whatsapp,
+//             $email,
+//             $sobre,
+//             $caminho_foto_adv,        // foto_adv
+//             $ftadv_nome_origem,
+//             $areas_atuacao,
+//             $frase_chamada_cta,
+//             $frase_chamada_cta_secundaria,
+//             $endereco,
+//             $estilizacao,
+//             $id_user
+//         );
+
+//         if ($stmt->execute()) {
+
+//             if (cadastro_log('Configurou modelo ', $identificador_log, $ip, $id_user)) {
+
+//                 $conexao->commit();
+//                 $conexao->close();
+
+//                 $res = [
+//                     'status' => 'success',
+//                     'message' => 'Modelo configurado com sucesso!',
+//                 ];
+//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//                 exit;
+//             } else {
+//                 $conexao->rollback();
+//                 $conexao->close();
+
+//                 $res = [
+//                     'status' => 'erro',
+//                     'message' => 'Erro ao configurar modelo!'
+//                 ];
+//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//                 exit;
+//             }
+//         }
+//     } catch (Exception $err) {
+//         $res = [
+//             'status' => 'erro',
+//             'message' => $err->getMessage()
+//         ];
+
+//         echo json_encode($res, JSON_UNESCAPED_UNICODE);
+//         $conexao->rollback();
+//         $conexao->close();
+//         exit;
+//     }
+// }
+
 
 // var_dump($_SESSION);
 
@@ -361,8 +624,7 @@ include_once('../geral/topo.php');
                                             name="banner_arquivo"
                                             id="banner_arquivo"
                                             accept=".jpg,.jpeg,.png"
-                                            class="custom-file-input"
-                                            <?php echo empty($dados_modelo['banner']) ? 'required' : ''; ?>>
+                                            class="custom-file-input">
 
                                         <div class="custo_add_arquivo" onclick="document.getElementById('banner_arquivo').click()">
                                             <p id="nome-arquivo-banner">
@@ -385,8 +647,7 @@ include_once('../geral/topo.php');
                                             name="foto_adv_arquivo"
                                             id="foto_adv_arquivo"
                                             accept=".jpg,.jpeg,.png"
-                                            class="custom-file-input"
-                                            <?php echo empty($dados_modelo['foto_adv']) ? 'required' : ''; ?>>
+                                            class="custom-file-input">
 
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto_adv_arquivo').click()">
                                             <p id="nome-arquivo-foto-adv">
@@ -547,6 +808,8 @@ include_once('../geral/topo.php');
                                             placeholder="EX: Trabalhista, Cível, Previdenciário"><?php echo htmlspecialchars($dados_modelo['areas_atuacao'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                                     </div>
 
+                                    <input type="hidden" name="acao" value="<?php echo empty($dados_modelo) ? 'cadastrar_configuracao' : 'atualizar_configuracao'; ?>">
+
                                 </div>
 
 
@@ -612,8 +875,9 @@ include_once('../geral/topo.php');
 
     <!-- Ajax para cadastro das infos landing pages -->
     <script>
-        $(document).ready(function() {
+        $(document).ready(function(e) {
 
+            e.preventDefault();
 
             // Validação ao submeter o formulário
             $('#form-configuracao-modelo').on('submit', function(e) {
@@ -654,54 +918,155 @@ include_once('../geral/topo.php');
 
 
                 // Ajax para realizar o cadastro
-                let dados_form = new FormData(this);
-                $.ajax({
-                    url: './configuracao_modelo.php',
-                    type: 'POST',
-                    data: dados_form,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function(res) {
-                        if (res.status === 'erro') {
+                if (foto_adv != 0 && banner_adv != 0) {
+                    let dados_form = new FormData(this);
+                    $.ajax({
+                        url: './configuracao_modelo.php',
+                        type: 'POST',
+                        data: dados_form,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function(res) {
+                            if (res.status === 'erro') {
 
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Erro",
+                                    text: res.message
+                                });
+
+                                $('.btn_cadastrar').attr('disabled', false)
+
+
+                            } else if (res.status === 'success') {
+                                Swal.close();
+
+                                setTimeout(() => {
+                                    Swal.fire({
+                                        title: "Sucesso!",
+                                        text: res.message,
+                                        icon: "success"
+                                    }).then((result) => {
+                                        window.location.reload()
+                                    });
+                                }, 300);
+                            }
+
+
+                        },
+                        error: function(err) {
                             Swal.fire({
                                 icon: "error",
                                 title: "Erro",
-                                text: res.message
+                                text: err.message,
                             });
-
                             $('.btn_cadastrar').attr('disabled', false)
-
-
-                        } else if (res.status === 'success') {
-                            Swal.close();
-
-                            setTimeout(() => {
-                                Swal.fire({
-                                    title: "Sucesso!",
-                                    text: res.message,
-                                    icon: "success"
-                                }).then((result) => {
-                                    // window.location.href = "./docs_pessoa.php?tkn=" + res.token;
-                                });
-                            }, 300);
                         }
+                    })
+                }
 
 
-                    },
-                    error: function(err) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Erro",
-                            text: err.message,
-                        });
-                        $('.btn_cadastrar').attr('disabled', false)
+
+            });
+        })
+    </script>
+
+
+    <!-- Ajax para cadastro das infos landing pages -->
+    <script>
+        $(document).ready(function() {
+
+
+            // Validação ao submeter o formulário
+            $('#form-atualizacao-modelo').on('submit', function(e) {
+
+                e.preventDefault();
+
+                const foto_adv = $('#foto_adv_arquivo')[0].files.length;
+                const banner_adv = $('#banner_arquivo')[0].files.length;
+
+                if (foto_adv === 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Atenção",
+                        text: "Você precisa selecionar a foto do advogado antes de continuar."
+                    });
+
+                    return; // impede o envio
+                }
+
+                if (banner_adv === 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Atenção",
+                        text: "Você precisa selecionar um banner antes de continuar."
+                    });
+
+                    return; // impede o envio
+                }
+
+                $('.btn_cadastrar').prop('disabled', true)
+
+                Swal.fire({
+                    title: "Carregando...",
+                    didOpen: () => {
+                        Swal.showLoading();
                     }
-                })
+                });
+
+                e.preventDefault();
+
+                if (foto_adv != 0 && banner_adv != 0) {
+                    // Ajax para realizar o cadastro
+                    let dados_form = new FormData(this);
+                    $.ajax({
+                        url: './configuracao_modelo.php',
+                        type: 'POST',
+                        data: dados_form,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function(res) {
+                            if (res.status === 'erro') {
+
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Erro",
+                                    text: res.message
+                                });
+
+                                $('.btn_cadastrar').attr('disabled', false)
 
 
+                            } else if (res.status === 'success') {
+                                Swal.close();
 
+                                setTimeout(() => {
+                                    Swal.fire({
+                                        title: "Sucesso!",
+                                        text: res.message,
+                                        icon: "success"
+                                    }).then((result) => {
+                                        window.location.reload()
+                                    });
+                                }, 300);
+                            }
+
+
+                        },
+                        error: function(err) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Erro",
+                                text: err.message,
+                            });
+                            $('.btn_cadastrar').attr('disabled', false)
+                        }
+                    })
+
+
+                }
             });
         })
     </script>
