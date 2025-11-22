@@ -136,7 +136,7 @@ include_once('../geral/topo.php');
 
             <div class="actions">
                 <button id="previewBtn" class="btn ghost" type="button" disabled>Pré-visualizar</button>
-                <button id="chooseBtn" class="btn primary" type="button" disabled>Escolher modelo</button>
+                <button id="chooseBtn" class="btn primary" type="button" disabled>Configurar modelo</button>
             </div>
 
         </div>

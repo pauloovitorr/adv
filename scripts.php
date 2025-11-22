@@ -76,3 +76,4 @@ function cadastro_log(string $acao, string $identificador, string $ip, int $id_u
     $stmt->bind_param('sssi', $acao, $identificador, $ip, $id_user);
     return $stmt->execute();
 }
+

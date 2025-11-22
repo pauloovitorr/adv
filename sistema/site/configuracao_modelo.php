@@ -3,10 +3,18 @@
 
 include_once('../../scripts.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET'){
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-    $sql_busca_configuracoes = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
 
+    $sql_config_modelo = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
+    $retorno_sql = $conexao->query($sql_config_modelo);
+    $dados_modelo = '';
+
+    if ($retorno_sql->num_rows > 0) {
+        $dados_modelo = $retorno_sql->fetch_assoc();
+    }
+
+    // var_dump($dados_modelo);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre']) && !empty($_FILES['foto_adv_arquivo']) && !empty($_FILES['banner_arquivo'])) {
@@ -25,12 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
     $frase_chamada_cta_secundaria    = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta_secundaria'] ?? ''));
     $sobre                           = $conexao->escape_string(htmlspecialchars($_POST['sobre'] ?? ''));
     $areas_atuacao                   = $conexao->escape_string(htmlspecialchars($_POST['areas_atuacao'] ?? ''));
-    $estilizacao                     = htmlspecialchars($_POST['estilizacao'] ?? '');
+    $estilizacao                     = $_POST['estilizacao'] ?? '';
 
 
     $banner_arquivo       = $_FILES['banner_arquivo'];
     $foto_adv_arquivo     = $_FILES['foto_adv_arquivo'];
 
+
+    $banner_nome_origem = $banner_arquivo['name'];
+    $ftadv_nome_origem = $foto_adv_arquivo['name'];
 
     try {
         $conexao->begin_transaction();
@@ -136,34 +147,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             fonte2,
             area_atuacao_principal,
             banner,
+            nome_origem_banner,
             frase_inicial,
             frase_secundaria,
             telefone_whatsapp,
             email,
             sobre,
             foto_adv,
+            nome_origem_ftadv,
             areas_atuacao,
             frase_chamada_cta,
             frase_chamada_cta_secundaria,
             endereco,
             estilizacao,
             usuario_config_id_usuario_config
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
 
         $stmt = $conexao->prepare($sql_configura_modelo);
 
         $stmt->bind_param(
-            "sssssssssssssssi",
+            "sssssssssssssssssi",
             $fonte1,
             $fonte2,
             $area_atuacao,
             $caminho_banner_adv,          // banner
+            $banner_nome_origem,
             $frase_inicial,
             $frase_secundaria,
             $telefone_whatsapp,
             $email,
             $sobre,
             $caminho_foto_adv,        // foto_adv
+            $ftadv_nome_origem,
             $areas_atuacao,
             $frase_chamada_cta,
             $frase_chamada_cta_secundaria,
@@ -258,7 +273,7 @@ include_once('../geral/topo.php');
 
                 <div class="cadastro-modelo__form-wrapper">
 
-                    <form action="" method="POST" enctype="multipart/form-data" id="form-configuracao-modelo">
+                    <form action="" method="POST" enctype="multipart/form-data" id="<?php echo !empty($dados_modelo) ? 'form-atualizacao-modelo' : 'form-configuracao-modelo'; ?>">
                         <fieldset>
                             <legend>Configuração do Modelo</legend>
 
@@ -269,61 +284,74 @@ include_once('../geral/topo.php');
 
 
                                     <div class="form-field">
-                                        <label for="fonte1">Fonte 1</label>
+                                        <label for="fonte1">Fonte 1 </label>
                                         <select name="fonte1" id="fonte1">
                                             <option value="">Selecione a fonte</option>
-
-                                            <option value="Barlow" style="font-family: 'Barlow';">Barlow</option>
-                                            <option value="Hind" style="font-family: 'Hind';">Hind</option>
-                                            <option value="IBM Plex Sans" style="font-family: 'IBM Plex Sans';">IBM Plex Sans</option>
-                                            <option value="Inter" style="font-family: 'Inter';">Inter</option>
-                                            <option value="Lato" style="font-family: 'Lato';">Lato</option>
-                                            <option value="Libre Baskerville" style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
-                                            <option value="Merriweather" style="font-family: 'Merriweather';">Merriweather</option>
-                                            <option value="Montserrat" style="font-family: 'Montserrat';">Montserrat</option>
-                                            <option value="Nunito" style="font-family: 'Nunito';">Nunito</option>
-                                            <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
-                                            <option value="Playfair Display" style="font-family: 'Playfair Display';">Playfair Display</option>
-                                            <option value="Poppins" style="font-family: 'Poppins';">Poppins</option>
-                                            <option value="PT Sans" style="font-family: 'PT Sans';">PT Sans</option>
-                                            <option value="Questrial" style="font-family: 'Questrial';">Questrial</option>
-                                            <option value="Roboto" style="font-family: 'Roboto';">Roboto</option>
-                                            <option value="Source Serif Pro" style="font-family: 'Source Serif Pro';">Source Serif Pro</option>
-                                            <option value="Ubuntu" style="font-family: 'Ubuntu';">Ubuntu</option>
-
+                                            <option value="Barlow" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Barlow' ? 'selected' : ''; ?> style="font-family: 'Barlow';">Barlow</option>
+                                            <option value="Hind" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Hind' ? 'selected' : ''; ?> style="font-family: 'Hind';">Hind</option>
+                                            <option value="IBM Plex Sans" <?php echo ($dados_modelo['fonte1'] ?? '') === 'IBM Plex Sans' ? 'selected' : ''; ?> style="font-family: 'IBM Plex Sans';">IBM Plex Sans</option>
+                                            <option value="Inter" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Inter' ? 'selected' : ''; ?> style="font-family: 'Inter';">Inter</option>
+                                            <option value="Lato" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Lato' ? 'selected' : ''; ?> style="font-family: 'Lato';">Lato</option>
+                                            <option value="Libre Baskerville" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Libre Baskerville' ? 'selected' : ''; ?> style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
+                                            <option value="Merriweather" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Merriweather' ? 'selected' : ''; ?> style="font-family: 'Merriweather';">Merriweather</option>
+                                            <option value="Montserrat" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Montserrat' ? 'selected' : ''; ?> style="font-family: 'Montserrat';">Montserrat</option>
+                                            <option value="Nunito" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Nunito' ? 'selected' : ''; ?> style="font-family: 'Nunito';">Nunito</option>
+                                            <option value="Open Sans" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Open Sans' ? 'selected' : ''; ?> style="font-family: 'Open Sans';">Open Sans</option>
+                                            <option value="Playfair Display" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Playfair Display' ? 'selected' : ''; ?> style="font-family: 'Playfair Display';">Playfair Display</option>
+                                            <option value="Poppins" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Poppins' ? 'selected' : ''; ?> style="font-family: 'Poppins';">Poppins</option>
+                                            <option value="PT Sans" <?php echo ($dados_modelo['fonte1'] ?? '') === 'PT Sans' ? 'selected' : ''; ?> style="font-family: 'PT Sans';">PT Sans</option>
+                                            <option value="Questrial" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Questrial' ? 'selected' : ''; ?> style="font-family: 'Questrial';">Questrial</option>
+                                            <option value="Roboto" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Roboto' ? 'selected' : ''; ?> style="font-family: 'Roboto';">Roboto</option>
+                                            <option value="Source Serif Pro" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Source Serif Pro' ? 'selected' : ''; ?> style="font-family: 'Source Serif Pro';">Source Serif Pro</option>
+                                            <option value="Ubuntu" <?php echo ($dados_modelo['fonte1'] ?? '') === 'Ubuntu' ? 'selected' : ''; ?> style="font-family: 'Ubuntu';">Ubuntu</option>
                                         </select>
+
                                     </div>
 
 
                                     <div class="form-field">
                                         <label for="fonte2">Fonte 2</label>
+                                        <?php $fonte2 = $dados_modelo['fonte2'] ?? ''; ?>
+
                                         <select name="fonte2" id="fonte2">
                                             <option value="">Selecione a fonte</option>
 
-                                            <option value="Barlow" style="font-family: 'Barlow';">Barlow</option>
-                                            <option value="Hind" style="font-family: 'Hind';">Hind</option>
-                                            <option value="IBM Plex Sans" style="font-family: 'IBM Plex Sans';">IBM Plex Sans</option>
-                                            <option value="Inter" style="font-family: 'Inter';">Inter</option>
-                                            <option value="Lato" style="font-family: 'Lato';">Lato</option>
-                                            <option value="Libre Baskerville" style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
-                                            <option value="Merriweather" style="font-family: 'Merriweather';">Merriweather</option>
-                                            <option value="Montserrat" style="font-family: 'Montserrat';">Montserrat</option>
-                                            <option value="Nunito" style="font-family: 'Nunito';">Nunito</option>
-                                            <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
-                                            <option value="Playfair Display" style="font-family: 'Playfair Display';">Playfair Display</option>
-                                            <option value="Poppins" style="font-family: 'Poppins';">Poppins</option>
-                                            <option value="PT Sans" style="font-family: 'PT Sans';">PT Sans</option>
-                                            <option value="Questrial" style="font-family: 'Questrial';">Questrial</option>
-                                            <option value="Roboto" style="font-family: 'Roboto';">Roboto</option>
-                                            <option value="Source Serif Pro" style="font-family: 'Source Serif Pro';">Source Serif Pro</option>
-                                            <option value="Ubuntu" style="font-family: 'Ubuntu';">Ubuntu</option>
+                                            <option value="Barlow" <?php echo $fonte2 === 'Barlow' ? 'selected' : ''; ?> style="font-family: 'Barlow';">Barlow</option>
 
+                                            <option value="Hind" <?php echo $fonte2 === 'Hind' ? 'selected' : ''; ?> style="font-family: 'Hind';">Hind</option>
+
+                                            <option value="IBM Plex Sans" <?php echo $fonte2 === 'IBM Plex Sans' ? 'selected' : ''; ?> style="font-family: 'IBM Plex Sans';">IBM Plex Sans</option>
+
+                                            <option value="Inter" <?php echo $fonte2 === 'Inter' ? 'selected' : ''; ?> style="font-family: 'Inter';">Inter</option>
+
+                                            <option value="Lato" <?php echo $fonte2 === 'Lato' ? 'selected' : ''; ?> style="font-family: 'Lato';">Lato</option>
+
+                                            <option value="Libre Baskerville" <?php echo $fonte2 === 'Libre Baskerville' ? 'selected' : ''; ?> style="font-family: 'Libre Baskerville';">Libre Baskerville</option>
+
+                                            <option value="Merriweather" <?php echo $fonte2 === 'Merriweather' ? 'selected' : ''; ?> style="font-family: 'Merriweather';">Merriweather</option>
+
+                                            <option value="Montserrat" <?php echo $fonte2 === 'Montserrat' ? 'selected' : ''; ?> style="font-family: 'Montserrat';">Montserrat</option>
+
+                                            <option value="Nunito" <?php echo $fonte2 === 'Nunito' ? 'selected' : ''; ?> style="font-family: 'Nunito';">Nunito</option>
+
+                                            <option value="Open Sans" <?php echo $fonte2 === 'Open Sans' ? 'selected' : ''; ?> style="font-family: 'Open Sans';">Open Sans</option>
+
+                                            <option value="Playfair Display" <?php echo $fonte2 === 'Playfair Display' ? 'selected' : ''; ?> style="font-family: 'Playfair Display';">Playfair Display</option>
+
+                                            <option value="Poppins" <?php echo $fonte2 === 'Poppins' ? 'selected' : ''; ?> style="font-family: 'Poppins';">Poppins</option>
+
+                                            <option value="PT Sans" <?php echo $fonte2 === 'PT Sans' ? 'selected' : ''; ?> style="font-family: 'PT Sans';">PT Sans</option>
+
+                                            <option value="Questrial" <?php echo $fonte2 === 'Questrial' ? 'selected' : ''; ?> style="font-family: 'Questrial';">Questrial</option>
+
+                                            <option value="Roboto" <?php echo $fonte2 === 'Roboto' ? 'selected' : ''; ?> style="font-family: 'Roboto';">Roboto</option>
+
+                                            <option value="Source Serif Pro" <?php echo $fonte2 === 'Source Serif Pro' ? 'selected' : ''; ?> style="font-family: 'Source Serif Pro';">Source Serif Pro</option>
+
+                                            <option value="Ubuntu" <?php echo $fonte2 === 'Ubuntu' ? 'selected' : ''; ?> style="font-family: 'Ubuntu';">Ubuntu</option>
                                         </select>
+
                                     </div>
-
-
-
-
 
                                     <div class="form-field" id="campo-banner">
                                         <label for="banner_arquivo">Banner (imagem) <span style="color: red;">*</span></label>
@@ -334,13 +362,20 @@ include_once('../geral/topo.php');
                                             id="banner_arquivo"
                                             accept=".jpg,.jpeg,.png"
                                             class="custom-file-input"
-                                            required>
+                                            <?php echo empty($dados_modelo['banner']) ? 'required' : ''; ?>>
 
                                         <div class="custo_add_arquivo" onclick="document.getElementById('banner_arquivo').click()">
-                                            <p id="nome-arquivo-banner">Selecione o arquivo</p>
+                                            <p id="nome-arquivo-banner">
+                                                <?php
+                                                echo !empty($dados_modelo['nome_origem_banner'])
+                                                    ? htmlspecialchars($dados_modelo['nome_origem_banner'], ENT_QUOTES, 'UTF-8')
+                                                    : 'Selecione o arquivo';
+                                                ?>
+                                            </p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                         </div>
                                     </div>
+
 
                                     <div class="form-field" id="campo-foto-advogado">
                                         <label for="foto_adv_arquivo">Foto do advogado <span style="color: red;">*</span></label>
@@ -351,13 +386,20 @@ include_once('../geral/topo.php');
                                             id="foto_adv_arquivo"
                                             accept=".jpg,.jpeg,.png"
                                             class="custom-file-input"
-                                            required>
+                                            <?php echo empty($dados_modelo['foto_adv']) ? 'required' : ''; ?>>
 
                                         <div class="custo_add_arquivo" onclick="document.getElementById('foto_adv_arquivo').click()">
-                                            <p id="nome-arquivo-foto-adv">Selecione o arquivo</p>
+                                            <p id="nome-arquivo-foto-adv">
+                                                <?php
+                                                echo !empty($dados_modelo['nome_origem_ftadv'])
+                                                    ? htmlspecialchars($dados_modelo['nome_origem_ftadv'], ENT_QUOTES, 'UTF-8')
+                                                    : 'Selecione o arquivo';
+                                                ?>
+                                            </p>
                                             <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                         </div>
                                     </div>
+
 
 
 
@@ -376,7 +418,9 @@ include_once('../geral/topo.php');
                                             name="area_atuacao"
                                             id="area_atuacao"
                                             placeholder="EX: Direito Trabalhista"
-                                            maxlength="50">
+                                            maxlength="50"
+                                            value="<?php echo $dados_modelo['area_atuacao_principal'] ?? ''; ?>">
+
                                     </div>
 
                                     <div class="form-field" id="container_frase_inicial">
@@ -386,7 +430,9 @@ include_once('../geral/topo.php');
                                             name="frase_inicial"
                                             id="frase_inicial"
                                             placeholder="EX: Defesa jurídica com excelência"
-                                            maxlength="150">
+                                            maxlength="150"
+                                            value="<?php echo htmlspecialchars($dados_modelo['frase_inicial'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
                                     </div>
 
                                     <div class="form-field" id="container_frase_secundaria">
@@ -396,7 +442,9 @@ include_once('../geral/topo.php');
                                             name="frase_secundaria"
                                             id="frase_secundaria"
                                             placeholder="EX: Atuação estratégica em diversas áreas"
-                                            maxlength="150">
+                                            maxlength="150"
+                                            value="<?php echo htmlspecialchars($dados_modelo['frase_secundaria'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+
                                     </div>
                                 </div>
 
@@ -411,7 +459,8 @@ include_once('../geral/topo.php');
                                             placeholder="(99) 99999-9999"
                                             minlength="10"
                                             maxlength="14"
-                                            required>
+                                            required
+                                            value="<?php echo htmlspecialchars($dados_modelo['telefone_whatsapp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
 
                                     <div class="form-field">
@@ -422,7 +471,8 @@ include_once('../geral/topo.php');
                                             id="email"
                                             placeholder="exemplo@dominio.com"
                                             maxlength="80"
-                                            required>
+                                            required
+                                            value="<?php echo htmlspecialchars($dados_modelo['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
 
                                     <div class="form-field form-field--wide" id="campo-endereco">
@@ -431,13 +481,13 @@ include_once('../geral/topo.php');
                                             type="text"
                                             name="endereco"
                                             id="endereco"
-                                            rows="3"
-
                                             maxlength="200"
                                             required
-                                            placeholder="Rua, número, bairro, cidade - UF"></input>
+                                            placeholder="Rua, número, bairro, cidade - UF"
+                                            value="<?php echo htmlspecialchars($dados_modelo['endereco'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
                                 </div>
+
 
 
 
@@ -452,7 +502,8 @@ include_once('../geral/topo.php');
                                             id="frase_chamada_cta"
                                             maxlength="150"
                                             required
-                                            placeholder="EX: Agende uma consulta agora mesmo">
+                                            placeholder="EX: Agende uma consulta agora mesmo"
+                                            value="<?php echo htmlspecialchars($dados_modelo['frase_chamada_cta'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
 
                                     <div class="form-field form-field--wide" id="campo-cta-secundaria">
@@ -463,9 +514,12 @@ include_once('../geral/topo.php');
                                             id="frase_chamada_cta_secundaria"
                                             maxlength="150"
                                             required
-                                            placeholder="EX: Atendimento online e presencial">
+                                            placeholder="EX: Atendimento online e presencial"
+                                            value="<?php echo htmlspecialchars($dados_modelo['frase_chamada_cta_secundaria'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                     </div>
+
                                 </div>
+
 
 
                                 <!-- Linha: sobre e áreas de atuação (campos grandes) -->
@@ -477,10 +531,9 @@ include_once('../geral/topo.php');
                                             name="sobre"
                                             id="sobre"
                                             rows="3"
-
                                             maxlength="200"
                                             required
-                                            placeholder="Breve descrição que aparecerá no site"></textarea>
+                                            placeholder="Breve descrição que aparecerá no site"><?php echo htmlspecialchars($dados_modelo['sobre'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                                     </div>
 
                                     <div class="form-field form-field--wide" id="campo-areas-atuacao">
@@ -489,17 +542,16 @@ include_once('../geral/topo.php');
                                             name="areas_atuacao"
                                             id="areas_atuacao"
                                             rows="3"
-
                                             maxlength="200"
                                             required
-                                            placeholder="EX: Trabalhista, Cível, Previdenciário"></textarea>
+                                            placeholder="EX: Trabalhista, Cível, Previdenciário"><?php echo htmlspecialchars($dados_modelo['areas_atuacao'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                                     </div>
 
                                 </div>
 
+
                                 <!-- Linha: endereço e estilização -->
                                 <div class="form-row">
-
 
                                     <div class="form-field form-field--wide" id="campo-estilizacao">
                                         <label for="estilizacao">Estilização (JSON / CSS opcional)</label>
@@ -507,10 +559,11 @@ include_once('../geral/topo.php');
                                             name="estilizacao"
                                             id="estilizacao"
                                             rows="3"
-
-                                            placeholder='EX: {"cor_primaria":"#123456","layout":"modelo1"}'></textarea>
+                                            placeholder='EX: {"cor_primaria":"#123456","layout":"modelo1"}'><?php echo htmlspecialchars($dados_modelo['estilizacao'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                                     </div>
+
                                 </div>
+
 
                             </div>
                         </fieldset>
