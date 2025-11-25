@@ -38,11 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             echo json_encode($res, JSON_UNESCAPED_UNICODE);
             exit;
         }
+    } else {
+        $sql_verifica = "SELECT banner, foto_adv  FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
+        $res = $conexao->query($sql_verifica);
+        $dados_verifica = $res->fetch_assoc();
+
+        if(file_exists('..'.$dados_verifica['banner'])){
+              unlink('..'.$dados_verifica['banner']);
+        }
+
+        if(file_exists('..'.$dados_verifica['foto_adv'])){
+              unlink('..'.$dados_verifica['foto_adv']);
+        }
+
     }
-    // else{
-    //     var_dump($_FILES);
-    //     die;
-    // }
 
 
     $fonte1 = $conexao->escape_string(htmlspecialchars($_POST['fonte1'] ?? ''));
@@ -70,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
     try {
         $conexao->begin_transaction();
 
-        if ($banner_arquivo['name']) {
+        if ($banner_arquivo['name'] !== '') {
             $nomeArquivo = $banner_arquivo['name'];
             $tmpArquivo = $banner_arquivo['tmp_name'];
             $tamanhoArquivo = $banner_arquivo['size'];
@@ -116,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             }
         }
 
-        if ($foto_adv_arquivo['name']) {
+        if ($foto_adv_arquivo['name'] !== '') {
 
             $nomeArquivo = $foto_adv_arquivo['name'];
             $tmpArquivo = $foto_adv_arquivo['tmp_name'];
