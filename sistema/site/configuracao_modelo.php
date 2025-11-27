@@ -20,40 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre'])) {
 
 
-    if ($_FILES['foto_adv_arquivo']['error'] === 4 || $_FILES['banner_arquivo']['error'] === 4) {
-
-        $sql_verifica = "SELECT banner, foto_adv  FROM configuracao_modelo  WHERE usuario_config_id_usuario_config = $id_user";
-        $res = $conexao->query($sql_verifica);
-
-        $dados_verifica = $res->fetch_assoc();
-
-        if ($dados_verifica["banner"] == "" || $dados_verifica["foto_adv"] == "") {
-
-            $conexao->close();
-
-            $res = [
-                'status' => 'erro',
-                'message' => 'Adicione o banner e a foto do advogado!'
-            ];
-            echo json_encode($res, JSON_UNESCAPED_UNICODE);
-            exit;
-        }
-    } else {
-        $sql_verifica = "SELECT banner, foto_adv  FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
-        $res = $conexao->query($sql_verifica);
-        $dados_verifica = $res->fetch_assoc();
-
-        if(file_exists('..'.$dados_verifica['banner'])){
-              unlink('..'.$dados_verifica['banner']);
-        }
-
-        if(file_exists('..'.$dados_verifica['foto_adv'])){
-              unlink('..'.$dados_verifica['foto_adv']);
-        }
-
-    }
-
-
+    $acao = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
     $fonte1 = $conexao->escape_string(htmlspecialchars($_POST['fonte1'] ?? ''));
     $fonte2 = $conexao->escape_string(htmlspecialchars($_POST['fonte2'] ?? ''));
     $area_atuacao = $conexao->escape_string(htmlspecialchars($_POST['area_atuacao'] ?? ''));
@@ -66,20 +33,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
     $frase_chamada_cta_secundaria = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta_secundaria'] ?? ''));
     $sobre = $conexao->escape_string(htmlspecialchars($_POST['sobre'] ?? ''));
     $areas_atuacao = $conexao->escape_string(htmlspecialchars($_POST['areas_atuacao'] ?? ''));
+
+    $cor_primaria = $conexao->escape_string(htmlspecialchars($_POST['cor_primaria'] ?? ''));
+    $cor_secundaria = $conexao->escape_string(htmlspecialchars($_POST['cor_secundaria'] ?? ''));
     $estilizacao = $_POST['estilizacao'] ?? '';
 
+    if ($acao == 'cadastrar_configuracao') {
+
+        // Verifico se ele mandou o banner e o arquivo de foto do adv, pois são obrigatórios
+        if ($_FILES['foto_adv_arquivo']['error'] === 4 || $_FILES['banner_arquivo']['error'] === 4) {
+            if ($caminho_banner_adv == null || $caminho_foto_adv == null) {
+                $conexao->close();
+                $res = [
+                    'status' => 'erro',
+                    'message' => 'Adicione o banner e a foto do advogado!'
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                exit;
+            }
+        }
+
+    }
 
     $banner_arquivo = $_FILES['banner_arquivo'];
     $foto_adv_arquivo = $_FILES['foto_adv_arquivo'];
 
+    $banner_nome_origem = $banner_arquivo['name'] ?? null;
+    $ftadv_nome_origem = $foto_adv_arquivo['name'] ?? null;
 
-    $banner_nome_origem = $banner_arquivo['name'];
-    $ftadv_nome_origem = $foto_adv_arquivo['name'];
+
 
     try {
         $conexao->begin_transaction();
 
-        if ($banner_arquivo['name'] !== '') {
+        if ($banner_nome_origem != null) {
             $nomeArquivo = $banner_arquivo['name'];
             $tmpArquivo = $banner_arquivo['tmp_name'];
             $tamanhoArquivo = $banner_arquivo['size'];
@@ -125,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             }
         }
 
-        if ($foto_adv_arquivo['name'] !== '') {
+        if ($ftadv_nome_origem != null) {
 
             $nomeArquivo = $foto_adv_arquivo['name'];
             $tmpArquivo = $foto_adv_arquivo['tmp_name'];
@@ -173,8 +160,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             }
         }
 
+        if (($banner_nome_origem == null || $ftadv_nome_origem == null) && $acao == 'atualizar_configuracao') {
 
-        if ($_POST['acao'] == 'cadastrar_configuracao') {
+            $sql_busca = "
+        SELECT banner, nome_origem_banner, foto_adv, nome_origem_ftadv
+        FROM configuracao_modelo
+        WHERE usuario_config_id_usuario_config = $id_user
+    ";
+
+            $resultado = $conexao->query($sql_busca);
+            $dados_antigos_mod = $resultado->fetch_assoc();
+
+            $banner_antigo_caminho = $dados_antigos_mod['banner'];
+            $banner_antigo_origem = $dados_antigos_mod['nome_origem_banner'];
+
+            $foto_antiga_caminho = $dados_antigos_mod['foto_adv'];
+            $foto_antiga_origem = $dados_antigos_mod['nome_origem_ftadv'];
+
+            /* ================================
+               3A) SE O NOVO CAMINHO DO BANNER
+               NÃO EXISTE OU ESTÁ NULO → USA O DO BANCO
+               ================================ */
+            if (empty($caminho_banner_adv)) {
+                $caminho_banner_adv = $banner_antigo_caminho;
+                $banner_nome_origem = $banner_antigo_origem;
+            }
+
+            /* ================================
+               3B) SE O NOVO CAMINHO DA FOTO
+               NÃO EXISTE OU ESTÁ NULO → USA O DO BANCO
+               ================================ */
+            if (empty($caminho_foto_adv)) {
+                $caminho_foto_adv = $foto_antiga_caminho;
+                $ftadv_nome_origem = $foto_antiga_origem;
+            }
+
+            /* ================================
+               3C) AGORA, APAGA SOMENTE O QUE TEM NOVO
+               ================================ */
+
+            // apagando banner antigo APENAS SE SUBIU NOVO
+            if ($banner_nome_origem !== $banner_antigo_origem && $banner_antigo_caminho) {
+                $arq = '..' . $banner_antigo_caminho;
+                if (file_exists($arq))
+                    unlink($arq);
+            }
+
+            // apagando foto antiga APENAS SE SUBIU NOVO
+            if ($ftadv_nome_origem !== $foto_antiga_origem && $foto_antiga_caminho) {
+                $arq = '..' . $foto_antiga_caminho;
+                if (file_exists($arq))
+                    unlink($arq);
+            }
+        }
+
+
+
+
+        if ($acao == 'cadastrar_configuracao') {
             $sql_configura_modelo = "INSERT INTO configuracao_modelo (
             fonte1,
             fonte2,
@@ -192,14 +235,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             frase_chamada_cta,
             frase_chamada_cta_secundaria,
             endereco,
+            cor_primaria,
+            cor_secundaria,
             estilizacao,
             usuario_config_id_usuario_config
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
 
             $stmt = $conexao->prepare($sql_configura_modelo);
 
             $stmt->bind_param(
-                "sssssssssssssssssi",
+                "sssssssssssssssssssi",
                 $fonte1,
                 $fonte2,
                 $area_atuacao,
@@ -216,10 +261,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
                 $frase_chamada_cta,
                 $frase_chamada_cta_secundaria,
                 $endereco,
+                $cor_primaria,
+                $cor_secundaria,
                 $estilizacao,
                 $id_user
             );
-        } elseif ($_POST['acao'] == 'atualizar_configuracao') {
+        } elseif ($acao == 'atualizar_configuracao') {
 
             $sql_configura_modelo = "
         UPDATE configuracao_modelo SET
@@ -239,6 +286,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             frase_chamada_cta = ?,
             frase_chamada_cta_secundaria = ?,
             endereco = ?,
+            cor_primaria = ?,
+            cor_secundaria = ?,
             estilizacao = ?,
             dt_atualizacao_modelo = NOW()
         WHERE usuario_config_id_usuario_config = ?
@@ -247,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             $stmt = $conexao->prepare($sql_configura_modelo);
 
             $stmt->bind_param(
-                "sssssssssssssssssi",
+                "sssssssssssssssssssi",
                 $fonte1,
                 $fonte2,
                 $area_atuacao,
@@ -264,6 +313,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
                 $frase_chamada_cta,
                 $frase_chamada_cta_secundaria,
                 $endereco,
+                $cor_primaria,
+                $cor_secundaria,
                 $estilizacao,
                 $id_user   // WHERE
             );
@@ -296,6 +347,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
                 exit;
             }
+        } else {
+            $conexao->rollback();
+            $conexao->close();
+
+            $res = [
+                'status' => 'erro',
+                'message' => 'Erro ao configurar modelo!'
+            ];
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            exit;
         }
     } catch (Exception $err) {
         $res = [
@@ -308,220 +369,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
         $conexao->close();
         exit;
     }
+
+
+
 }
 
-
-
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre']) && !empty($_FILES['foto_adv_arquivo']) && !empty($_FILES['banner_arquivo']) && $_POST['acao'] == 'atualizar_configuracao') {
-
-//     // var_dump($_POST);
-
-//     $fonte1                          = $conexao->escape_string(htmlspecialchars($_POST['fonte1'] ?? ''));
-//     $fonte2                          = $conexao->escape_string(htmlspecialchars($_POST['fonte2'] ?? ''));
-//     $area_atuacao                    = $conexao->escape_string(htmlspecialchars($_POST['area_atuacao'] ?? ''));
-//     $frase_inicial                   = $conexao->escape_string(htmlspecialchars($_POST['frase_inicial'] ?? ''));
-//     $frase_secundaria                = $conexao->escape_string(htmlspecialchars($_POST['frase_secundaria'] ?? ''));
-//     $telefone_whatsapp               = $conexao->escape_string(htmlspecialchars($_POST['telefone_whatsapp'] ?? ''));
-//     $email                           = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
-//     $endereco                        = $conexao->escape_string(htmlspecialchars($_POST['endereco'] ?? ''));
-//     $frase_chamada_cta               = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta'] ?? ''));
-//     $frase_chamada_cta_secundaria    = $conexao->escape_string(htmlspecialchars($_POST['frase_chamada_cta_secundaria'] ?? ''));
-//     $sobre                           = $conexao->escape_string(htmlspecialchars($_POST['sobre'] ?? ''));
-//     $areas_atuacao                   = $conexao->escape_string(htmlspecialchars($_POST['areas_atuacao'] ?? ''));
-//     $estilizacao                     = $_POST['estilizacao'] ?? '';
-
-
-//     $banner_arquivo       = $_FILES['banner_arquivo'];
-//     $foto_adv_arquivo     = $_FILES['foto_adv_arquivo'];
-
-
-//     $banner_nome_origem = $banner_arquivo['name'];
-//     $ftadv_nome_origem = $foto_adv_arquivo['name'];
-
-//     try {
-//         $conexao->begin_transaction();
-
-//         if ($banner_arquivo['name']) {
-//             $nomeArquivo = $banner_arquivo['name'];
-//             $tmpArquivo = $banner_arquivo['tmp_name'];
-//             $tamanhoArquivo = $banner_arquivo['size'];
-
-//             $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
-
-//             $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
-
-//             if ($tamanhoArquivo > 5 * 1024 * 1024) {
-
-//                 // Apesar de aceitar 5 mb eu informo que é até 3mb
-//                 $res = [
-//                     'status' => "erro",
-//                     'message' => "Arquivo $nomeArquivo muito grande! Tamanho máximo permitido de 3MB"
-//                 ];
-
-//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                 $conexao->rollback();
-//                 $conexao->close();
-
-//                 exit;
-//             } elseif ($banner_arquivo['error'] !== 0) {
-//                 $res = [
-//                     'status' => 'erro',
-//                     'message' => 'Imagem com erro'
-//                 ];
-
-//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                 $conexao->rollback();
-//                 $conexao->close();
-
-//                 exit;
-//             } else {
-//                 $caminho = '../geral/docs/site';
-
-//                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
-
-//                 $retorno_img_movida =   move_uploaded_file($tmpArquivo, $novo_caminho);
-
-//                 if ($retorno_img_movida) {
-//                     $caminho_banner_adv = '/geral/docs/site/' . $novo_nome_arquivo;
-//                 }
-//             }
-//         }
-
-//         if ($foto_adv_arquivo['name']) {
-
-//             $nomeArquivo = $foto_adv_arquivo['name'];
-//             $tmpArquivo = $foto_adv_arquivo['tmp_name'];
-//             $tamanhoArquivo = $foto_adv_arquivo['size'];
-
-//             $extensao_arquivo = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
-
-//             $novo_nome_arquivo = uniqid() . uniqid() . '.' . $extensao_arquivo;
-
-//             // Validação de tamanho — usa 5MB como limite real
-//             if ($tamanhoArquivo > 5 * 1024 * 1024) {
-
-//                 $res = [
-//                     'status' => "erro",
-//                     'message' => "Arquivo $nomeArquivo muito grande! Tamanho máximo permitido de 3MB"
-//                 ];
-
-//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                 $conexao->rollback();
-//                 $conexao->close();
-//                 exit;
-//             } elseif ($foto_adv_arquivo['error'] !== 0) {
-
-//                 $res = [
-//                     'status' => 'erro',
-//                     'message' => 'Imagem com erro'
-//                 ];
-
-//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                 $conexao->rollback();
-//                 $conexao->close();
-//                 exit;
-//             } else {
-
-//                 $caminho = '../geral/docs/site';
-
-//                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
-
-//                 $retorno_img_movida = move_uploaded_file($tmpArquivo, $novo_caminho);
-
-//                 if ($retorno_img_movida) {
-
-//                     $caminho_foto_adv = '/geral/docs/site/' . $novo_nome_arquivo;
-//                 }
-//             }
-//         }
-
-
-
-//         $sql_configura_modelo = "INSERT INTO configuracao_modelo (
-//             fonte1,
-//             fonte2,
-//             area_atuacao_principal,
-//             banner,
-//             nome_origem_banner,
-//             frase_inicial,
-//             frase_secundaria,
-//             telefone_whatsapp,
-//             email,
-//             sobre,
-//             foto_adv,
-//             nome_origem_ftadv,
-//             areas_atuacao,
-//             frase_chamada_cta,
-//             frase_chamada_cta_secundaria,
-//             endereco,
-//             estilizacao,
-//             usuario_config_id_usuario_config
-//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
-
-//         $stmt = $conexao->prepare($sql_configura_modelo);
-
-//         $stmt->bind_param(
-//             "sssssssssssssssssi",
-//             $fonte1,
-//             $fonte2,
-//             $area_atuacao,
-//             $caminho_banner_adv,          // banner
-//             $banner_nome_origem,
-//             $frase_inicial,
-//             $frase_secundaria,
-//             $telefone_whatsapp,
-//             $email,
-//             $sobre,
-//             $caminho_foto_adv,        // foto_adv
-//             $ftadv_nome_origem,
-//             $areas_atuacao,
-//             $frase_chamada_cta,
-//             $frase_chamada_cta_secundaria,
-//             $endereco,
-//             $estilizacao,
-//             $id_user
-//         );
-
-//         if ($stmt->execute()) {
-
-//             if (cadastro_log('Configurou modelo ', $identificador_log, $ip, $id_user)) {
-
-//                 $conexao->commit();
-//                 $conexao->close();
-
-//                 $res = [
-//                     'status' => 'success',
-//                     'message' => 'Modelo configurado com sucesso!',
-//                 ];
-//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                 exit;
-//             } else {
-//                 $conexao->rollback();
-//                 $conexao->close();
-
-//                 $res = [
-//                     'status' => 'erro',
-//                     'message' => 'Erro ao configurar modelo!'
-//                 ];
-//                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//                 exit;
-//             }
-//         }
-//     } catch (Exception $err) {
-//         $res = [
-//             'status' => 'erro',
-//             'message' => $err->getMessage()
-//         ];
-
-//         echo json_encode($res, JSON_UNESCAPED_UNICODE);
-//         $conexao->rollback();
-//         $conexao->close();
-//         exit;
-//     }
-// }
-
-
-// var_dump($_SESSION);
 
 ?>
 
@@ -776,6 +628,9 @@ include_once('../geral/topo.php');
                                     </div>
                                 </div>
 
+                                <!-- <img src="../geral/docs/site/6927898a7aef86927898a7aefa.png" alt="" srcset=""> -->
+                                <!-- C:\xampp\htdocs\adv\sistema\geral\docs\site\6927898a7aef86927898a7aefa.png -->
+                                <!-- C:\xampp\htdocs\adv\sistema\site\configuracao_modelo.php -->
 
 
 
@@ -829,6 +684,21 @@ include_once('../geral/topo.php');
 
                                 <!-- Linha: endereço e estilização -->
                                 <div class="form-row">
+
+                                    <div class="form-field">
+                                        <label for="cor_primaria">Cor Primária</label>
+                                        <input style="width: 100%;" type="color" name="cor_primaria" id="cor_primaria"
+                                            minlength="10" maxlength="14"
+                                            value="<?php echo htmlspecialchars($dados_modelo['cor_primaria'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                    </div>
+
+
+                                    <div class="form-field">
+                                        <label for="cor_secundaria">Cor Secundária</label>
+                                        <input style="width: 100%;" type="color" name="cor_secundaria"
+                                            id="cor_secundaria" minlength="10" maxlength="14"
+                                            value="<?php echo htmlspecialchars($dados_modelo['cor_secundaria'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                    </div>
 
                                     <div class="form-field form-field--wide" id="campo-estilizacao">
                                         <label for="estilizacao">Estilização (JSON / CSS opcional)</label>
