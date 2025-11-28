@@ -4,15 +4,7 @@
 
 
 
-:root {
-    --bg-main: #121212;
-    --color-gold: #C6A664;
-    --color-white: #ebe8e8;
-    --color-grey: #B5B5B5;
-    --color-whatsapp: #25D366;
-    --font-serif: 'Playfair Display', serif;
-    --font-sans: 'Inter', sans-serif;
-}
+
 
 * {
     margin: 0;
@@ -22,7 +14,7 @@
 }
 
 body {
-    background-color: var(--bg-main);
+    background-color: var(--bg-primary);
     color: var(--color-white);
     font-family: var(--font-sans);
     line-height: 1.6;
@@ -67,7 +59,7 @@ section {
 
 .cta-button.primary, .cta-button:not(.secondary) {
     background-color: var(--color-gold);
-    color: var(--bg-main);
+    color: var(--bg-primary);
     border: 2px solid var(--color-gold);
 }
 
@@ -85,12 +77,12 @@ section {
 
 .cta-button.secondary:hover {
     background-color: var(--color-white);
-    color: var(--bg-main);
+    color: var(--bg-primary);
 }
 
 /* --- HEADER --- */
 .header {
-    background-color: var(--bg-main);
+    background-color: var(--bg-primary);
     padding: 1rem 0;
     position: sticky;
     top: 0;
@@ -178,7 +170,7 @@ section {
 
 /* --- ABOUT SECTION --- */
 .about-section {
-    background-color: #1a1a1a;
+    background-color: var(--bg-secondary);
 }
 
 .two-columns {
@@ -255,7 +247,7 @@ section {
 }
 
 .testimonials-section .section-title {
-    color: var(--bg-main);
+    color: var(--bg-primary);
 }
 
 .testimonial-slider {
@@ -291,7 +283,7 @@ section {
 
 /* --- DIRECT CTA SECTION --- */
 .direct-cta-section {
-    background-color: var(--bg-main);
+    background-color: var(--bg-primary);
     text-align: center;
     padding: 5rem 0;
 }
@@ -308,13 +300,13 @@ section {
 
 .direct-cta-section .cta-button {
     background-color: var(--color-gold);
-    color: var(--bg-main);
+    color: var(--bg-primary);
     font-size: 1.1rem;
 }
 
 /* --- FOOTER / CONTACT --- */
 .footer {
-    background-color: #0a0a0a;
+    background-color: var(--bg-secondary);
     padding: 5rem 0 2rem;
 }
 

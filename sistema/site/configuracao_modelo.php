@@ -160,6 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             }
         }
 
+
+        // Caso não tenha enviado uma imagem, eu busco no banco a que tem e atribuo na variável onde vai o update
         if (($banner_nome_origem == null || $ftadv_nome_origem == null) && $acao == 'atualizar_configuracao') {
 
             $sql_busca = "
@@ -177,27 +179,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
             $foto_antiga_caminho = $dados_antigos_mod['foto_adv'];
             $foto_antiga_origem = $dados_antigos_mod['nome_origem_ftadv'];
 
-            /* ================================
-               3A) SE O NOVO CAMINHO DO BANNER
-               NÃO EXISTE OU ESTÁ NULO → USA O DO BANCO
-               ================================ */
+
             if (empty($caminho_banner_adv)) {
                 $caminho_banner_adv = $banner_antigo_caminho;
                 $banner_nome_origem = $banner_antigo_origem;
             }
 
-            /* ================================
-               3B) SE O NOVO CAMINHO DA FOTO
-               NÃO EXISTE OU ESTÁ NULO → USA O DO BANCO
-               ================================ */
+
             if (empty($caminho_foto_adv)) {
                 $caminho_foto_adv = $foto_antiga_caminho;
                 $ftadv_nome_origem = $foto_antiga_origem;
             }
-
-            /* ================================
-               3C) AGORA, APAGA SOMENTE O QUE TEM NOVO
-               ================================ */
 
             // apagando banner antigo APENAS SE SUBIU NOVO
             if ($banner_nome_origem !== $banner_antigo_origem && $banner_antigo_caminho) {

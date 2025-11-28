@@ -1,18 +1,70 @@
+<?php
+
+date_default_timezone_set('America/Sao_Paulo');
+
+require __DIR__ . '/../../../vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../');
+$dotenv->load();
+
+$host = $_ENV['DB_HOST'];
+$user = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASS'];
+$data_base = $_ENV['DB_BASE'];
+
+$conexao = new mysqli($host, $user, $password, $data_base);
+$conexao->set_charset("utf8");
+
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
+
+
+    $modelo = $conexao->escape_string(htmlspecialchars($_GET['modelo'] ?? ''));
+   
+
+    $sql_busca_user = "SELECT * FROM usuario_config WHERE tk = '$modelo'";
+    $result = $conexao->query($sql_busca_user);
+
+    if ($result->num_rows > 0) {
+        $dados_user     = $result->fetch_assoc();
+        $id_user        =  $dados_user["id_usuario_config"];
+
+        $sql_busca_config_modelo = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = '$id_user'";
+        $result_modelo = $conexao->query($sql_busca_config_modelo);
+
+        if ($result_modelo->num_rows > 0) {
+            $config_modelo = $result_modelo->fetch_assoc();
+            var_dump($config_modelo);
+        }
+     
+    }
+    
+}
+
+
+?>
+
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dra. Laisla Maria | Advocacia Penal e Civil</title>
-  <meta name="description" content="Defesa Criminal e Direito Civil com excelência e discrição. Atendimento sigiloso, estratégico e personalizado. Fale agora no WhatsApp ou agende uma consulta." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="style.css" />
-  <meta name="theme-color" content="#121212" />
-  <script type="application/ld+json">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dra. Laisla Maria | Advocacia Penal e Civil</title>
+    <meta name="description"
+        content="Defesa Criminal e Direito Civil com excelência e discrição. Atendimento sigiloso, estratégico e personalizado. Fale agora no WhatsApp ou agende uma consulta." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#121212" />
+    <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "LegalService",
@@ -26,7 +78,22 @@
     "sameAs": ["https://wa.me/5511999999999"]
   }
   </script>
+
+
+  <style>
+    :root {
+    --bg-primary:  <?php echo $config_modelo['cor_primaria'] ?? '#121212' ?>;
+    --bg-secondary: <?php echo $config_modelo['cor_secundaria'] ?? '#020202ff' ?>;
+    --color-gold: #C6A664;
+    --color-white: #e8ebe9ff;
+    --color-grey: #B5B5B5;
+    --color-whatsapp: #25D366;
+    --font-serif:  <?php echo $config_modelo["fonte1"] ?? 'Playfair Display' ?>;
+    --font-sans:  <?php echo $config_modelo["fonte2"] ?? 'Inter' ?>;;
+}
+  </style>
 </head>
+
 <body>
 
     <!-- Header Fixo -->
@@ -42,7 +109,7 @@
                     <li><a href="#contato">Contato</a></li>
                 </ul>
             </nav>
-           
+
         </div>
     </header>
 
@@ -51,9 +118,11 @@
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <h1 class="animate-on-scroll">Defesa Criminal e Direito Civil com Excelência e Discrição.</h1>
-            <h2 class="animate-on-scroll">Atuação estratégica e sigilosa em casos complexos do Direito Penal e Civil.</h2>
+            <h2 class="animate-on-scroll">Atuação estratégica e sigilosa em casos complexos do Direito Penal e Civil.
+            </h2>
             <div class="hero-ctas animate-on-scroll">
-                <a href="https://wa.me/5500000000000" target="_blank" class="cta-button primary">Fale Agora no WhatsApp</a>
+                <a href="https://wa.me/5500000000000" target="_blank" class="cta-button primary">Fale Agora no
+                    WhatsApp</a>
                 <a href="#contato" class="cta-button secondary">Agendar Consulta</a>
             </div>
         </div>
@@ -67,7 +136,8 @@
             </div>
             <div class="about-content animate-on-scroll">
                 <h3>Sobre o Dra. Laisla Maria</h3>
-                <p>Advogado especializado em Direito Penal e Civil, com ampla experiência em defesas criminais, ações indenizatórias e consultoria preventiva. Comprometido com ética, estratégia e resultados.</p>
+                <p>Advogado especializado em Direito Penal e Civil, com ampla experiência em defesas criminais, ações
+                    indenizatórias e consultoria preventiva. Comprometido com ética, estratégia e resultados.</p>
                 <ul>
                     <li>✓ Mais de 10 anos de experiência jurídica</li>
                     <li>✓ Atuação em todo o território nacional</li>
@@ -157,8 +227,10 @@
                 </div>
                 <div class="contact-info">
                     <h4>Contatos Diretos</h4>
-                    <p><a href="https://wa.me/5500000000000" target="_blank"><strong>WhatsApp:</strong> (XX) XXXXX-XXXX</a></p>
-                    <p><a href="mailto:contato@drpaulovitor.com"><strong>E-mail:</strong> contato@drpaulovitor.com</a></p>
+                    <p><a href="https://wa.me/5500000000000" target="_blank"><strong>WhatsApp:</strong> (XX)
+                            XXXXX-XXXX</a></p>
+                    <p><a href="mailto:contato@drpaulovitor.com"><strong>E-mail:</strong> contato@drpaulovitor.com</a>
+                    </p>
                     <p><strong>Endereço:</strong> Av. Principal, 123, Sala 45, Cidade-UF (Opcional)</p>
                 </div>
             </div>
@@ -170,10 +242,11 @@
 
     <!-- Botão WhatsApp Flutuante -->
     <a href="https://wa.me/5500000000000" target="_blank" class="whatsapp-float">
-      <i class="fa-brands fa-whatsapp" style="font-size: 32px;color: white;"></i>
+        <i class="fa-brands fa-whatsapp" style="font-size: 32px;color: white;"></i>
     </a>
 
     <!-- JS -->
     <script src="script.js"></script>
 </body>
+
 </html>
