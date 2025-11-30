@@ -15,31 +15,45 @@ $data_base = $_ENV['DB_BASE'];
 $conexao = new mysqli($host, $user, $password, $data_base);
 $conexao->set_charset("utf8");
 
+// $config_modelo = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
 
 
     $modelo = $conexao->escape_string(htmlspecialchars($_GET['modelo'] ?? ''));
-   
+
 
     $sql_busca_user = "SELECT * FROM usuario_config WHERE tk = '$modelo'";
     $result = $conexao->query($sql_busca_user);
 
     if ($result->num_rows > 0) {
-        $dados_user     = $result->fetch_assoc();
-        $id_user        =  $dados_user["id_usuario_config"];
+        $dados_user = $result->fetch_assoc();
+        $id_user = $dados_user["id_usuario_config"];
 
         $sql_busca_config_modelo = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = '$id_user'";
         $result_modelo = $conexao->query($sql_busca_config_modelo);
 
         if ($result_modelo->num_rows > 0) {
             $config_modelo = $result_modelo->fetch_assoc();
-            var_dump($config_modelo);
+            // var_dump($config_modelo);
         }
-     
+
     }
-    
+
 }
 
+$banner = (!empty($config_modelo) && !empty($config_modelo['banner']))
+    ? '../..' . $config_modelo['banner']
+    : './imgs/banners.jpg';
+
+
+$foto_adv = (!empty($config_modelo) && !empty($config_modelo['foto_adv']))
+    ? '../..' . $config_modelo['foto_adv']
+    : './imgs/advogada.png';
+
+
+$telefone_raw = $config_modelo['telefone_whatsapp'] ?? '(00) 00000-0000';
+$telefone_limpo = preg_replace('/\D+/', '', $telefone_raw);
 
 ?>
 
@@ -53,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dra. Laisla Maria | Advocacia Penal e Civil</title>
     <meta name="description"
-        content="Defesa Criminal e Direito Civil com excelência e discrição. Atendimento sigiloso, estratégico e personalizado. Fale agora no WhatsApp ou agende uma consulta." />
+        content=" <?php echo $config_modelo['frase_inicial'] ?? 'Defesa Criminal e Direito Civil com excelência e discrição. Atendimento sigiloso, estratégico e personalizado. Fale agora no WhatsApp ou agende uma consulta.'; ?> " />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -80,18 +94,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
   </script>
 
 
-  <style>
-    :root {
-    --bg-primary:  <?php echo $config_modelo['cor_primaria'] ?? '#121212' ?>;
-    --bg-secondary: <?php echo $config_modelo['cor_secundaria'] ?? '#020202ff' ?>;
-    --color-gold: #C6A664;
-    --color-white: #e8ebe9ff;
-    --color-grey: #B5B5B5;
-    --color-whatsapp: #25D366;
-    --font-serif:  <?php echo $config_modelo["fonte1"] ?? 'Playfair Display' ?>;
-    --font-sans:  <?php echo $config_modelo["fonte2"] ?? 'Inter' ?>;;
-}
-  </style>
+    <style>
+        :root {
+            --bg-primary:
+                <?php echo $config_modelo['cor_primaria'] ?? '#121212' ?>
+            ;
+            --bg-secondary:
+                <?php echo $config_modelo['cor_secundaria'] ?? '#020202ff' ?>
+            ;
+            --color-gold: #C6A664;
+            --color-white: #e8ebe9ff;
+            --color-grey: #B5B5B5;
+            --color-whatsapp: #25D366;
+            --font-serif:
+                <?php echo $config_modelo["fonte1"] ?? 'Playfair Display' ?>
+            ;
+            --font-sans:
+                <?php echo $config_modelo["fonte2"] ?? 'Inter' ?>
+            ;
+            ;
+        }
+
+        .hero-section {
+            background: url("<?php echo $banner ?>") no-repeat center center/cover;
+        }
+    </style>
 </head>
 
 <body>
@@ -99,7 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
     <!-- Header Fixo -->
     <header class="header">
         <div class="container">
-            <a href="#inicio" class="logo">Advocacia Penal e Civil</a>
+            <a href="#inicio" class="logo">
+                <?php echo $config_modelo["area_atuacao_principal"] ?? 'Advocacia Penal e Civil'; ?> </a>
             <nav class="main-nav">
                 <ul>
                     <li><a href="#inicio">Início</a></li>
@@ -117,8 +145,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
     <section id="inicio" class="hero-section">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
-            <h1 class="animate-on-scroll">Defesa Criminal e Direito Civil com Excelência e Discrição.</h1>
-            <h2 class="animate-on-scroll">Atuação estratégica e sigilosa em casos complexos do Direito Penal e Civil.
+            <h1 class="animate-on-scroll">
+                <?php echo $config_modelo['frase_inicial'] ?? 'Defesa Criminal e Direito Civil com Excelência e Discrição.'; ?>
+            </h1>
+            <h2 class="animate-on-scroll">
+                <?php echo $config_modelo['frase_secundaria'] ?? 'Atuação estratégica e sigilosa em casos complexos do Direito Penal e Civil.'; ?>
             </h2>
             <div class="hero-ctas animate-on-scroll">
                 <a href="https://wa.me/5500000000000" target="_blank" class="cta-button primary">Fale Agora no
@@ -132,17 +163,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
     <section id="sobre" class="about-section">
         <div class="container two-columns">
             <div class="about-image animate-on-scroll">
-                <img src="./imgs/advogada.png" alt="Dra. Laisla Maria, advogado especialista">
+                <img src="<?php echo $foto_adv ?>">
             </div>
             <div class="about-content animate-on-scroll">
-                <h3>Sobre o Dra. Laisla Maria</h3>
-                <p>Advogado especializado em Direito Penal e Civil, com ampla experiência em defesas criminais, ações
-                    indenizatórias e consultoria preventiva. Comprometido com ética, estratégia e resultados.</p>
-                <ul>
-                    <li>✓ Mais de 10 anos de experiência jurídica</li>
-                    <li>✓ Atuação em todo o território nacional</li>
-                    <li>✓ Atendimento personalizado e sigiloso</li>
-                </ul>
+                <h3>Sobre Mim</h3>
+                <p><?php echo $config_modelo['sobre'] ?? 'Advogado especializado em Direito Penal e Civil, com ampla experiência em defesas criminais, ações
+                    indenizatórias e consultoria preventiva. Comprometido com ética, estratégia e resultados.'; ?></p>
+
                 <a href="#contato" class="cta-button">Solicitar Atendimento</a>
             </div>
         </div>
@@ -205,9 +232,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
     <!-- Sessão CTA Direta -->
     <section class="direct-cta-section">
         <div class="container">
-            <h3>Precisa de um advogado criminalista de confiança?</h3>
-            <p>Atendimento 100% sigiloso e estratégico.</p>
-            <a href="https://wa.me/5500000000000" target="_blank" class="cta-button">Falar com o Dra. Paulo Agora</a>
+            <h3>
+                <?php echo $config_modelo['frase_chamada_cta']
+                    ?? 'Precisa de um advogado criminalista de confiança?'; ?>
+            </h3>
+
+            <p>
+                <?php echo $config_modelo['frase_chamada_cta_secundaria']
+                    ?? 'Atendimento 100% sigiloso e estratégico.'; ?>
+            </p>
+
+            <a href="https://wa.me/55<?php echo $telefone_limpo; ?>" target="_blank" class="cta-button">
+                Solicitar Atendimento
+            </a>
+
         </div>
     </section>
 
@@ -227,12 +265,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
                 </div>
                 <div class="contact-info">
                     <h4>Contatos Diretos</h4>
-                    <p><a href="https://wa.me/5500000000000" target="_blank"><strong>WhatsApp:</strong> (XX)
-                            XXXXX-XXXX</a></p>
-                    <p><a href="mailto:contato@drpaulovitor.com"><strong>E-mail:</strong> contato@drpaulovitor.com</a>
+
+
+
+
+                    <p>
+                        <a href="https://wa.me/55<?php echo $telefone_limpo; ?>" target="_blank">
+                            <strong>WhatsApp:</strong>
+                            <?php echo $telefone_raw; ?>
+                        </a>
                     </p>
-                    <p><strong>Endereço:</strong> Av. Principal, 123, Sala 45, Cidade-UF (Opcional)</p>
+
+                    <p>
+                        <a href="mailto:<?php echo $config_modelo['email'] ?? 'contato@dr.com'; ?>">
+                            <strong>E-mail:</strong>
+                            <?php echo $config_modelo['email'] ?? 'contato@dr.com'; ?>
+                        </a>
+                    </p>
+
+                    <p>
+                        <strong>Endereço:</strong>
+                        <?php echo $config_modelo['endereco']
+                            ?? 'Av. Principal, 123, Sala 45, Cidade-UF'; ?>
+                    </p>
                 </div>
+
             </div>
             <div class="footer-bottom">
                 <p>© 2025 Dra. Laisla Maria – OAB [UF/00000] | Todos os direitos reservados.</p>

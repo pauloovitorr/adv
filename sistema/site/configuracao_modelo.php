@@ -66,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
     try {
         $conexao->begin_transaction();
 
+
+
+
         if ($banner_nome_origem != null) {
             $nomeArquivo = $banner_arquivo['name'];
             $tmpArquivo = $banner_arquivo['tmp_name'];
@@ -100,6 +103,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
 
                 exit;
             } else {
+
+                $sql_busca = "SELECT banner FROM configuracao_modelo
+        WHERE usuario_config_id_usuario_config = $id_user";
+
+                $resultado = $conexao->query($sql_busca);
+
+                if ($resultado && $resultado->num_rows > 0) {
+                    $dados_antigos_mod = $resultado->fetch_assoc();
+
+                    if ($dados_antigos_mod['banner']) {
+                        $arq = '..' . $dados_antigos_mod['banner'];
+                        if (file_exists($arq))
+                            unlink($arq);
+                    }
+
+
+                }
+
                 $caminho = '../geral/docs/site';
 
                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
@@ -147,6 +168,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
                 exit;
             } else {
 
+                $sql_busca = "SELECT foto_adv FROM configuracao_modelo
+        WHERE usuario_config_id_usuario_config = $id_user";
+
+                $resultado = $conexao->query($sql_busca);
+
+                if ($resultado && $resultado->num_rows > 0) {
+                    $dados_antigos_mod = $resultado->fetch_assoc();
+
+                    if ($dados_antigos_mod['foto_adv']) {
+                        $arq = '..' . $dados_antigos_mod['foto_adv'];
+                        if (file_exists($arq))
+                            unlink($arq);
+                    }
+
+
+                }
+
                 $caminho = '../geral/docs/site';
 
                 $novo_caminho = $caminho . '/' . $novo_nome_arquivo;
@@ -191,19 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
                 $ftadv_nome_origem = $foto_antiga_origem;
             }
 
-            // apagando banner antigo APENAS SE SUBIU NOVO
-            if ($banner_nome_origem !== $banner_antigo_origem && $banner_antigo_caminho) {
-                $arq = '..' . $banner_antigo_caminho;
-                if (file_exists($arq))
-                    unlink($arq);
-            }
-
-            // apagando foto antiga APENAS SE SUBIU NOVO
-            if ($ftadv_nome_origem !== $foto_antiga_origem && $foto_antiga_caminho) {
-                $arq = '..' . $foto_antiga_caminho;
-                if (file_exists($arq))
-                    unlink($arq);
-            }
+        
         }
 
 

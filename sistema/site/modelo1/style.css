@@ -143,7 +143,7 @@ section {
     text-align: center;
     position: relative;
     padding: 0;
-    background: url('./imgs/banners.jpg') no-repeat center center/cover;
+   
 }
 
 .hero-overlay {
@@ -184,6 +184,11 @@ section {
     width: 100%;
     height: auto;
     border-radius: 12px;
+}
+
+.about-content{
+    /* border: 1px solid red; */
+    width: 80%;
 }
 
 .about-content h3 {
