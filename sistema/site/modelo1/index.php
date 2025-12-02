@@ -55,6 +55,9 @@ $foto_adv = (!empty($config_modelo) && !empty($config_modelo['foto_adv']))
 $telefone_raw = $config_modelo['telefone_whatsapp'] ?? '(00) 00000-0000';
 $telefone_limpo = preg_replace('/\D+/', '', $telefone_raw);
 
+
+$areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
+
 ?>
 
 
@@ -152,7 +155,8 @@ $telefone_limpo = preg_replace('/\D+/', '', $telefone_raw);
                 <?php echo $config_modelo['frase_secundaria'] ?? 'Atuação estratégica e sigilosa em casos complexos do Direito Penal e Civil.'; ?>
             </h2>
             <div class="hero-ctas animate-on-scroll">
-                <a href="https://wa.me/5500000000000" target="_blank" class="cta-button primary">Fale Agora no
+                <a href="https://wa.me/55<?php echo $telefone_limpo; ?>" target="_blank" class="cta-button primary">Fale
+                    Agora no
                     WhatsApp</a>
                 <a href="#contato" class="cta-button secondary">Agendar Consulta</a>
             </div>
@@ -180,30 +184,52 @@ $telefone_limpo = preg_replace('/\D+/', '', $telefone_raw);
         <div class="container">
             <h3 class="section-title">Áreas de Atuação</h3>
             <div class="services-grid">
-                <div class="service-card animate-on-scroll">
-                    <div class="service-icon">⚖️</div>
-                    <h4>Defesa em Processos Criminais</h4>
-                </div>
-                <div class="service-card animate-on-scroll">
-                    <div class="service-icon">💼</div>
-                    <h4>Crimes Econômicos e Empresariais</h4>
-                </div>
-                <div class="service-card animate-on-scroll">
-                    <div class="service-icon">🏛️</div>
-                    <h4>Tribunal do Júri</h4>
-                </div>
-                <div class="service-card animate-on-scroll">
-                    <div class="service-icon">📝</div>
-                    <h4>Direito Civil e Contratos</h4>
-                </div>
-                <div class="service-card animate-on-scroll">
-                    <div class="service-icon">💰</div>
-                    <h4>Ações Indenizatórias</h4>
-                </div>
-                <div class="service-card animate-on-scroll">
-                    <div class="service-icon">🛡️</div>
-                    <h4>Consultoria Preventiva</h4>
-                </div>
+
+                <?php if ($areas_atuacao):
+
+                    $areas_atuacao = explode(',', trim($areas_atuacao));
+                    $areas_atuacao = array_map('trim', $areas_atuacao);
+
+                    foreach ($areas_atuacao as $area):  ?>
+
+                        <div class="service-card animate-on-scroll">
+                            <div class="service-icon"><?php echo substr($area, 0,1) ?></div>
+                            <h4><?php echo $area ?></h4>
+                        </div>
+
+                    <?php endforeach ?>
+
+                <?php else: ?>
+
+                    <div class="service-card animate-on-scroll">
+                        <div class="service-icon">PC</div>
+                        <h4>Defesa em Processos Criminais</h4>
+                    </div>
+                    <div class="service-card animate-on-scroll">
+                        <div class="service-icon">EE</div>
+                        <h4>Crimes Econômicos e Empresariais</h4>
+                    </div>
+                    <div class="service-card animate-on-scroll">
+                        <div class="service-icon">TJ</div>
+                        <h4>Tribunal do Júri</h4>
+                    </div>
+                    <div class="service-card animate-on-scroll">
+                        <div class="service-icon">CC</div>
+                        <h4>Direito Civil e Contratos</h4>
+                    </div>
+                    <div class="service-card animate-on-scroll">
+                        <div class="service-icon">AI</div>
+                        <h4>Ações Indenizatórias</h4>
+                    </div>
+                    <div class="service-card animate-on-scroll">
+                        <div class="service-icon">CP</div>
+                        <h4>Consultoria Preventiva</h4>
+                    </div>
+
+                <?php endif ?>
+
+
+
             </div>
         </div>
     </section>
