@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
                 $ftadv_nome_origem = $foto_antiga_origem;
             }
 
-        
+
         }
 
 
@@ -431,8 +431,11 @@ include_once('../geral/topo.php');
             <section class="cadastro-modelo">
 
                 <div class="cadastro-modelo__header">
-                    <i class="fa-solid fa-display"></i>
-                    <p>Informações da Landing Page</p>
+                    <div class="infos_pagina">
+                        <i class="fa-solid fa-display"></i>
+                        <p>Informações da Landing Page</p>
+                    </div>
+                    <button id="add_depoimentos"><i class="fa-solid fa-gear"></i> Configurar CRM</button>
                 </div>
 
                 <hr>
@@ -746,6 +749,120 @@ include_once('../geral/topo.php');
 
 
     <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
+    <script>
+        $(function () {
+            // Simulando dados
+            let depoimentos = [
+                { nome: "Maria Silva", texto: "Ótimo sistema, muito prático!" },
+                { nome: "João Souza", texto: "Atendimento excelente." }
+            ];
+
+            $('#add_depoimentos').on('click', function () {
+                Swal.fire({
+                    title: 'Gerenciar Depoimentos',
+                    width: 600,
+                    // Injetamos o CSS diretamente aqui para garantir que o estilo pegue
+                    html: `
+                <style>
+                    .custom-swal-input {
+                        padding: 10px;
+                        border-radius: 8px;
+                        border: 1px solid #ccc;
+                        outline: none;
+                        transition: border-color 0.2s;
+                        width: 100%;
+                        box-sizing: border-box; /* Importante para o padding não quebrar a largura */
+                        margin-bottom: 15px;
+                        font-size: 14px;
+                    }
+                    
+                    /* Cor da borda ao clicar (para ver a transição funcionando) */
+                    .custom-swal-input:focus {
+                        border-color: #3085d6; 
+                    }
+                </style>
+
+                <div style="text-align: left;">
+                    <label style="font-weight: 500; display:block; margin-bottom:5px;">Nome</label>
+                    <input id="swal-input-nome" class="custom-swal-input" placeholder="Nome do cliente">
+                    
+                    <label style="font-weight: 500; display:block; margin-bottom:5px;">Depoimento</label>
+                    <textarea id="swal-input-texto" class="custom-swal-input" rows="3" placeholder="Escreva o depoimento aqui..."></textarea>
+                    
+                    <div style="width: 100%;margin: 0;display: flex;justify-content: center;">
+                        <button type="button" id="btn-salvar-depoimento" class="swal2-confirm swal2-styled" style="width: 45%;margin: 0;background-color: #3085d6">
+                            Salvar Depoimento
+                        </button>
+                    </div>
+                </div>
+
+                <hr style="margin: 25px 0;">
+
+                <div style="text-align: left;">
+                    <h3 style="font-size: 1.1em; font-weight: 500; margin-bottom: 15px;">Depoimentos Cadastrados</h3>
+                    <div id="lista-depoimentos" style="max-height: 250px; overflow-y: auto; border-radius: 8px;">
+                        <!-- Lista Renderizada via JS -->
+                    </div>
+                </div>
+            `,
+                    showConfirmButton: false,
+                    showCloseButton: true,
+
+                    didOpen: () => {
+                        const listaEl = document.getElementById('lista-depoimentos');
+                        const btnSalvar = document.getElementById('btn-salvar-depoimento');
+                        const inputNome = document.getElementById('swal-input-nome');
+                        const inputTexto = document.getElementById('swal-input-texto');
+
+                        // Função de renderizar (mesma lógica anterior)
+                        const renderizarLista = () => {
+                            if (depoimentos.length === 0) {
+                                listaEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Nenhum depoimento ainda.</div>';
+                                return;
+                            }
+
+                            let htmlLista = '';
+                            depoimentos.forEach((dep) => {
+                                htmlLista += `
+                            <div style="padding: 20px;border: 1px solid #e0e0e0;background: #fff;border-radius: 8px;margin-bottom: 10px;">
+                                <strong style="color: #333; display:block;">${dep.nome}</strong>
+                                <span style="color: #666; font-size: 0.95em;">${dep.texto}</span>
+                            </div>
+                        `;
+                            });
+                            listaEl.innerHTML = htmlLista;
+                        };
+
+                        renderizarLista();
+
+                        // Ação do botão salvar
+                        btnSalvar.addEventListener('click', () => {
+                            if (!inputNome.value || !inputTexto.value) {
+                                // Usamos o mixin de Toast para erro, fica mais elegante que um alert
+                                Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 })
+                                    .fire({ icon: 'warning', title: 'Preencha todos os campos' });
+                                return;
+                            }
+
+                            // Adiciona ao array (simulando backend)
+                            depoimentos.unshift({ nome: inputNome.value, texto: inputTexto.value });
+
+                            inputNome.value = '';
+                            inputTexto.value = '';
+                            renderizarLista();
+
+                            // Foco volta para o nome para facilitar cadastros seguidos
+                            inputNome.focus();
+
+                            Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 })
+                                .fire({ icon: 'success', title: 'Salvo com sucesso!' });
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>
     <script>
         $(function () {
 
