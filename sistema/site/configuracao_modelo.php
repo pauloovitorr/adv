@@ -3,19 +3,7 @@
 
 include_once('../../scripts.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-
-    $sql_config_modelo = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
-    $retorno_sql = $conexao->query($sql_config_modelo);
-    $dados_modelo = '';
-
-    if ($retorno_sql->num_rows > 0) {
-        $dados_modelo = $retorno_sql->fetch_assoc();
-    }
-
-    // var_dump($dados_modelo);
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre'])) {
 
@@ -392,7 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
 
 }
 
-if ( $_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['input_nome'])  && !empty($_POST['input_texto'])  && $_POST['input_acao'] === 'cadastrar_depoimento') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['input_nome']) && !empty($_POST['input_texto']) && $_POST['input_acao'] === 'cadastrar_depoimento') {
 
     // Pegando variáveis
     $nome = $conexao->escape_string(htmlspecialchars($_POST['input_nome']));
@@ -424,6 +412,48 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['input_nome'])  && 
         $conexao->close();
         exit;
     }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && $_GET['acao'] == 'buscar_depoimentos') {
+    $sql_busca_depoimentos = "SELECT * FROM depoimentos WHERE usuario_config_id_usuario_config = $id_user ORDER BY dt_cadastro DESC";
+
+    $retorno = $conexao->query($sql_busca_depoimentos);
+    $depoimentos = [];
+    if ($retorno->num_rows > 0) {
+        while ($depoimento = $retorno->fetch_assoc()) {
+            $depoimentos[] = $depoimento;
+        }
+        $res = [
+            'status' => "success",
+            'message' => "Depoimentos encontrados com sucesso!",
+            'depoimentos' => $depoimentos
+        ];
+    } else {
+        $res = [
+            'status' => "erro",
+            'message' => "Não possui depoimentos cadastrado",
+            'depoimentos' => $depoimentos
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+
+    $sql_config_modelo = "SELECT * FROM configuracao_modelo WHERE usuario_config_id_usuario_config = $id_user";
+    $retorno_sql = $conexao->query($sql_config_modelo);
+    $dados_modelo = '';
+
+    if ($retorno_sql->num_rows > 0) {
+        $dados_modelo = $retorno_sql->fetch_assoc();
+    }
+
+    // var_dump($dados_modelo);
 }
 
 ?>
@@ -784,11 +814,33 @@ include_once('../geral/topo.php');
     <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
     <script>
         $(function () {
+
             // Simulando dados
             let depoimentos = [
-                { nome: "Maria Silva", texto: "Ótimo sistema, muito prático!" },
-                { nome: "João Souza", texto: "Atendimento excelente." }
+                // { nome: "Maria Silva", texto: "Ótimo sistema, muito prático!" },
+                // { nome: "João Souza", texto: "Atendimento excelente." }
             ];
+
+            $.ajax({
+                url: './configuracao_modelo.php',
+                type: 'GET',
+                data: {
+                    acao: 'buscar_depoimentos'
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status == 'success') {
+                        res.depoimentos.forEach((item) => {
+                            let depoimento = { nome: item.nome, texto: item.texto }
+                            depoimentos.push(depoimento)
+                        })
+                    }
+                }
+            })
+
+            // console.log
+
+
 
             $('#add_depoimentos').on('click', function () {
                 Swal.fire({
@@ -838,7 +890,7 @@ include_once('../geral/topo.php');
 
                 <div style="text-align: left;">
                     <h3 style="font-size: 1.1em; font-weight: 500; margin-bottom: 15px;">Depoimentos Cadastrados</h3>
-                    <div id="lista-depoimentos" style="max-height: 250px; overflow-y: auto; border-radius: 8px;">
+                    <div id="lista-depoimentos" style="max-height: 200px; overflow-y: auto; border-radius: 8px;">
                         <!-- Lista Renderizada via JS -->
                     </div>
                 </div>
@@ -848,16 +900,13 @@ include_once('../geral/topo.php');
 
                     didOpen: () => {
 
-
+                        // Evento de submit
                         $('#btn-salvar-depoimento').on('submit', function (e) {
+                            e.preventDefault();
 
-                            const inputNome = $('#swal-input-nome').val();
-                            const inputTexto = $('#swal-input-texto').val();
-                            const inputAcao = $('#acao_depoimento').val()
-                            e.preventDefault()
-
-                            console.log(inputNome)
-                            console.log(inputTexto)
+                            const inputNome = $('#swal-input-nome').val().trim();
+                            const inputTexto = $('#swal-input-texto').val().trim();
+                            const inputAcao = $('#acao_depoimento').val();
 
                             if (!inputNome || !inputTexto) {
                                 Swal.fire({
@@ -866,57 +915,61 @@ include_once('../geral/topo.php');
                                     showConfirmButton: true,
                                 });
                                 return;
-                            } else {
+                            }
 
-                                $.ajax({
-                                    url: './configuracao_modelo.php',
-                                    type: 'POST',
-                                    data: {
-                                        input_nome: inputNome,
-                                        input_texto: inputTexto,
-                                        input_acao: inputAcao
-                                    },
-                                    dataType: 'json',
-                                    success: function (res) {
-                                        if (res.status === 'erro') {
+                            $.ajax({
+                                url: './configuracao_modelo.php',
+                                type: 'POST',
+                                data: {
+                                    input_nome: inputNome,
+                                    input_texto: inputTexto,
+                                    input_acao: inputAcao
+                                },
+                                dataType: 'json',
 
-                                            Swal.fire({
-                                                icon: "error",
-                                                title: "Erro",
-                                                text: res.message
-                                            });
-
-                                            $('.btn_cadastrar').attr('disabled', false)
-
-
-                                        } else if (res.status === 'success') {
-                                          
-                                            Swal.fire({
-                                                    title: "Sucesso!",
-                                                    text: res.message,
-                                                    icon: "success"
-                                                })
-                                        }
-
-
-                                    },
-                                    error: function (err) {
+                                success: function (res) {
+                                    if (res.status === 'erro') {
                                         Swal.fire({
                                             icon: "error",
                                             title: "Erro",
-                                            text: err.message,
+                                            text: res.message
                                         });
-                                        $('.btn_cadastrar').attr('disabled', false)
+                                        return;
                                     }
-                                })
 
-                            }
+                                    if (res.status === 'success') {
 
-                        })
+                                        const novoDepHtml = `
+                        <div style="padding: 8px;border: 1px solid #e0e0e0;background: #fff;border-radius: 8px;margin-bottom: 10px;">
+                            <strong style="color: #333; display:block;">${inputNome}</strong>
+                            <span style="color: #666; font-size: 0.95em;">${inputTexto}</span>
+                        </div>
+                    `;
 
+                                        // Prepend no HTML da lista
+                                        $('#lista-depoimentos').prepend(novoDepHtml);
+
+                                        // (Opcional) limpar inputs
+                                        $('#swal-input-nome').val('');
+                                        $('#swal-input-texto').val('');
+
+                                    }
+                                },
+
+                                error: function (err) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Erro",
+                                        text: err.message,
+                                    });
+                                }
+                            });
+                        });
+
+
+                        // --------- RENDERIZA LISTA INICIAL (CARREGADA DO BANCO) ---------
                         const listaEl = document.querySelector('#lista-depoimentos');
 
-                        // Função de renderizar (mesma lógica anterior)
                         const renderizarLista = () => {
                             if (depoimentos.length === 0) {
                                 listaEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Nenhum depoimento ainda.</div>';
@@ -926,38 +979,19 @@ include_once('../geral/topo.php');
                             let htmlLista = '';
                             depoimentos.forEach((dep) => {
                                 htmlLista += `
-                            <div style="padding: 20px;border: 1px solid #e0e0e0;background: #fff;border-radius: 8px;margin-bottom: 10px;">
-                                <strong style="color: #333; display:block;">${dep.nome}</strong>
-                                <span style="color: #666; font-size: 0.95em;">${dep.texto}</span>
-                            </div>
-                        `;
+                <div style="padding: 8px;border: 1px solid #e0e0e0;background: #fff;border-radius: 8px;margin-bottom: 10px;">
+                    <strong style="color: #333; display:block;">${dep.nome}</strong>
+                    <span style="color: #666; font-size: 0.95em;">${dep.texto}</span>
+                </div>
+            `;
                             });
+
                             listaEl.innerHTML = htmlLista;
                         };
 
                         renderizarLista();
-
-                        // Ação do botão salvar
-                        // btnSalvar.addEventListener('click', () => {
-
-
-                        //     // Adiciona ao array (simulando backend)
-                        //     depoimentos.unshift({ nome: inputNome, texto: inputTexto.value });
-
-                        //     inputNome.value = '';
-                        //     inputTexto.value = '';
-                        //     renderizarLista();
-
-                        //     // Foco volta para o nome para facilitar cadastros seguidos
-                        //     inputNome.focus();
-
-                        //     Swal.fire({
-                        //         title: "Sucesso!",
-                        //         text: "Depoimento cadastrado com sucesso!",
-                        //         icon: "success"
-                        //     });
-                        // });
                     }
+
                 });
             });
         });
