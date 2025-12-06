@@ -190,10 +190,10 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
                     $areas_atuacao = explode(',', trim($areas_atuacao));
                     $areas_atuacao = array_map('trim', $areas_atuacao);
 
-                    foreach ($areas_atuacao as $area):  ?>
+                    foreach ($areas_atuacao as $area): ?>
 
                         <div class="service-card animate-on-scroll">
-                            <div class="service-icon"><?php echo substr($area, 0,1) ?></div>
+                            <div class="service-icon"><?php echo substr($area, 0, 1) ?></div>
                             <h4><?php echo $area ?></h4>
                         </div>
 
@@ -331,5 +331,8 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
     <!-- JS -->
     <script src="script.js"></script>
 </body>
+
+
+
 
 </html>

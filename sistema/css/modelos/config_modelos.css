@@ -82,35 +82,35 @@
   font-size: 24px;
 }
 
-.infos_pagina{
+.infos_pagina {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 #add_depoimentos {
-    width: auto;
-    height: 40px;
-    background-color: #06112483;
-    border: 1px solid rgb(232, 232, 232);
-    padding: 10px 8px;
-    border-radius: 8px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 14px;
-    line-height: 14px;
-    cursor: pointer;
-    transition: 0.3s;
+  width: auto;
+  height: 40px;
+  background-color: #2f81f7;
+  border: 1px solid rgb(232, 232, 232);
+  padding: 10px 8px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 14px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 #add_depoimentos:hover {
-    background-color: #061124;
+  background-color: #2873de;
 }
 
-#add_depoimentos i{
+#add_depoimentos i {
   color: white;
 }
 
@@ -218,7 +218,7 @@
 /* Campos “largos” (sobre, áreas, endereço, CTA etc.) */
 .form-field--wide,
 #container_frase_inicial,
-#campo-endereco{
+#campo-endereco {
   grid-column: span 2;
 }
 
@@ -253,18 +253,17 @@
   display: block;
 }
 
-
 .custom-file-input {
-    display: none; /* esconde o input nativo */
+  display: none; /* esconde o input nativo */
 }
 
 .custo_add_arquivo {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px;
-    cursor: pointer;
-    /* aqui você mantém o restante do estilo que já usa
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+  cursor: pointer;
+  /* aqui você mantém o restante do estilo que já usa
        (borda, background, radius, etc.) */
 }
 
@@ -272,13 +271,12 @@
 #nome-arquivo-banner,
 #nome-arquivo-foto-adv,
 #nome-arquivo-foto {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 200px;
-    display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 200px;
+  display: block;
 }
-
 
 /* RESPONSIVO */
 @media (max-width: 1024px) {

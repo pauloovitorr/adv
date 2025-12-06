@@ -392,6 +392,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp'])
 
 }
 
+if ( $_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['input_nome'])  && !empty($_POST['input_texto'])  && $_POST['input_acao'] === 'cadastrar_depoimento') {
+
+    // Pegando variáveis
+    $nome = $conexao->escape_string(htmlspecialchars($_POST['input_nome']));
+    $texto = $conexao->escape_string(htmlspecialchars($_POST['input_texto']));
+    $acao = $conexao->escape_string(htmlspecialchars($_POST['input_acao']));
+
+
+    $sql = "INSERT INTO depoimentos (nome, texto, usuario_config_id_usuario_config) VALUES ('$nome', '$texto', $id_user)";
+
+    if ($conexao->query($sql)) {
+
+        $res = [
+            'status' => "success",
+            'message' => "Depoimento cadastrado com sucesso!"
+        ];
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+
+    } else {
+
+        $res = [
+            'status' => "erro",
+            'message' => "Erro ao salvar depoimento: " . $conexao->error
+        ];
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+    }
+}
 
 ?>
 
@@ -435,7 +468,7 @@ include_once('../geral/topo.php');
                         <i class="fa-solid fa-display"></i>
                         <p>Informações da Landing Page</p>
                     </div>
-                    <button id="add_depoimentos"><i class="fa-solid fa-gear"></i> Configurar CRM</button>
+                    <button id="add_depoimentos"><i class="fa-solid fa-plus"></i> Adicionar Depoimentos</button>
                 </div>
 
                 <hr>
@@ -782,19 +815,24 @@ include_once('../geral/topo.php');
                     }
                 </style>
 
-                <div style="text-align: left;">
-                    <label style="font-weight: 500; display:block; margin-bottom:5px;">Nome</label>
-                    <input id="swal-input-nome" class="custom-swal-input" placeholder="Nome do cliente">
-                    
-                    <label style="font-weight: 500; display:block; margin-bottom:5px;">Depoimento</label>
-                    <textarea id="swal-input-texto" class="custom-swal-input" rows="3" placeholder="Escreva o depoimento aqui..."></textarea>
-                    
-                    <div style="width: 100%;margin: 0;display: flex;justify-content: center;">
-                        <button type="button" id="btn-salvar-depoimento" class="swal2-confirm swal2-styled" style="width: 45%;margin: 0;background-color: #3085d6">
-                            Salvar Depoimento
-                        </button>
-                    </div>
-                </div>
+                <form action="" id="btn-salvar-depoimento" >
+    <div style="text-align: left;">
+        <label style="font-weight: 500; display:block; margin-bottom:5px;">Nome</label>
+        <input id="swal-input-nome" class="custom-swal-input" placeholder="Nome do cliente" required>
+
+        <label style="font-weight: 500; display:block; margin-bottom:5px;">Depoimento</label>
+        <textarea id="swal-input-texto" class="custom-swal-input" rows="3"
+            placeholder="Escreva o depoimento aqui..." required></textarea >
+
+        <div style="width: 100%;margin: 0;display: flex;justify-content: center;">
+            <button type="submit"  class="swal2-confirm swal2-styled"
+                style="width: 45%;margin: 0;background-color: #3085d6">
+                Salvar Depoimento
+            </button>
+        </div>
+    </div>
+    <input type="hidden" id='acao_depoimento' name="acao" value="cadastrar_depoimento">
+</form>
 
                 <hr style="margin: 25px 0;">
 
@@ -809,10 +847,74 @@ include_once('../geral/topo.php');
                     showCloseButton: true,
 
                     didOpen: () => {
-                        const listaEl = document.getElementById('lista-depoimentos');
-                        const btnSalvar = document.getElementById('btn-salvar-depoimento');
-                        const inputNome = document.getElementById('swal-input-nome');
-                        const inputTexto = document.getElementById('swal-input-texto');
+
+
+                        $('#btn-salvar-depoimento').on('submit', function (e) {
+
+                            const inputNome = $('#swal-input-nome').val();
+                            const inputTexto = $('#swal-input-texto').val();
+                            const inputAcao = $('#acao_depoimento').val()
+                            e.preventDefault()
+
+                            console.log(inputNome)
+                            console.log(inputTexto)
+
+                            if (!inputNome || !inputTexto) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Preencha todos os campos',
+                                    showConfirmButton: true,
+                                });
+                                return;
+                            } else {
+
+                                $.ajax({
+                                    url: './configuracao_modelo.php',
+                                    type: 'POST',
+                                    data: {
+                                        input_nome: inputNome,
+                                        input_texto: inputTexto,
+                                        input_acao: inputAcao
+                                    },
+                                    dataType: 'json',
+                                    success: function (res) {
+                                        if (res.status === 'erro') {
+
+                                            Swal.fire({
+                                                icon: "error",
+                                                title: "Erro",
+                                                text: res.message
+                                            });
+
+                                            $('.btn_cadastrar').attr('disabled', false)
+
+
+                                        } else if (res.status === 'success') {
+                                          
+                                            Swal.fire({
+                                                    title: "Sucesso!",
+                                                    text: res.message,
+                                                    icon: "success"
+                                                })
+                                        }
+
+
+                                    },
+                                    error: function (err) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Erro",
+                                            text: err.message,
+                                        });
+                                        $('.btn_cadastrar').attr('disabled', false)
+                                    }
+                                })
+
+                            }
+
+                        })
+
+                        const listaEl = document.querySelector('#lista-depoimentos');
 
                         // Função de renderizar (mesma lógica anterior)
                         const renderizarLista = () => {
@@ -836,27 +938,25 @@ include_once('../geral/topo.php');
                         renderizarLista();
 
                         // Ação do botão salvar
-                        btnSalvar.addEventListener('click', () => {
-                            if (!inputNome.value || !inputTexto.value) {
-                                // Usamos o mixin de Toast para erro, fica mais elegante que um alert
-                                Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 })
-                                    .fire({ icon: 'warning', title: 'Preencha todos os campos' });
-                                return;
-                            }
+                        // btnSalvar.addEventListener('click', () => {
 
-                            // Adiciona ao array (simulando backend)
-                            depoimentos.unshift({ nome: inputNome.value, texto: inputTexto.value });
 
-                            inputNome.value = '';
-                            inputTexto.value = '';
-                            renderizarLista();
+                        //     // Adiciona ao array (simulando backend)
+                        //     depoimentos.unshift({ nome: inputNome, texto: inputTexto.value });
 
-                            // Foco volta para o nome para facilitar cadastros seguidos
-                            inputNome.focus();
+                        //     inputNome.value = '';
+                        //     inputTexto.value = '';
+                        //     renderizarLista();
 
-                            Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 })
-                                .fire({ icon: 'success', title: 'Salvo com sucesso!' });
-                        });
+                        //     // Foco volta para o nome para facilitar cadastros seguidos
+                        //     inputNome.focus();
+
+                        //     Swal.fire({
+                        //         title: "Sucesso!",
+                        //         text: "Depoimento cadastrado com sucesso!",
+                        //         icon: "success"
+                        //     });
+                        // });
                     }
                 });
             });
