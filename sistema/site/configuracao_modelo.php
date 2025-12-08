@@ -3,6 +3,31 @@
 
 include_once('../../scripts.php');
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_depoimento']) && $_POST['acao'] == 'excluir_depoimento') {
+
+    $id_depoimento = $conexao->escape_string(htmlspecialchars($_POST['id_depoimento']));
+
+    $sql_deleta_depoimento = "DELETE FROM depoimentos WHERE id_depoimento = $id_depoimento AND usuario_config_id_usuario_config = $id_user";
+
+    $resultado = $conexao->query($sql_deleta_depoimento);
+
+    if ($resultado) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Depoimento excluído com sucesso!'
+        ];
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Erro ao excluir depoimento!'
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+
+}
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['telefone_whatsapp']) && !empty($_POST['email']) && !empty($_POST['endereco']) && !empty($_POST['frase_chamada_cta']) && !empty($_POST['frase_chamada_cta_secundaria']) && !empty($_POST['sobre'])) {
@@ -394,7 +419,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['input_nome']) && !em
 
         $res = [
             'status' => "success",
-            'message' => "Depoimento cadastrado com sucesso!"
+            'message' => "Depoimento cadastrado com sucesso!",
+            'id_depoimento' => $conexao->insert_id
         ];
 
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
@@ -816,38 +842,41 @@ include_once('../geral/topo.php');
         $(function () {
 
             // Simulando dados
-            let depoimentos = [
-                // { nome: "Maria Silva", texto: "Ótimo sistema, muito prático!" },
-                // { nome: "João Souza", texto: "Atendimento excelente." }
-            ];
-
-            $.ajax({
-                url: './configuracao_modelo.php',
-                type: 'GET',
-                data: {
-                    acao: 'buscar_depoimentos'
-                },
-                dataType: 'json',
-                success: function (res) {
-                    if (res.status == 'success') {
-                        res.depoimentos.forEach((item) => {
-                            let depoimento = { nome: item.nome, texto: item.texto }
-                            depoimentos.push(depoimento)
-                        })
-                    }
-                }
-            })
-
-            // console.log
-
-
+            let depoimentos = [];
 
             $('#add_depoimentos').on('click', function () {
-                Swal.fire({
-                    title: 'Gerenciar Depoimentos',
-                    width: 600,
-                    // Injetamos o CSS diretamente aqui para garantir que o estilo pegue
-                    html: `
+
+                Swal.showLoading();
+
+                $.ajax({
+                    url: './configuracao_modelo.php',
+                    type: 'GET',
+                    data: {
+                        acao: 'buscar_depoimentos'
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.status == 'success') {
+                            res.depoimentos.forEach((item) => {
+                                let depoimento = { id_depoimento: item.id_depoimento, nome: item.nome, texto: item.texto }
+                                depoimentos.push(depoimento)
+                            })
+                        }
+                    }
+                })
+
+
+
+
+                setTimeout(() => {
+
+                    Swal.close()
+
+                    Swal.fire({
+                        title: 'Gerenciar Depoimentos',
+                        width: 600,
+                        // Injetamos o CSS diretamente aqui para garantir que o estilo pegue
+                        html: `
                 <style>
                     .custom-swal-input {
                         padding: 10px;
@@ -895,110 +924,175 @@ include_once('../geral/topo.php');
                     </div>
                 </div>
             `,
-                    showConfirmButton: false,
-                    showCloseButton: true,
+                        showConfirmButton: false,
+                        showCloseButton: true,
 
-                    didOpen: () => {
+                        didOpen: () => {
 
-                        // Evento de submit
-                        $('#btn-salvar-depoimento').on('submit', function (e) {
-                            e.preventDefault();
 
-                            const inputNome = $('#swal-input-nome').val().trim();
-                            const inputTexto = $('#swal-input-texto').val().trim();
-                            const inputAcao = $('#acao_depoimento').val();
 
-                            if (!inputNome || !inputTexto) {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Preencha todos os campos',
-                                    showConfirmButton: true,
-                                });
-                                return;
-                            }
+                            $(document).on('click', '.container_id_card', function () {
 
-                            $.ajax({
-                                url: './configuracao_modelo.php',
-                                type: 'POST',
-                                data: {
-                                    input_nome: inputNome,
-                                    input_texto: inputTexto,
-                                    input_acao: inputAcao
-                                },
-                                dataType: 'json',
+                                const $btn = $(this); // elemento clicado
+                                const $card = $btn.closest('.card_depoimento'); // card a ser removido
+                                const id_depoimento = $btn.find('.id_card').val();
 
-                                success: function (res) {
-                                    if (res.status === 'erro') {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Erro",
-                                            text: res.message
-                                        });
-                                        return;
+                                $.ajax({
+                                    url: './configuracao_modelo.php',
+                                    type: 'POST',
+                                    data: {
+                                        id_depoimento: id_depoimento,
+                                        acao: 'excluir_depoimento'
+                                    },
+                                    dataType: 'json',
+                                    success: function (res) {
+
+                                        if (res.status == "success") {
+                                           $card.fadeOut('500')
+                                        } else {
+                                            Swal.fire({
+                                                icon: "error",
+                                                title: "Oops...",
+                                                text: res.message
+                                            });
+                                        }
+
                                     }
+                                })
 
-                                    if (res.status === 'success') {
+                            })
 
-                                        const novoDepHtml = `
-                        <div style="padding: 8px;border: 1px solid #e0e0e0;background: #fff;border-radius: 8px;margin-bottom: 10px;">
-                            <strong style="color: #333; display:block;">${inputNome}</strong>
-                            <span style="color: #666; font-size: 0.95em;">${inputTexto}</span>
+                          
+                            // Evento de submit
+                            $('#btn-salvar-depoimento').on('submit', function (e) {
+                                e.preventDefault();
+
+                                const inputNome = $('#swal-input-nome').val().trim();
+                                const inputTexto = $('#swal-input-texto').val().trim();
+                                const inputAcao = $('#acao_depoimento').val();
+
+                                if (!inputNome || !inputTexto) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Preencha todos os campos',
+                                        showConfirmButton: true,
+                                    });
+                                    return;
+                                }
+
+                                $.ajax({
+                                    url: './configuracao_modelo.php',
+                                    type: 'POST',
+                                    data: {
+                                        input_nome: inputNome,
+                                        input_texto: inputTexto,
+                                        input_acao: inputAcao // Cadastrar depoimento
+                                    },
+                                    dataType: 'json',
+
+                                    success: function (res) {
+                                        if (res.status === 'erro') {
+                                            Swal.fire({
+                                                icon: "error",
+                                                title: "Erro",
+                                                text: res.message
+                                            });
+                                            return;
+                                        }
+
+                                        if (res.status === 'success') {
+
+                                            const novoDepHtml = `
+    
+                        <div class="card_depoimento">
+                            <div> 
+                                    <strong style="color: #333; display:block;">${inputNome}</strong>
+                                    <span style="color: #666; font-size: 0.95em;">${inputTexto}</span>
+                            </div>
+                            <div class="container_id_card">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    <input type="hidden" class="id_card" value="${res.id_depoimento}">
+                            </div>
                         </div>
                     `;
 
-                                        // Prepend no HTML da lista
-                                        $('#lista-depoimentos').prepend(novoDepHtml);
+                                            // Prepend no HTML da lista
+                                            $('#lista-depoimentos').prepend(novoDepHtml);
 
-                                        // (Opcional) limpar inputs
-                                        $('#swal-input-nome').val('');
-                                        $('#swal-input-texto').val('');
+                                            // (Opcional) limpar inputs
+                                            $('#swal-input-nome').val('');
+                                            $('#swal-input-texto').val('');
 
+                                        }
+                                    },
+
+                                    error: function (err) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Erro",
+                                            text: err.message,
+                                        });
                                     }
-                                },
+                                });
+                            });
 
-                                error: function (err) {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Erro",
-                                        text: err.message,
-                                    });
+
+
+
+
+                            // --------- RENDERIZA LISTA INICIAL (CARREGADA DO BANCO) ---------
+                            const listaEl = document.querySelector('#lista-depoimentos');
+
+                            const renderizarLista = () => {
+                                if (depoimentos.length === 0) {
+                                    listaEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Nenhum depoimento ainda.</div>';
+                                    return;
                                 }
-                            });
-                        });
 
-
-                        // --------- RENDERIZA LISTA INICIAL (CARREGADA DO BANCO) ---------
-                        const listaEl = document.querySelector('#lista-depoimentos');
-
-                        const renderizarLista = () => {
-                            if (depoimentos.length === 0) {
-                                listaEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Nenhum depoimento ainda.</div>';
-                                return;
-                            }
-
-                            let htmlLista = '';
-                            depoimentos.forEach((dep) => {
-                                htmlLista += `
-                <div style="padding: 8px;border: 1px solid #e0e0e0;background: #fff;border-radius: 8px;margin-bottom: 10px;">
-                    <strong style="color: #333; display:block;">${dep.nome}</strong>
-                    <span style="color: #666; font-size: 0.95em;">${dep.texto}</span>
-                </div>
+                                let htmlLista = '';
+                                depoimentos.forEach((dep) => {
+                                    htmlLista += `
+                <div class="card_depoimento">
+                            <div> 
+                                    <strong style="color: #333; display:block;">${dep.nome}</strong>
+                                    <span style="color: #666; font-size: 0.95em;">${dep.texto}</span>
+                            </div>
+                            <div class="container_id_card">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    <input type="hidden" class="id_card" value="${dep.id_depoimento}">
+                            </div>
+                        </div>
             `;
-                            });
+                                });
 
-                            listaEl.innerHTML = htmlLista;
-                        };
+                                listaEl.innerHTML = htmlLista;
+                            };
 
-                        renderizarLista();
-                    }
+                            renderizarLista();
 
-                });
+                        }
+
+
+
+                    });
+
+                }, 1400)
+
+                setTimeout(() => {
+                    tippy(`.container_id_card`, {
+                        content: "Ao clicar em excluir a ação será irreversível",
+                        placement: "right",
+                    });
+                }, 1500)
+
             });
         });
 
     </script>
     <script>
         $(function () {
+
+
 
             $('#telefone_whatsapp').mask('(99) 99999-9999')
 
@@ -1224,6 +1318,7 @@ include_once('../geral/topo.php');
             });
         })
     </script>
+
 
 </body>
 
