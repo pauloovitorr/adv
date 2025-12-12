@@ -99,6 +99,7 @@
             display: block;
             filter: saturate(1.05) contrast(1.05);
             transition: transform .4s ease;
+            object-fit: contain;
         }
 
         .template-card:hover .card-media img {

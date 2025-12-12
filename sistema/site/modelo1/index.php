@@ -4,6 +4,10 @@ date_default_timezone_set('America/Sao_Paulo');
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
+require_once '../enviar_emails_modelos.php';
+
+
+
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../');
 $dotenv->load();
 
@@ -15,7 +19,32 @@ $data_base = $_ENV['DB_BASE'];
 $conexao = new mysqli($host, $user, $password, $data_base);
 $conexao->set_charset("utf8");
 
-// $config_modelo = '';
+
+$tk = $_GET["modelo"] ?? null ;
+
+
+// if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+// var_dump($_POST);
+// die();
+// }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['phone']) && !empty($_POST['message'])  ) {
+
+    
+
+    $nome_lead = $conexao->escape_string(htmlspecialchars($_POST['name'] ?? ''));
+    $email_lead = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
+    $telefone_lead = $conexao->escape_string(htmlspecialchars($_POST['phone'] ?? ''));
+    $mensagem_lead = $conexao->escape_string(htmlspecialchars($_POST['message'] ?? ''));
+
+    $sql_email_usuario_adm = "SELECT email from usuario_config WHERE tk = '$tk'";
+    $res = $conexao->query($sql_email_usuario_adm);
+
+    var_dump($sql_email_usuario_adm);
+
+    // envia_email('José', 'lead@gmail.com', '1898156165', '$msg', 'paulov.pv25@gmail.com');
+
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
 
@@ -35,8 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
 
         if ($result_modelo->num_rows > 0) {
             $config_modelo = $result_modelo->fetch_assoc();
-            // var_dump($config_modelo);
         }
+
+
+        // Busca os dados referentes aos depoimentos
+        $sql_busca_depoimentos = "SELECT nome,texto FROM depoimentos WHERE usuario_config_id_usuario_config = '$id_user'";
+        $result_depoimentos = $conexao->query($sql_busca_depoimentos);
 
     }
 
@@ -57,6 +90,8 @@ $telefone_limpo = preg_replace('/\D+/', '', $telefone_raw);
 
 
 $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
+
+
 
 ?>
 
@@ -81,20 +116,48 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css" />
     <meta name="theme-color" content="#121212" />
-    <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LegalService",
-    "name": "Dra. Laisla Maria | Advocacia Penal e Civil",
-    "areaServed": "Brasil",
-    "priceRange": "$$$",
-    "image": "https://example.com/hero.jpg",
-    "url": "https://example.com",
-    "telephone": "+55 11 99999-9999",
-    "address": { "@type": "PostalAddress", "addressCountry": "BR" },
-    "sameAs": ["https://wa.me/5511999999999"]
-  }
-  </script>
+
+    <?php
+
+    $schema = [
+        "@context" => "https://schema.org",
+        "@type" => "LegalService",
+
+        "name" => "Dra. Laisla Maria | Advocacia Penal e Civil",
+        "areaServed" => "Brasil",
+        "priceRange" => "$$$",
+
+        "image" => ($config_modelo['banner'] ?? '') ?: "https://example.com/hero.jpg",
+        "url" => "https://example.com",
+
+        "telephone" => ($config_modelo['telefone_whatsapp'] ?? '') ?: "+55 11 99999-9999",
+        "email" => ($config_modelo['email'] ?? '') ?: "email@padrao.com",
+        "description" => ($config_modelo['sobre'] ?? '') ?: "Descrição padrão do escritório.",
+        "serviceType" => ($config_modelo['areas_atuacao'] ?? '') ?: "Trabalhista, Civil, Penal",
+
+        "address" => [
+            "@type" => "PostalAddress",
+            "addressCountry" => "BR",
+            "streetAddress" => ($config_modelo['endereco'] ?? '') ?: ""
+        ],
+
+        "sameAs" => [
+            "https://wa.me/" . (
+                !empty($config_modelo['telefone_whatsapp'])
+                ? preg_replace('/\D/', '', $config_modelo['telefone_whatsapp'])
+                : "5511999999999"
+            )
+        ]
+    ];
+
+    echo '<script type="application/ld+json">'
+        . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+        . '</script>';
+
+    ?>
+
+
+
 
 
     <style>
@@ -239,18 +302,34 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
         <div class="container">
             <h3 class="section-title">Prova Social</h3>
             <div class="testimonial-slider">
-                <div class="testimonial-card active">
-                    <p>"Profissional exemplar, conduziu meu caso com total sigilo e excelência."</p>
-                    <span>— Cliente Satisfeito</span>
-                </div>
-                <div class="testimonial-card">
-                    <p>"Atendimento rápido, humano e muito eficiente. Recomendo fortemente o Dra. Paulo."</p>
-                    <span>— J.C., Empresário</span>
-                </div>
-                <div class="testimonial-card">
-                    <p>"Sua estratégia de defesa foi crucial para o resultado positivo do meu processo."</p>
-                    <span>— M.A., Cliente</span>
-                </div>
+
+                <?php if (isset($result_depoimentos) && $result_depoimentos->num_rows > 0):
+                    while ($depoimento = $result_depoimentos->fetch_assoc()): ?>
+
+                        <div class="testimonial-card active">
+                            <p><?php echo $depoimento['texto'] ?></p>
+                            <span><?php echo $depoimento['nome'] ?></span>
+                        </div>
+
+                    <?php endwhile;
+                else: ?>
+
+
+                    <div class="testimonial-card active">
+                        <p>"Profissional exemplar, conduziu meu caso com total sigilo e excelência."</p>
+                        <span>— Cliente Satisfeito</span>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"Atendimento rápido, humano e muito eficiente. Recomendo fortemente o Dra. Paulo."</p>
+                        <span>— J.C., Empresário</span>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"Sua estratégia de defesa foi crucial para o resultado positivo do meu processo."</p>
+                        <span>— M.A., Cliente</span>
+                    </div>
+
+                <?php endif ?>
+
             </div>
         </div>
     </section>
@@ -281,10 +360,10 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
             <div class="footer-content">
                 <div class="contact-form-wrapper">
                     <h4>Envie sua Mensagem</h4>
-                    <form id="contact-form">
+                    <form action="./index.php" id="contact-form" method="post">
                         <input type="text" name="name" placeholder="Nome" required>
                         <input type="email" name="email" placeholder="E-mail" required>
-                        <input type="tel" name="phone" placeholder="Telefone / WhatsApp" required>
+                        <input type="tel" name="phone" placeholder="Telefone / WhatsApp" id="tell" required>
                         <textarea name="message" placeholder="Mensagem" rows="4" required></textarea>
                         <button type="submit" class="cta-button">Enviar Mensagem</button>
                     </form>
@@ -318,7 +397,7 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
 
             </div>
             <div class="footer-bottom">
-                <p>© 2025 Dra. Laisla Maria – OAB [UF/00000] | Todos os direitos reservados.</p>
+                <p>© Paulo Vitor 2025 | Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
@@ -330,6 +409,12 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
 
     <!-- JS -->
     <script src="script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
+    <script>
+        $('#tell').mask('(99) 99999-9999')
+    </script>
 </body>
 
 

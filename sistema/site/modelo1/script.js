@@ -67,23 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Validação de Formulário de Contato
-    const contactForm = document.getElementById('contact-form');
-    if(contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // // Validação de Formulário de Contato
+    // const contactForm = document.getElementById('contact-form');
+    // if(contactForm) {
+    //     contactForm.addEventListener('submit', function(e) {
+    //         e.preventDefault();
 
-            const name = this.querySelector('input[name="name"]').value;
-            const email = this.querySelector('input[name="email"]').value;
-            const message = this.querySelector('textarea[name="message"]').value;
+    //         const name = this.querySelector('input[name="name"]').value;
+    //         const email = this.querySelector('input[name="email"]').value;
+    //         const message = this.querySelector('textarea[name="message"]').value;
 
-            if(name && email && message) {
-                alert('Mensagem enviada com sucesso! Em breve entraremos em contato.');
-                this.reset();
-            } else {
-                alert('Por favor, preencha todos os campos obrigatórios.');
-            }
-        });
-    }
+    //         if(name && email && message) {
+    //             alert('Mensagem enviada com sucesso! Em breve entraremos em contato.');
+    //             this.reset();
+    //         } else {
+    //             alert('Por favor, preencha todos os campos obrigatórios.');
+    //         }
+    //     });
+    // }
 });
 

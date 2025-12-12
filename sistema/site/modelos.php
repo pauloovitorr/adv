@@ -98,12 +98,12 @@ include_once('../geral/topo.php');
                 <label class="template-card" tabindex="0">
                     <input type="radio" name="template" value="1" class="visually-hidden" />
                     <div class="card-media">
-                        <img src="https://picsum.photos/seed/law1/640/360" alt="Prévia do Modelo 1" loading="lazy" />
+                        <img src="../../img/modelo1.png" alt="Prévia do Modelo 1" loading="lazy" />
                         <span class="badge">Modelo 1</span>
                     </div>
                     <div class="card-body">
                         <h2>Clássico Escritório</h2>
-                        <p>Layout sóbrio com herói amplo e foco em serviços.</p>
+                        <p>Layout moderno foco em serviços.</p>
                     </div>
                 </label>
 
