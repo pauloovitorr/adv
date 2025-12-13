@@ -439,9 +439,13 @@ section {
   .main-nav {
     margin: 1rem 0;
   }
-  .main-nav ul {
+  /* .main-nav ul {
     flex-direction: column;
     text-align: center;
+  } */
+
+  .main-nav {
+    display: none;
   }
   .main-nav li {
     margin: 0.5rem 0;

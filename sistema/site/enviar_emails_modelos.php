@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-function envia_email($nome_cliente, $email_lead, $telefone, $msg, $email_usuario)
+function envia_email($nome_lead, $email_lead, $telefone_lead, $msg_lead, $email_usuario)
 {
     $mail = new PHPMailer(true);
 
@@ -32,7 +32,7 @@ function envia_email($nome_cliente, $email_lead, $telefone, $msg, $email_usuario
         $mail->addAddress($email_usuario, 'Novo Lead');
 
         // --- OPCIONAL: Responder ao lead ---
-        $mail->addReplyTo($email_lead, $nome_cliente);
+        $mail->addReplyTo($email_lead, $nome_lead);
 
         // --- CONFIGURAÇÃO DO E-MAIL ---
         $mail->CharSet = 'UTF-8';
@@ -45,12 +45,12 @@ function envia_email($nome_cliente, $email_lead, $telefone, $msg, $email_usuario
         $mail->Body = "
             <h2>📩 Novo Lead Recebido</h2>
 
-            <p><strong>Nome:</strong> {$nome_cliente}</p>
+            <p><strong>Nome:</strong> {$nome_lead}</p>
             <p><strong>E-mail:</strong> {$email_lead}</p>
-            <p><strong>Telefone/WhatsApp:</strong> {$telefone}</p>
+            <p><strong>Telefone/WhatsApp:</strong> {$telefone_lead}</p>
 
             <p><strong>Mensagem:</strong><br>
-            " . nl2br($msg) . "</p>
+            " . nl2br($msg_lead) . "</p>
 
             <hr>
             <p>Este lead veio do formulário do site.</p>
@@ -60,22 +60,23 @@ function envia_email($nome_cliente, $email_lead, $telefone, $msg, $email_usuario
         $mail->AltBody = "
 Novo Lead no Seu Site
 
-Nome: $nome_cliente
+Nome: $nome_lead
 E-mail: $email_lead
-Telefone: $telefone
+Telefone: $telefone_lead
 Mensagem:
-$msg
+$msg_lead
         ";
 
         // --- ENVIO ---
         if ($mail->send()) {
-            return 'Lead enviado com sucesso!';
+            return true;
         }
 
-        return 'Erro ao enviar.';
+        return false;
 
     } catch (Exception $e) {
-        return "Erro: {$mail->ErrorInfo}";
+        return false;
+        // return "Erro: {$mail->ErrorInfo}";
     }
 }
 

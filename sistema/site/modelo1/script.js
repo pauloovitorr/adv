@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+
+
     // // Validação de Formulário de Contato
     // const contactForm = document.getElementById('contact-form');
     // if(contactForm) {

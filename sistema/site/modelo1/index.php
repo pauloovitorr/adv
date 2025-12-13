@@ -19,31 +19,44 @@ $data_base = $_ENV['DB_BASE'];
 $conexao = new mysqli($host, $user, $password, $data_base);
 $conexao->set_charset("utf8");
 
-
-$tk = $_GET["modelo"] ?? null ;
-
-
 // if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 // var_dump($_POST);
 // die();
 // }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['phone']) && !empty($_POST['message'])  ) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['phone']) && !empty($_POST['message']) && !empty($_POST['modelo'])) {
 
-    
+
 
     $nome_lead = $conexao->escape_string(htmlspecialchars($_POST['name'] ?? ''));
     $email_lead = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
     $telefone_lead = $conexao->escape_string(htmlspecialchars($_POST['phone'] ?? ''));
     $mensagem_lead = $conexao->escape_string(htmlspecialchars($_POST['message'] ?? ''));
+    // Chamo de modelo, mas é o token do usuário
+    $modelo = $conexao->escape_string(htmlspecialchars($_POST['modelo'] ?? ''));
 
-    $sql_email_usuario_adm = "SELECT email from usuario_config WHERE tk = '$tk'";
+    $sql_email_usuario_adm = "SELECT email from usuario_config WHERE tk = '$modelo'";
     $res = $conexao->query($sql_email_usuario_adm);
 
-    var_dump($sql_email_usuario_adm);
+    if ($res && $res->num_rows > 0) {
+        $email_dono_site = $res->fetch_assoc()["email"];
 
-    // envia_email('José', 'lead@gmail.com', '1898156165', '$msg', 'paulov.pv25@gmail.com');
+        if (envia_email($nome_lead, $email_lead, $telefone_lead, $mensagem_lead, $email_dono_site)) {
+            $res = [
+                'status' => 'success',
+                'message' => 'E-mail encaminhado com sucesso!',
+            ];
+        } else {
+            $res = [
+                'status' => 'erro',
+                'message' => 'Falha ao enviar e-mail, tente entrar em contato pelo whatsApp!',
+            ];
+        }
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    }
 
+    $conexao->close();
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
@@ -364,8 +377,9 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
                         <input type="text" name="name" placeholder="Nome" required>
                         <input type="email" name="email" placeholder="E-mail" required>
                         <input type="tel" name="phone" placeholder="Telefone / WhatsApp" id="tell" required>
+                        <input type="hidden" id="modelo" name="modelo" value="<?php echo $_GET['modelo'] ?? '' ?>">
                         <textarea name="message" placeholder="Mensagem" rows="4" required></textarea>
-                        <button type="submit" class="cta-button">Enviar Mensagem</button>
+                        <button type="submit" class="cta-button" id="enviar_msg">Enviar Mensagem</button>
                     </form>
                 </div>
                 <div class="contact-info">
@@ -403,7 +417,7 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
     </footer>
 
     <!-- Botão WhatsApp Flutuante -->
-    <a href="https://wa.me/5500000000000" target="_blank" class="whatsapp-float">
+     <a href="https://wa.me/55<?php echo $telefone_limpo; ?>" target="_blank" class="whatsapp-float"> 
         <i class="fa-brands fa-whatsapp" style="font-size: 32px;color: white;"></i>
     </a>
 
@@ -412,8 +426,56 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $('#tell').mask('(99) 99999-9999')
+
+        $(function () {
+
+            $('#contact-form').on('submit', function (e) {
+                e.preventDefault();
+
+                const $btn = $('#enviar_msg');
+                $btn.prop('disabled', true);
+
+                if (!$(this).find('#modelo').val()) {
+
+                    Swal.fire({
+                        title: "Sucesso!",
+                        text: "Mensagem encaminhada com sucesso (Demonstração)!",
+                        icon: "success"
+                    });
+
+                    $btn.prop('disabled', false);
+                    return;
+                }
+
+                $.ajax({
+                    url: './index.php',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: $(this).serialize(),
+
+                    success: function (res) {
+                        if (res.status === 'success') {
+                            Swal.fire("Sucesso", res.message, "success");
+                        } else {
+                            Swal.fire("Falha", res.message, "error");
+                        }
+                    },
+
+                    error: function () {
+                        Swal.fire("Erro", "Erro ao enviar mensagem", "error");
+                    },
+
+                    complete: function () {
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
+        });
+
+
     </script>
 </body>
 
