@@ -1,3 +1,33 @@
+
+<?php
+    
+    $link_modelo = "";
+
+    // Função que adiciona o link do modelo no "visualizar site"
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+        $sql_dados_modelo_site = "SELECT tk, modelo FROM usuario_config WHERE id_usuario_config = $id_user";
+
+        $resposta = $conexao->query($sql_dados_modelo_site);
+
+        if($resposta && $resposta->num_rows > 0) {
+            $dados = $resposta->fetch_assoc();
+
+            if(isset($dados["tk"]) && !empty($dados["tk"]) && isset($dados["modelo"]) && !empty($dados["modelo"]) ) {
+
+                $num_modelo = $dados["modelo"];
+                $tk         = $dados["tk"];
+
+                if($num_modelo == 1) {
+                    $link_modelo = "../site/modelo1/index.php?modelo=$tk" ;
+                }
+        }
+
+    }
+}
+
+?>
+
+
 <!-- Css Geral e topo das páginas internas como btn add, buscar, filtrar etc... -->
 <link rel="stylesheet" href="../css/geral.css">
 <!-- <link rel="stylesheet" href="../css/topo_funcoes.css"> -->
@@ -368,7 +398,7 @@
         <div class="infos_menu">
 
             <div class="header-right">
-                <span class="header-link">Visualizar site</span>
+                <a href="<?php echo $link_modelo ?? '' ?>" target="_blank" style="text-decoration:none"><span class="header-link">Visualizar site</span></a>
                 <i class="fas fa-bell notification-icon"></i>
             </div>
 

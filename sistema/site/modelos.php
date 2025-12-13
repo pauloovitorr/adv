@@ -109,9 +109,9 @@ include_once('../geral/topo.php');
 
                 <!-- Card 2 -->
                 <label class="template-card" tabindex="0">
-                    <input type="radio" name="template" value="2" class="visually-hidden" />
+                    <!-- <input type="radio" name="template" value="2" class="visually-hidden" /> -->
                     <div class="card-media">
-                        <img src="https://picsum.photos/seed/law2/640/360" alt="Prévia do Modelo 2" loading="lazy" />
+                        <img src="../../img/breve.png" alt="Prévia do Modelo 2" loading="lazy" />
                         <span class="badge">Modelo 2</span>
                     </div>
                     <div class="card-body">
@@ -122,9 +122,9 @@ include_once('../geral/topo.php');
 
                 <!-- Card 3 -->
                 <label class="template-card" tabindex="0">
-                    <input type="radio" name="template" value="3" class="visually-hidden" />
+                    <!-- <input type="radio" name="template" value="3" class="visually-hidden" /> -->
                     <div class="card-media">
-                        <img src="https://picsum.photos/seed/law3/640/360" alt="Prévia do Modelo 3" loading="lazy" />
+                        <img src="../../img/breve.png" alt="Prévia do Modelo 3" loading="lazy" />
                         <span class="badge">Modelo 3</span>
                     </div>
                     <div class="card-body">

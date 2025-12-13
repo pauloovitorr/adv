@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
     $modelo = $conexao->escape_string(htmlspecialchars($_GET['modelo'] ?? ''));
 
 
-    $sql_busca_user = "SELECT * FROM usuario_config WHERE tk = '$modelo'";
+    $sql_busca_user = "SELECT id_usuario_config FROM usuario_config WHERE tk = '$modelo'";
     $result = $conexao->query($sql_busca_user);
 
     if ($result->num_rows > 0) {
