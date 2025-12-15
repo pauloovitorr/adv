@@ -171,9 +171,9 @@
                     <p>SITE</p>
                 </div>
             </a></li>
-        <li id="leads"><a href="">
-                <div class="div_opcao_menu_lat"><img src="../../img/leads.png" alt="">
-                    <p>LEADS</p>
+        <li id="ia"><a href="/adv/sistema/ia/chat.php">
+                <div class="div_opcao_menu_lat"><img src="../../img/ia.png" alt="">
+                    <p>IA</p>
                 </div>
             </a></li>
         <li id="financeiro"><a href="">

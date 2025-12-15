@@ -1,0 +1,72 @@
+.container_chat {
+  margin-top: 24px;
+  height: 600px;
+  display: flex;
+  gap: 12px;
+
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+  /* border-radius: 16px; */
+}
+
+.chat {
+  width: 80%;
+  border: 1px solid rgb(243, 240, 240);
+  background-color: #f4f5f7;
+  border-radius: 16px;
+  box-shadow: rgba(178, 178, 190, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.historico {
+  width: 20%;
+  background-color: #061124;
+  border-radius: 16px;
+}
+
+.topo_conversas {
+  /* border: 1px solid red; */
+  /* margin-top: 12px; */
+  margin-bottom: 12px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 16px;
+  border-bottom: 1px solid #28364e;
+}
+
+.historico h3 {
+  color: rgb(243, 239, 239);
+  font-weight: 500;
+}
+
+.container_conversas {
+  height: 540px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+  overflow-y: auto;
+  /* border: 1px solid red; */
+}
+
+.historico_chat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+}
+
+.historico_chat span {
+  color: rgb(243, 239, 239);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.historico_chat i {
+  color: rgb(243, 239, 239);
+  font-size: 10px;
+  cursor: pointer;
+}
