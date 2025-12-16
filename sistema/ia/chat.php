@@ -42,12 +42,54 @@ include_once('../geral/topo.php');
                         <h3>Conversas</h3>
                     </div>
                     <div class="container_conversas">
-                        <div class="historico_chat"><span>Como Comprar arroz?</span> <i class="fa-regular fa-trash-can"></i></div>
-                    
-                     
+                        <div class="historico_chat"><span>Como Comprar arroz?</span> <i
+                                class="fa-regular fa-trash-can"></i></div>
                     </div>
                 </aside>
-                <div class="chat"></div>
+                <div class="chat">
+                    <div class="topo_conversa_atual">
+                        <h3>Seu Assistente de IA</h3>
+                        <span>LLM • Neural Engine ativo</span>
+                    </div>
+
+                    <div class="msgs">
+
+                        <h2>Comece uma conversa</h2>
+                        <p>
+                            Explique seu caso ou dúvida jurídica e anexe arquivos se precisar.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Barra de input IA -->
+                    <div class="container_input_ia">
+                        <div class="barra-input-ia">
+                            <div class="barra-input-conteudo">
+                                <div class="grupo-icones-esquerda">
+                                    <button type="button" class="botao-icone-input">
+                                        <i class="fa-solid fa-microchip"></i>
+                                    </button>
+                                    <button type="button" class="botao-icone-input">
+                                        <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="botao-icone-input">
+                                        <i class="fa fa-microphone" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+
+                                <input type="text" class="campo-input-ia"
+                                    placeholder="Pergunte qualquer coisa sobre seu processo, prazos ou documentos..." />
+
+                                <button type="button" class="botao-enviar-ia">
+                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
 
         </div>
