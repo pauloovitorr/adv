@@ -54,10 +54,22 @@ include_once('../geral/topo.php');
 
                     <div class="msgs">
 
-                        <h2>Comece uma conversa</h2>
-                        <p>
-                            Explique seu caso ou dúvida jurídica e anexe arquivos se precisar.
-                        </p>
+                        <div class="msg_padrao">
+                            <h2>Comece uma conversa</h2>
+                            <p>
+                                Explique seu caso ou dúvida jurídica e anexe arquivos se precisar.
+                            </p>
+                        </div>
+
+                        <div class="container_msg_usuario">
+                            <div class="msg_usuario"><span>Quero saber como é a lei do Brasil Quero saber como é a lei
+                                    do Brasil Quero saber como é a lei do Brasil</span></div>
+                        </div>
+
+                        <div class="container_msg_ia">
+                            <div class="msg_ia"><span>Quero saber como é a lei do Brasil Quero saber como é a lei do
+                                    Brasil Quero saber como é a lei do Brasil</span></div>
+                        </div>
 
                     </div>
 
@@ -98,8 +110,46 @@ include_once('../geral/topo.php');
 
 
     <script>
+        $(function () {
 
+            function enviarMensagem() {
+                let $input = $('.campo-input-ia');
+                let texto = $input.val().trim();
+
+                if (texto === '') return;
+
+                let $msg = $(`
+                <div class="container_msg_usuario" style="display:none">
+                    <div class="msg_usuario">
+                        <span>${texto}</span>
+                    </div>
+                </div>
+            `);
+
+                $('.msgs').append($msg);
+                $msg.fadeIn(300);
+
+                // limpa o input após enviar
+                $input.val('');
+            }
+
+            // Clique no botão
+            $('.botao-enviar-ia').on('click', function () {
+                enviarMensagem();
+            });
+
+            // Tecla Enter no input
+            $('.campo-input-ia').on('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // evita quebra de linha / submit
+                    enviarMensagem();
+                }
+            });
+
+        });
     </script>
+
+
 </body>
 
 </html>

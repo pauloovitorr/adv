@@ -1,6 +1,6 @@
 .container_chat {
   margin-top: 24px;
-  height: 600px;
+  height: 630px;
   display: flex;
   gap: 12px;
 
@@ -170,12 +170,62 @@
 }
 
 .msgs {
-  height: calc(100% - 155px);
-  /* border: 1px solid red; */
+  height: calc(100% - 156px);
+  padding: 0 20px;
+  overflow-y: auto;
+}
+
+ .msg_padrao{
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  display: none;
+}
+
+.container_msg_usuario{
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  
+}
+
+.container_msg_ia{
+   min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.msg_usuario{
+  max-width: 70%;
+  min-width: 30px;
+  border-radius: 16px;
+  padding: 6px 12px;
+  background-color: white;
+  margin-bottom: 12px;
+  background-image: linear-gradient(135deg, #4e46e5ce, #06b5d4c5);
+  box-shadow: 0 12px 34px rgba(79, 70, 229, .25);;
+}
+
+.msg_ia{
+  max-width: 70%;
+  min-width: 30px;
+  border-radius: 16px;
+  padding: 6px 12px;
+  background-color: white;
+  margin-bottom: 12px
+}
+
+.msg_usuario span,
+.msg_ia span{
+  font-size: 14px;
+} 
+
+.msg_usuario span{
+  color: white;
 }
 
 .msgs h2 {
