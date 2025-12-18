@@ -48,8 +48,16 @@ include_once('../geral/topo.php');
                 </aside>
                 <div class="chat">
                     <div class="topo_conversa_atual">
-                        <h3>Seu Assistente de IA</h3>
-                        <span>LLM • Neural Engine ativo</span>
+                        <div class="infos">
+                            <h3>Seu Assistente de IA</h3>
+                            <span>LLM • Neural Engine ativo</span>
+                        </div>
+
+                        <div class="modelo_llm">
+                            <span class="dot"></span>
+                            ChatGPT 5 — Acesso NET
+                        </div>
+
                     </div>
 
                     <div class="msgs">
@@ -61,15 +69,15 @@ include_once('../geral/topo.php');
                             </p>
                         </div>
 
-                        <div class="container_msg_usuario">
+                        <!-- <div class="container_msg_usuario">
                             <div class="msg_usuario"><span>Quero saber como é a lei do Brasil Quero saber como é a lei
                                     do Brasil Quero saber como é a lei do Brasil</span></div>
-                        </div>
+                        </div> -->
 
-                        <div class="container_msg_ia">
-                            <div class="msg_ia"><span>Quero saber como é a lei do Brasil Quero saber como é a lei do
-                                    Brasil Quero saber como é a lei do Brasil</span></div>
-                        </div>
+                        <!-- <div class="container_msg_ia">
+                            <div class="msg_ia"><span>kkkkkkkkkkkkk</span></div>
+                            <span class="modelo_resposta"> Perplexity</span>
+                        </div> -->
 
                     </div>
 
@@ -79,9 +87,35 @@ include_once('../geral/topo.php');
                         <div class="barra-input-ia">
                             <div class="barra-input-conteudo">
                                 <div class="grupo-icones-esquerda">
-                                    <button type="button" class="botao-icone-input">
-                                        <i class="fa-solid fa-microchip"></i>
-                                    </button>
+                                    <div class="llm-selector">
+                                        <button type="button" class="botao-icone-input btn-llm">
+                                            <i class="fa-solid fa-microchip"></i>
+                                        </button>
+
+                                        <div class="llm-dropdown">
+                                            
+                                            <div class="llm-item active" data-model="GPT-5.2">
+                                                GPT-5.2 
+                                            </div>
+
+                                            <div class="llm-item" data-model="Gemini 3 Pro">
+                                                Gemini 3 Pro
+                                            </div>
+
+                                            <div class="llm-item" data-model="Grok 4.1">
+                                                Grok 4.1
+                                            </div>
+
+                                            <div class="llm-item" data-model="Kimi K2 Thinking">
+                                                Kimi K2 Thinking
+                                            </div>
+
+                                            <div class="llm-footer">
+                                                Modelos Para Testes
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <button type="button" class="botao-icone-input">
                                         <i class="fa fa-paperclip" aria-hidden="true"></i>
                                     </button>
@@ -118,6 +152,8 @@ include_once('../geral/topo.php');
 
                 if (texto === '') return;
 
+                $('.msg_padrao').hide()
+
                 let $msg = $(`
                 <div class="container_msg_usuario" style="display:none">
                     <div class="msg_usuario">
@@ -145,6 +181,38 @@ include_once('../geral/topo.php');
                     enviarMensagem();
                 }
             });
+
+
+
+
+
+
+            // Toggle dropdown
+            $('.btn-llm').on('click', function (e) {
+                e.stopPropagation();
+                $('.llm-dropdown').fadeToggle(150);
+            });
+
+            // Selecionar modelo
+            $('.llm-item').on('click', function () {
+                $('.llm-item').removeClass('active');
+                $(this).addClass('active');
+
+                let modelo = $(this).data('model');
+                console.log('Modelo selecionado:', modelo);
+                $('.modelo_llm').html(`<span class="dot"></span> ${modelo}`);
+
+
+                $('.llm-dropdown').fadeOut(150);
+            });
+
+            // Fechar ao clicar fora
+            $(document).on('click', function () {
+                $('.llm-dropdown').fadeOut(150);
+            });
+
+            
+
 
         });
     </script>
