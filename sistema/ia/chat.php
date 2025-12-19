@@ -93,9 +93,9 @@ include_once('../geral/topo.php');
                                         </button>
 
                                         <div class="llm-dropdown">
-                                            
+
                                             <div class="llm-item active" data-model="GPT-5.2">
-                                                GPT-5.2 
+                                                GPT-5.2
                                             </div>
 
                                             <div class="llm-item" data-model="Gemini 3 Pro">
@@ -119,13 +119,15 @@ include_once('../geral/topo.php');
                                     <button type="button" class="botao-icone-input">
                                         <i class="fa fa-paperclip" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="botao-icone-input">
+                                    <button type="button" class="botao-icone-input" id="microfone">
                                         <i class="fa fa-microphone" aria-hidden="true"></i>
+                                        <i class="fa-solid fa-stop" style="display:none"></i>
                                     </button>
                                 </div>
 
-                                <input type="text" class="campo-input-ia"
-                                    placeholder="Pergunte qualquer coisa sobre seu processo, prazos ou documentos..." />
+                                <textarea class="campo-input-ia" rol="1"
+                                    placeholder="Pergunte qualquer coisa sobre seu processo, prazos ou documentos..."></textarea>
+
 
                                 <button type="button" class="botao-enviar-ia">
                                     <i class="fa fa-arrow-up" aria-hidden="true"></i>
@@ -211,12 +213,137 @@ include_once('../geral/topo.php');
                 $('.llm-dropdown').fadeOut(150);
             });
 
-            
+
+
+
+            let recognition = null;
+            let textoFinal = '';
+
+            const textarea = document.querySelector('.campo-input-ia');
+
+            function manterFocoNoFinal(el) {
+                el.focus();
+                el.scrollTop = el.scrollHeight;
+                el.setSelectionRange(el.value.length, el.value.length);
+            }
+
+            $('#microfone').on('click', function () {
+
+                $(this).toggleClass('transcrevendo_audio');
+
+                const mic = $(this).find('.fa-microphone');
+                const stop = $(this).find('.fa-stop');
+
+                if (mic.is(':visible')) {
+                    mic.fadeOut(50);
+                    stop.fadeIn(300);
+
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (!SpeechRecognition) {
+                        alert("Seu navegador não suporta Web Speech API");
+                        return;
+                    }
+
+                    recognition = new SpeechRecognition();
+                    recognition.lang = "pt-BR";
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+
+                    recognition.onresult = (event) => {
+                        let textoInterim = '';
+
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const resultado = event.results[i][0].transcript;
+
+                            if (event.results[i].isFinal) {
+                                textoFinal += resultado + ' ';
+                            } else {
+                                textoInterim += resultado;
+                            }
+                        }
+
+                        textarea.value = textoFinal + textoInterim;
+                        manterFocoNoFinal(textarea);
+                    };
+
+                    $('.botao-enviar-ia')
+                        .prop('disabled', true)
+                        .addClass('desabilitado');
+
+
+                    recognition.start();
+
+                } else {
+                    stop.fadeOut(50);
+                    mic.fadeIn(300);
+
+                    $('.botao-enviar-ia')
+                        .prop('disabled', false)
+                        .removeClass('desabilitado');
+
+
+                    if (recognition) {
+                        recognition.stop();
+                        recognition = null;
+                    }
+                }
+            });
+
+
+
+
 
 
         });
     </script>
 
+
+    <!-- <script>
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Seu navegador não suporta Web Speech API");
+    } else {
+      const recognition = new SpeechRecognition();
+
+      recognition.lang = "pt-BR";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      const output = document.getElementById("output");
+
+      recognition.onstart = () => {
+        console.log("🎙️ Escutando...");
+      };
+
+      recognition.onerror = event => {
+        console.error("Erro:", event.error);
+      };
+
+      recognition.onend = () => {
+        console.log("🛑 Parou");
+      };
+
+      recognition.onresult = event => {
+        let texto = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          texto += event.results[i][0].transcript;
+        }
+
+        output.innerText = texto;
+      };
+
+      document.getElementById("start").onclick = () => {
+        recognition.start();
+      };
+
+      document.getElementById("stop").onclick = () => {
+        recognition.stop();
+      };
+    }
+  </script> -->
 
 </body>
 

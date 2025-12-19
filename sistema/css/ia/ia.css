@@ -399,17 +399,35 @@
   transform: translateY(-1px);
 }
 
+.transcrevendo_audio {
+  box-shadow: 0 8px 22px rgba(37, 197, 255, 0.7);
+  background-color: red !important;
+  color: white !important;
+}
+
 .campo-input-ia {
   flex: 1;
-  border: none;
+  border: 1px solid rgb(235, 229, 229);
+  padding: 6px;
+  border-radius: 8px;
   outline: none;
-  font-size: 14px;
+  font-size: 12px;
   color: #374151;
   background: transparent;
+
+  /* NOVO */
+  resize: none;              /* impede arrastar */
+  overflow-y: auto;          /* scroll vertical */
+           /* altura inicial */
+  max-height: 120px;         /* limite de crescimento */
+  white-space: pre-wrap;     /* quebra linha */
+  word-break: break-word;    /* quebra palavras longas */
 }
+
 
 .campo-input-ia::placeholder {
   color: #9ca3af;
+  font-size: 12px;
 }
 
 .botao-enviar-ia {
@@ -426,6 +444,12 @@
   box-shadow: 0 8px 22px rgba(37, 197, 255, 0.7);
   transition: background 0.15s ease-out, transform 0.15s ease-out,
     box-shadow 0.15s ease-out;
+}
+
+.botao-enviar-ia.desabilitado {
+    background-color: rgb(107, 114, 128);
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .botao-enviar-ia i {
