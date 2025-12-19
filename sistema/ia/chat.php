@@ -116,9 +116,13 @@ include_once('../geral/topo.php');
                                         </div>
                                     </div>
 
-                                    <button type="button" class="botao-icone-input">
+                                    <label for="arquivos" class="botao-icone-input">
                                         <i class="fa fa-paperclip" aria-hidden="true"></i>
-                                    </button>
+                                    </label>
+
+                                    <input type="file" id="arquivos" hidden>
+
+
                                     <button type="button" class="botao-icone-input" id="microfone">
                                         <i class="fa fa-microphone" aria-hidden="true"></i>
                                         <i class="fa-solid fa-stop" style="display:none"></i>
