@@ -62,7 +62,7 @@ include_once('../geral/topo.php');
 
                         <div class="modelo_llm">
                             <span class="dot"></span>
-                            ChatGPT 5 — Acesso NET
+                            Llama-3.3-70b
                         </div>
 
                     </div>
@@ -105,20 +105,29 @@ include_once('../geral/topo.php');
 
                                         <div class="llm-dropdown">
 
-                                            <div class="llm-item active" data-model="GPT-5.2">
-                                                GPT-5.2
+                                            <div class="llm-item active" data-model="Llama-3.3-70b">
+                                                Llama-3.3-70b
                                             </div>
 
-                                            <div class="llm-item" data-model="Gemini 3 Pro">
-                                                Gemini 3 Pro
+                                            <div class="llm-item" data-model="Kimi K2">
+                                                kimi-k2-instruct-0905
                                             </div>
 
-                                            <div class="llm-item" data-model="Grok 4.1">
-                                                Grok 4.1
+                                            <div class="llm-item" data-model="Gpt-oss-120b">
+                                                Gpt-oss-120b (Reasoning)
                                             </div>
 
-                                            <div class="llm-item" data-model="Kimi K2 Thinking">
-                                                Kimi K2 Thinking
+                                            <div class="llm-item" data-model="GPT-5-nano">
+                                                Openai/GPT-5-nano (Acesso Web)
+                                            </div>
+
+
+                                            <div class="llm-item" data-model="Compound-mini">
+                                                Groq/Compound-mini (Acesso Web)
+                                            </div>
+
+                                            <div class="llm-item" data-model="Sonar">
+                                                Perplexity/Sonar (Pesquisa jurídica)
                                             </div>
 
                                             <div class="llm-footer">
@@ -180,16 +189,26 @@ include_once('../geral/topo.php');
                         <span>${texto}</span>
                     </div>
                 </div>
+            `);
 
-                <section class="dots-container">
+                let animacao = `
+                        <section class="dots-container">
                             <div class="dott"></div>
                             <div class="dott"></div>
                             <div class="dott"></div>
                         </section>
-            `);
+            `
 
                 $('.msgs').append($msg);
                 $msg.fadeIn(300);
+
+                setTimeout(() => {
+                    $('.msgs').append(animacao);
+                    $msg.fadeIn(300);
+                }, 900)
+
+                // Desabilita botão de enviar enquanto IA responde
+                $('.botao-enviar-ia').prop('disabled', true)
 
                 // limpa o input após enviar
                 $input.val('');
@@ -298,7 +317,7 @@ include_once('../geral/topo.php');
 
                     $('.botao-enviar-ia')
                         .prop('disabled', true)
-                        .addClass('desabilitado');
+                    // .addClass('desabilitado');
 
 
                     recognition.start();
@@ -309,7 +328,7 @@ include_once('../geral/topo.php');
 
                     $('.botao-enviar-ia')
                         .prop('disabled', false)
-                        .removeClass('desabilitado');
+                    // .removeClass('desabilitado');
 
 
                     if (recognition) {
