@@ -76,8 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
             exit;
         }
 
-
-
     }
 
     if ($texto_modelo && $texto_modelo !== '') {
@@ -405,6 +403,8 @@ include_once('../geral/topo.php');
                     msg.fadeIn(300);
                 }, 600)
 
+                rolarParaFinalChat();
+
                 // Desabilita botão de enviar enquanto IA responde
                 $('.botao-enviar-ia').prop('disabled', true)
 
@@ -426,6 +426,7 @@ include_once('../geral/topo.php');
 
                         if (res.status == 'success') {
                             iaMensagem(res.resposta_modelo, res.modelo)
+                            rolarParaFinalChat();
                         }
                         else {
                             $('.botao-enviar-ia').prop('disabled', false);
@@ -469,6 +470,8 @@ include_once('../geral/topo.php');
                 setTimeout(() => {
                     $('.botao-enviar-ia').prop('disabled', false);
                 }, tempoEstimado);
+
+
             }
 
             function typeWriter(element, text, speed = 40) {
@@ -496,13 +499,19 @@ include_once('../geral/topo.php');
 
             // Tecla Enter no input
             $('.campo-input-ia').on('keydown', function (e) {
-                if (e.key === 'Enter') {
+                // Verifica se a tecla é Enter E se o Shift NÃO está pressionado
+                if (e.key === 'Enter' && !e.shiftKey) {
+
+                    // Impede a quebra de linha padrão do Enter simples
                     e.preventDefault();
-                    // só envia se o botão estiver ATIVO
+
+                    // Só envia se o botão estiver ATIVO
                     if (!$('.botao-enviar-ia').prop('disabled')) {
                         enviarMensagem();
                     }
                 }
+                // Se for Shift + Enter, o código acima é ignorado 
+                // e o textarea pula linha normalmente.
             });
 
             // Toggle dropdown
@@ -533,7 +542,7 @@ include_once('../geral/topo.php');
 
             // Transcrição áudio 
             let recognition = null;
-            let textoFinal = '';
+
 
             const textarea = document.querySelector('.campo-input-ia');
 
@@ -551,6 +560,7 @@ include_once('../geral/topo.php');
                 const stop = $(this).find('.fa-stop');
 
                 if (mic.is(':visible')) {
+                    let textoFinal = '';
                     mic.fadeOut(50);
                     stop.fadeIn(300);
 
@@ -620,57 +630,20 @@ include_once('../geral/topo.php');
             })
 
 
+            function rolarParaFinalChat() {
+                const containerMsgs = $('.msgs');
+                if (containerMsgs.length > 0) {
+                    containerMsgs.animate({
+                        scrollTop: containerMsgs.get(0).scrollHeight
+                    }, 300); // 300ms para a animação
+                }
+            }
 
         });
     </script>
 
 
-    <!-- <script>
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      alert("Seu navegador não suporta Web Speech API");
-    } else {
-      const recognition = new SpeechRecognition();
-
-      recognition.lang = "pt-BR";
-      recognition.continuous = true;
-      recognition.interimResults = true;
-
-      const output = document.getElementById("output");
-
-      recognition.onstart = () => {
-        console.log("🎙️ Escutando...");
-      };
-
-      recognition.onerror = event => {
-        console.error("Erro:", event.error);
-      };
-
-      recognition.onend = () => {
-        console.log("🛑 Parou");
-      };
-
-      recognition.onresult = event => {
-        let texto = "";
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          texto += event.results[i][0].transcript;
-        }
-
-        output.innerText = texto;
-      };
-
-      document.getElementById("start").onclick = () => {
-        recognition.start();
-      };
-
-      document.getElementById("stop").onclick = () => {
-        recognition.stop();
-      };
-    }
-  </script> -->
 
 
 </body>
