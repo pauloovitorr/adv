@@ -38,13 +38,20 @@ include_once('../geral/topo.php');
 
             <div class="container_chat">
                 <aside class="historico">
+
                     <div class="topo_conversas">
                         <h3>Conversas</h3>
                     </div>
+
                     <div class="container_conversas">
-                        <div class="historico_chat"><span>Como Comprar arroz?</span> <i
-                                class="fa-regular fa-trash-can"></i></div>
+                        <div class="historico_chat">
+                            <div class="titulo_conversa">
+                                <span>Como Comprar arroz?</span>
+                            </div>
+                            <i class="fa-regular fa-trash-can dell_conversa"></i>
+                        </div>
                     </div>
+
                 </aside>
                 <div class="chat">
                     <div class="topo_conversa_atual">
@@ -61,6 +68,8 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="msgs">
+                        <!-- Animação de loading  -->
+
 
                         <div class="msg_padrao">
                             <h2>Comece uma conversa</h2>
@@ -78,6 +87,8 @@ include_once('../geral/topo.php');
                             <div class="msg_ia"><span>kkkkkkkkkkkkk</span></div>
                             <span class="modelo_resposta"> Perplexity</span>
                         </div> -->
+
+
 
                     </div>
 
@@ -116,11 +127,14 @@ include_once('../geral/topo.php');
                                         </div>
                                     </div>
 
-                                    <label for="arquivos" class="botao-icone-input">
+                                    <label for="arquivos" class="botao-icone-input" id="container_arquivos">
+                                        <span id="qtd_arquivos"></span>
                                         <i class="fa fa-paperclip" aria-hidden="true"></i>
                                     </label>
 
-                                    <input type="file" id="arquivos" hidden>
+                                    <input type="file" id="arquivos" multiple hidden
+                                        accept=".txt,.pdf,.doc,.docx,.xls,.xlsx">
+
 
 
                                     <button type="button" class="botao-icone-input" id="microfone">
@@ -166,6 +180,12 @@ include_once('../geral/topo.php');
                         <span>${texto}</span>
                     </div>
                 </div>
+
+                <section class="dots-container">
+                            <div class="dott"></div>
+                            <div class="dott"></div>
+                            <div class="dott"></div>
+                        </section>
             `);
 
                 $('.msgs').append($msg);
@@ -219,7 +239,7 @@ include_once('../geral/topo.php');
 
 
 
-
+            // Transcrição áudio 
             let recognition = null;
             let textoFinal = '';
 
@@ -244,7 +264,13 @@ include_once('../geral/topo.php');
 
                     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                     if (!SpeechRecognition) {
-                        alert("Seu navegador não suporta Web Speech API");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Navegador incompatível',
+                            text: 'Seu navegador não suporta essa funcionalidade!',
+                            confirmButtonText: 'Entendi'
+                        });
+
                         return;
                     }
 
@@ -295,6 +321,11 @@ include_once('../geral/topo.php');
 
 
 
+            $('#arquivos').on('change', function () {
+                $('#qtd_arquivos').text(this.files.length)
+                $('#qtd_arquivos').fadeIn()
+                $('#qtd_arquivos').css({ 'display': 'flex' })
+            })
 
 
 
@@ -348,6 +379,21 @@ include_once('../geral/topo.php');
       };
     }
   </script> -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeSwitcher = document.getElementById('theme-switcher');
+            const body = document.body;
+
+            themeSwitcher.addEventListener('change', function () {
+                if (this.checked) {
+                    body.classList.add('light-theme');
+                } else {
+                    body.classList.remove('light-theme');
+                }
+            });
+        });
+    </script>
 
 </body>
 
