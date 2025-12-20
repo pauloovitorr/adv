@@ -14,6 +14,11 @@ $user = $_ENV['DB_USER'];
 $password = $_ENV['DB_PASS'];
 $data_base = $_ENV['DB_BASE'];
 
+
+$api_groq = $_ENV['API_KEY_GROQ'];
+$api_openai = $_ENV['API_KEY_OPENAI'];
+$api_perplexity = $_ENV['API_KEY_PERPLEXITY'];
+
 $conexao = new mysqli($host, $user, $password, $data_base);
 $conexao->set_charset("utf8");
 

@@ -226,6 +226,7 @@
   height: calc(100% - 156px);
   padding: 0 20px;
   overflow-y: auto;
+  padding-bottom: 20px;
 }
 
 .msg_padrao {
