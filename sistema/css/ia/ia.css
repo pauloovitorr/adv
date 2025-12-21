@@ -272,9 +272,15 @@
   margin-bottom: 6px;
 }
 
+.container_infos_ia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .modelo_resposta {
   font-size: 8px;
-  margin-bottom: 12px;
 }
 
 .msg_usuario span,
@@ -284,6 +290,11 @@
 
 .msg_usuario span {
   color: white;
+}
+
+.fonts {
+  font-size: 12px;
+  color: #4b5563;
 }
 
 .msgs h2 {
@@ -501,30 +512,7 @@
   box-shadow: 0 4px 12px rgba(37, 197, 255, 0.5);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.dots-container{
+.dots-container {
   display: flex;
 }
 
@@ -573,5 +561,3 @@
     box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
   }
 }
-
-

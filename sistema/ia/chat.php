@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
         // Se for Perplexity, anexa metadados 
         if ($provedor === 'perplexity') {
             if (!empty($retorno['search_results'])) {
-                $res['search_results'] = $retorno['search_results']; 
+                $res['search_results'] = $retorno['search_results'];
             }
             if (!empty($retorno['videos'])) {
                 $res['videos'] = $retorno['videos'];
@@ -510,7 +510,10 @@ include_once('../geral/topo.php');
 
                         <!-- <div class="container_msg_ia">
                             <div class="msg_ia"><span>kkkkkkkkkkkkk</span></div>
-                            <span class="modelo_resposta"> Perplexity</span>
+                            <div class="container_infos_ia">
+                                <span class="modelo_resposta"> Perplexity</span>
+                                <span class="fonts"></span>
+                            </div>
                         </div> -->
 
 
@@ -673,6 +676,10 @@ include_once('../geral/topo.php');
                             error: error,
                             response: xhr.responseText
                         });
+
+                        $('.dots-container').remove()
+                        iaMensagem('Erro: Recarregue a página e tente utilizar outro modelo', 'Sistema')
+                        rolarParaFinalChat();
                     }
                 })
 
@@ -687,8 +694,12 @@ include_once('../geral/topo.php');
                         <div class="msg_ia">
                             <span class="texto_ia"></span>
                         </div>
-                        <span class="modelo_resposta">${modelo}</span>
+                         <div class="container_infos_ia">
+                                <span class="modelo_resposta">${modelo}</span>
+                                <span class="fonts"></span>
+                            </div>
                     </div>
+
                 `);
 
                 $('.msgs').append(msg);
