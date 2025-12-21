@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
     $provedor = $conexao->escape_string(htmlspecialchars($_POST['provedor']));
     $input = $conexao->escape_string(htmlspecialchars($_POST['input']));
     $texto_modelo = '';
-
+    $res = '';
 
 
     if ($provedor == 'groq') {
@@ -101,6 +101,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
             'resposta_modelo' => $texto_modelo,
             'modelo' => $modelo
         ];
+
+        // Se for Perplexity, anexa metadados 
+        if ($provedor === 'perplexity') {
+            if (!empty($retorno['search_results'])) {
+                $res['search_results'] = $retorno['search_results']; 
+            }
+            if (!empty($retorno['videos'])) {
+                $res['videos'] = $retorno['videos'];
+            }
+        }
     } else {
         $res = [
             'status' => 'erro',
@@ -295,8 +305,126 @@ function openai_chat($input)
 
 }
 
-function perplexity_chat($input){
-    
+function perplexity_chat($input)
+{
+    global $api_perplexity;
+    global $content_ia;
+
+    $url = "https://api.perplexity.ai/chat/completions";
+
+    $headers = [
+        "Content-Type: application/json",
+        "Authorization: Bearer {$api_perplexity}",
+    ];
+
+    $body = [
+        "model" => "sonar",
+        "messages" => [
+            [
+                "role" => "system",
+                "content" => $content_ia
+            ],
+            [
+                "role" => "user",
+                "content" => $input
+            ],
+        ],
+
+        "search_mode" => "academic",                 // "web" ou "academic" 
+        "reasoning_effort" => "medium",
+        "max_tokens" => 1200,
+        "temperature" => 0.4,
+        "top_p" => 0.9,
+        "language_preference" => "Português - Brasil", // suportado (sonar/sonar-pro) 
+        "enable_search_classifier" => true,
+        // web search options
+        "web_search_options" => [
+            "search_context_size" => "medium",
+            "user_location" => [
+                "country" => "BR"
+            ]
+        ],
+
+        // mídia (vídeos/imagens)
+        "media_response" => [
+            "overrides" => [
+                "return_videos" => false,
+                "return_images" => false
+            ]
+        ],
+
+        // "return_related_questions" => false,
+        // "return_images" => false,
+    ];
+
+
+    $ch = curl_init($url);
+
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS => json_encode($body, JSON_UNESCAPED_UNICODE),
+        CURLOPT_TIMEOUT => 100
+    ]);
+
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        return [
+            'status' => 'erro',
+            'message' => 'Erro de conexão com a API Perplexity',
+            'details' => $error
+        ];
+    }
+
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $resposta = json_decode($response, true);
+
+    // var_dump($resposta);
+
+    if ($httpCode === 429) {
+        return [
+            'status' => 'erro',
+            'message' => 'Limite da API Perplexity atingido. Tente novamente em alguns instantes.',
+        ];
+    }
+
+    if ($httpCode >= 400) {
+        return [
+            'status' => 'erro',
+            'message' => $resposta['error']['message'] ?? 'Erro na API Perplexity',
+        ];
+    }
+
+    if (!isset($resposta['choices'][0]['message']['content'])) {
+        return [
+            'status' => 'erro',
+            'message' => 'Resposta inválida da API Perplexity',
+        ];
+    }
+
+    // texto principal
+    $content = $resposta['choices'][0]['message']['content'];
+
+    // vídeos (quando return_videos=true, pode vir em $resposta['videos']) 
+    $videos = $resposta['videos'] ?? [];
+
+    // fontes (pode vir em search_results) [web:9]
+    $search_results = $resposta['search_results'] ?? [];
+
+    return [
+        'status' => 'success',
+        'content' => $content,
+        'videos' => $videos,
+        'search_results' => $search_results,
+    ];
+
+
 }
 
 ?>
