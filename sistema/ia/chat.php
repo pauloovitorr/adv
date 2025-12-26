@@ -330,7 +330,7 @@ function perplexity_chat($input)
             ],
         ],
 
-        "search_mode" => "academic",                 // "web" ou "academic" 
+        "search_mode" => "web",                 // "web" ou "academic" 
         "reasoning_effort" => "medium",
         "max_tokens" => 1200,
         "temperature" => 0.4,
@@ -659,7 +659,13 @@ include_once('../geral/topo.php');
                         $('.dots-container').remove()
 
                         if (res.status == 'success') {
-                            iaMensagem(res.resposta_modelo, res.modelo)
+
+                            let fontes = [];
+                            if (res.search_results) {
+                                fontes = res.search_results
+                            }
+
+                            iaMensagem(res.resposta_modelo, res.modelo, fontes)
                             rolarParaFinalChat();
                         }
                         else {
@@ -687,40 +693,58 @@ include_once('../geral/topo.php');
             }
 
 
-            function iaMensagem(texto, modelo) {
+            function iaMensagem(texto, modelo, fontes = []) {
 
                 let msg = $(`
-                    <div class="container_msg_ia" style="display:none">
-                        <div class="msg_ia">
-                            <span class="texto_ia"></span>
-                        </div>
-                         <div class="container_infos_ia">
-                                <span class="modelo_resposta">${modelo}</span>
-                                <span class="fonts"></span>
-                            </div>
-                    </div>
-
-                `);
+        <div class="container_msg_ia" style="display:none">
+            <div class="msg_ia">
+                <span class="texto_ia"></span>
+            </div>
+            <div class="container_infos_ia">
+                <span class="modelo_resposta">${modelo}</span>
+                <span class="fonts"></span>
+            </div>
+        </div>
+    `);
 
                 $('.msgs').append(msg);
                 msg.fadeIn(300);
 
                 let spanTexto = msg.find('.texto_ia');
+                let spanFontes = msg.find('.fonts');
 
+                // efeito máquina de escrever
+                typeWriter(spanTexto, texto);
 
-                typeWriter(spanTexto, texto);      // palavra por palavra
+                // monta as fontes com links
+                if (fontes.length > 0) {
+                    fontes.forEach((fonte, index) => {
+                        let link = $(`
+                <a href="${fonte.url}" 
+                   target="_blank" 
+                   title="${fonte.title}">
+                   [${index + 1}]
+                </a>
+            `);
 
-                // Reabilita botão ao final (tempo estimado)
+                        spanFontes.append(link);
+                    });
+                }
+
+                // Reabilita botão ao final
                 let tempoEstimado = texto.split(' ').length * 35;
                 setTimeout(() => {
                     $('.botao-enviar-ia').prop('disabled', false);
                 }, tempoEstimado);
-
-
             }
+
+
 
             function typeWriter(element, text, speed = 40) {
                 let words = text.split(' ');
+
+                console.log(words);
+
                 let index = 0;
 
                 function write() {
@@ -782,7 +806,6 @@ include_once('../geral/topo.php');
             $(document).on('click', function () {
                 $('.llm-dropdown').fadeOut(150);
             });
-
 
 
             // Transcrição áudio 
