@@ -202,10 +202,9 @@ CREATE TABLE mensagem (
     id_mensagem INT NOT NULL AUTO_INCREMENT,
     conteudo TEXT NOT NULL,
     dt_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    remetente VARCHAR(50) NOT NULL,
     conversa_id_conversa INT NOT NULL,
-    usuario_config_id_usuario_config INT NOT NULL,
     
     CONSTRAINT pk_mensagem PRIMARY KEY (id_mensagem),
-    CONSTRAINT fk_mensagem_conversa FOREIGN KEY (conversa_id_conversa) REFERENCES conversa(id_conversa),
-    CONSTRAINT fk_mensagem_usuario FOREIGN KEY (usuario_config_id_usuario_config) REFERENCES usuario_config(id_usuario_config)
+    CONSTRAINT fk_mensagem_conversa FOREIGN KEY (conversa_id_conversa) REFERENCES conversa(id_conversa)
 );

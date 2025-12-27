@@ -42,6 +42,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
     $modelo = $conexao->escape_string(htmlspecialchars($_POST['modelo']));
     $provedor = $conexao->escape_string(htmlspecialchars($_POST['provedor']));
     $input = $conexao->escape_string(htmlspecialchars($_POST['input']));
+
+    if (isset($_POST['id_conversa']) && $_POST['id_conversa'] != '') {
+        $id_conversa = $conexao->escape_string(htmlspecialchars($_POST['id_conversa']));
+    } else {
+        $sql_cadastra_conversa = "INSERT INTO conversa (usuario_config_id_usuario_config) VALUES ($id_user)";
+        $conexao->query($sql_cadastra_conversa);
+        $id_conversa = $conexao->insert_id;
+    }
+
+
+    // Com o ID da conversa, eu cadastro a mensagem do usuário
+    $sql_cadastra_mensagem_user = "INSERT INTO mensagem (conteudo, remetente, conversa_id_conversa ) VALUES ('$input','usuario',$id_conversa)";
+    $retorno_cadastro_user = $conexao->query($sql_cadastra_mensagem_user);
+
+    if (!$retorno_cadastro_user) {
+        echo json_encode([
+            'status' => 'erro',
+            'message' => 'Erro ao cadastrar mensagem do usuário.'
+        ], JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+    }
+
+
+
+
+
+
+
     $texto_modelo = '';
     $res = '';
 
@@ -73,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
                 'status' => 'erro',
                 'message' => $retorno['message']
             ], JSON_UNESCAPED_UNICODE);
+            $conexao->close();
             exit;
         }
 
@@ -96,10 +126,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
 
     // Verifico se teve resposta de algum modelo
     if ($texto_modelo && $texto_modelo !== '') {
+
+        $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, conversa_id_conversa ) VALUES ('$texto_modelo','ia',$id_conversa)";
+        $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
+
+        if (!$retorno_cadastro_ia) {
+            echo json_encode([
+                'status' => 'erro',
+                'message' => 'Erro ao cadastrar mensagem da IA.'
+            ], JSON_UNESCAPED_UNICODE);
+            $conexao->close();
+            exit;
+        }
+
+
+
         $res = [
             'status' => 'success',
             'resposta_modelo' => $texto_modelo,
-            'modelo' => $modelo
+            'modelo' => $modelo,
+            'id_conversa' => $id_conversa
         ];
 
         // Se for Perplexity, anexa metadados 
@@ -119,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
     }
 
     echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
     exit;
 
 }
@@ -492,7 +539,7 @@ include_once('../geral/topo.php');
 
                     </div>
 
-                    <div class="msgs">
+                    <div class="msgs" data-conversa="">
                         <!-- Animação de loading  -->
 
 
@@ -611,6 +658,12 @@ include_once('../geral/topo.php');
 
                 if (texto === '') return;
 
+                let id_conversa = ''
+                // Verifico se data-conversa está vazio ou não
+                if ($('.msgs').attr('data-conversa') != '') {
+                    id_conversa = $('.msgs').attr('data-conversa');
+                }
+
                 $('.msg_padrao').hide()
 
                 let msg = $(`
@@ -653,12 +706,17 @@ include_once('../geral/topo.php');
                     data: {
                         modelo: modelo,
                         provedor: provedor,
-                        input: texto
+                        input: texto,
+                        id_conversa: id_conversa
                     },
                     success: function (res) {
                         $('.dots-container').remove()
 
                         if (res.status == 'success') {
+
+                            $('.msgs').attr('data-conversa', res.id_conversa);
+
+
 
                             let fontes = [];
                             if (res.search_results) {
@@ -742,9 +800,6 @@ include_once('../geral/topo.php');
 
             function typeWriter(element, text, speed = 40) {
                 let words = text.split(' ');
-
-                console.log(words);
-
                 let index = 0;
 
                 function write() {
@@ -795,7 +850,6 @@ include_once('../geral/topo.php');
                 $(this).addClass('active');
 
                 let modelo = $(this).data('model');
-                console.log('Modelo selecionado:', modelo);
                 $('.modelo_llm').html(`<span class="dot"></span> ${modelo}`);
 
 
