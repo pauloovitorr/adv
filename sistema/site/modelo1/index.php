@@ -130,6 +130,7 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
     <link rel="stylesheet" href="style.css" />
     <meta name="theme-color" content="#121212" />
 
+    
     <?php
 
     $schema = [
@@ -477,6 +478,12 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
 
 
     </script>
+
+
+
+<!--  Puxa os códigos de estilização personalizados -->
+<?php echo $config_modelo["estilizacao"] ?? ''; ?>
+
 </body>
 
 
