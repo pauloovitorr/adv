@@ -124,7 +124,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
         }
 
     } elseif ($provedor == 'openai') {
-        $retorno = openai_chat($input);
+
+
+        // Envio as mensagens formatadas para o OpenAI
+        while ($mensagem = $resultado_mensagens->fetch_assoc()) {
+            if ($mensagem['remetente'] === 'ia') {
+                $mensagens_conversa[] = [
+                    'role' => 'assistant',
+                    'content' => [
+                        [
+                            'type' => 'output_text',
+                            'text' => $mensagem['conteudo']
+                        ]
+                    ]
+                ];
+            } else {
+                $mensagens_conversa[] = [
+                    'role' => 'user',
+                    'content' => [
+                        [
+                            'type' => 'input_text',
+                            'text' => $mensagem['conteudo']
+                        ]
+                    ]
+                ];
+            }
+        }
+
+
+
+
+
+
+
+        $retorno = openai_chat($mensagens_conversa);
         if ($retorno['status'] === 'success') {
             $texto_modelo = $retorno['content'];
         }
@@ -283,7 +316,7 @@ function groq_chat_completion($model, $mensagens_conversa)
     ];
 }
 
-function openai_chat($input)
+function openai_chat($mensagens_conversa)
 {
 
     global $api_openai;
@@ -296,29 +329,34 @@ function openai_chat($input)
         "Authorization: Bearer {$api_openai}"
     ];
 
+
+    $input = [
+        [
+            "role" => "developer",
+            "content" => [
+                [
+                    "type" => "input_text",
+                    "text" => $content_ia
+                ]
+            ]
+        ]
+    ];
+
+
+
     $body = [
         "model" => "gpt-5-nano",
-        "input" => [
-            [
-                "role" => 'assistant',
-                "content" => [
-                    [
-                        "type" => "output_text",
-                        "text" => $content_ia
-                    ]
-                ],
-            ],
-            [
-                "role" => 'user',
-                "content" => [
-                    [
-                        "type" => "input_text",
-                        "text" => $input
-                    ]
-                ],
-            ]
+        "input" => array_merge(
+            $input,
+            $mensagens_conversa
+        ),
+        "text" => [
+            "format" => ["type" => "text"],
+            "verbosity" => "medium"
         ],
-
+        "reasoning" => [
+            "effort" => "medium"
+        ],
         "tools" => [
             [
                 "type" => "web_search",
@@ -358,14 +396,34 @@ function openai_chat($input)
 
 
     $resposta = json_decode($response, true);
-    foreach ($resposta['output'] as $item) {
-        if ($item['type'] === 'message' && isset($item['content'][0]['text'])) {
-            return [
-                'status' => 'success',
-                'content' => $item['content'][0]['text']
-            ];
+
+    if (!empty($resposta['output_text'])) {
+        return [
+            'status' => 'success',
+            'content' => $resposta['output_text']
+        ];
+    }
+
+
+
+    // (fallback)
+    if (!empty($resposta['output']) && is_array($resposta['output'])) {
+        foreach ($resposta['output'] as $item) {
+            if (
+                ($item['type'] ?? null) === 'message' &&
+                isset($item['content'][0]['text'])
+            ) {
+                return [
+                    'status' => 'success',
+                    'content' => $item['content'][0]['text']
+                ];
+            }
         }
     }
+
+    var_dump($resposta);
+    var_dump($body);
+    curl_close($ch);
 
 }
 
