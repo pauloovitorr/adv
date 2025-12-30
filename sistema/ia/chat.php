@@ -38,7 +38,7 @@ Objetivo:
 
 
 
-
+// Trecho que centraliza as chamadas às APIs dos modelos de IA
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty($_POST['provedor']) && !empty($_POST['input'])) {
 
     $modelo = $conexao->escape_string(htmlspecialchars($_POST['modelo']));
@@ -201,15 +201,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
         if ($modelo == 'Sonar') {
 
             // Pego o array de fontes (search_results) para salvar no banco
-            $fontes =  '';
+            $fontes = '';
 
-            if(!empty($retorno['search_results'])) {
-                
+            if (!empty($retorno['search_results'])) {
+
                 foreach ($retorno['search_results'] as $fonte) {
                     $url = $conexao->escape_string(htmlspecialchars($fonte['url']));
                     $fontes .= $url . ', ';
                 }
-            } 
+            }
 
             $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, modelo_llm, fontes ,conversa_id_conversa ) VALUES ('$texto_modelo','ia', '$modelo' , '$fontes' ,$id_conversa)";
             $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
@@ -592,27 +592,44 @@ function perplexity_chat($mensagens_conversa)
 }
 
 
-// Pego o id da conversa para excluir mensagens relacionadas e a conversa
-if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['id_conversa']) && $_POST['acao'] == 'excluir_conversa') {
+// Pego o id da conversa para excluir mensagens relacionadas
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['id_conversa']) && $_POST['acao'] == 'excluir_conversa') {
     $id_conversa = $conexao->escape_string(htmlspecialchars($_POST['id_conversa']));
 
-    try{
+    try {
         $conexao->begin_transaction();
+
+        // Verifico se a conversa pertence ao usuário
+        $sql_verifica_conversa = "SELECT id_conversa FROM conversa WHERE id_conversa = $id_conversa AND usuario_config_id_usuario_config = $id_user";
+        $resultado_verifica = $conexao->query($sql_verifica_conversa);
+
+        if ($resultado_verifica->num_rows == 0) {
+            $res = [
+            'status' => 'erro',
+            'message' => 'Conversa não encontrada ou não pertence ao usuário.'
+        ];
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+        }
 
         // Excluo as mensagens relacionadas à conversa
         $sql_excluir_mensagens = "DELETE FROM mensagem WHERE conversa_id_conversa = $id_conversa";
         $conexao->query($sql_excluir_mensagens);
 
         // Excluo a conversa
-        $sql_excluir_conversa = "DELETE FROM conversa WHERE id_conversa = $id_conversa";
+        $sql_excluir_conversa = "DELETE FROM conversa WHERE id_conversa = $id_conversa AND usuario_config_id_usuario_config = $id_user";
         $conexao->query($sql_excluir_conversa);
 
         $conexao->commit();
 
-        echo json_encode([
+        $res = [
             'status' => 'success',
             'message' => 'Conversa excluída com sucesso.'
-        ], JSON_UNESCAPED_UNICODE);
+        ];
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
         $conexao->close();
         exit;
 
@@ -629,6 +646,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['id_conversa']) && $_PO
 
 }
 
+
+// Listo as conversas do usuário para popular o histórico
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    $sql_listar_conversas = "SELECT c.id_conversa, m.conteudo AS primeira_mensagem
+    FROM conversa c 
+    LEFT JOIN mensagem m ON c.id_conversa = m.conversa_id_conversa 
+    WHERE c.usuario_config_id_usuario_config = $id_user 
+    AND m.id_mensagem = ( SELECT id_mensagem FROM mensagem WHERE conversa_id_conversa = c.id_conversa ORDER BY dt_envio LIMIT 1) 
+    ORDER BY m.dt_envio DESC;";
+
+    $resultado_conversas = $conexao->query($sql_listar_conversas);
+    $conversas = [];
+
+    while ($conversa = $resultado_conversas->fetch_assoc()) {
+        $conversas[] = $conversa;
+    }
+
+    // echo json_encode([
+    //     'status' => 'success',
+    //     'conversas' => $conversas
+    // ], JSON_UNESCAPED_UNICODE);
+    // $conexao->close();
+    // exit;
+}
 
 
 ?>
@@ -673,9 +714,23 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="container_conversas">
+
+                        <?php
+                        if (!empty($conversas)):
+                            foreach ($conversas as $conversa): ?>
+                                <div class="historico_chat" data-conversa="<?php echo $conversa['id_conversa']; ?>">
+                                    <div class="titulo_conversa">
+                                        <span> <?php echo ucfirst($conversa['primeira_mensagem']); ?> </span>
+                                    </div>
+                                    <i class="fa-regular fa-trash-can dell_conversa"></i>
+                                </div>
+                            <?php endforeach;
+                        endif;
+                        ?>
+
                         <!-- <div class="historico_chat">
                             <div class="titulo_conversa">
-                                <span>Como Comprar arroz?</span>
+                                <span>Que dia é hoje?</span>
                             </div>
                             <i class="fa-regular fa-trash-can dell_conversa"></i>
                         </div> -->
@@ -708,12 +763,11 @@ include_once('../geral/topo.php');
                         </div>
 
                         <!-- <div class="container_msg_usuario">
-                            <div class="msg_usuario"><span>Quero saber como é a lei do Brasil Quero saber como é a lei
-                                    do Brasil Quero saber como é a lei do Brasil</span></div>
+                            <div class="msg_usuario"><span>Quero saber como é a lei do Brasil</span></div>
                         </div> -->
 
                         <!-- <div class="container_msg_ia">
-                            <div class="msg_ia"><span>kkkkkkkkkkkkk</span></div>
+                            <div class="msg_ia"><span>Lei é bastante importante</span></div>
                             <div class="container_infos_ia">
                                 <span class="modelo_resposta"> Perplexity</span>
                                 <span class="fonts"></span>
@@ -873,7 +927,7 @@ include_once('../geral/topo.php');
                         if (res.status == 'success') {
 
                             // Verifico se já possui conversa no histórico com o id da conversa
-                            let qtd_conversa = $('.historico_chat').data('conversa', res.id_conversa).length;
+                            let qtd_conversa = $(`.historico_chat[data-conversa="${res.id_conversa}"]`).length;
 
                             if (qtd_conversa == 0) {
                                 // Adiciona nova conversa no histórico
@@ -889,7 +943,6 @@ include_once('../geral/topo.php');
                             }
 
                             $('.msgs').attr('data-conversa', res.id_conversa);
-
 
                             // Se for o perplexity, adiciona as fontes
                             let fontes = [];
@@ -1140,10 +1193,10 @@ include_once('../geral/topo.php');
 
 
     <script>
-        $(function(){
+        $(function () {
 
             // Adiciono evento na tag i para excluir conversas ao ser clicada
-            $(document).on('click', '.dell_conversa', function(){
+            $(document).on('click', '.dell_conversa', function () {
                 let id_conversa = $(this).closest('.historico_chat').data('conversa');
 
                 Swal.fire({
@@ -1167,13 +1220,23 @@ include_once('../geral/topo.php');
                                 id_conversa: id_conversa,
                                 acao: 'excluir_conversa'
                             },
-                            success: function(res) {
-                                if(res.status == 'success') {
+                            success: function (res) {
+
+
+                                if (res.status == 'success') {
+                                    // Swal exibindo a mensagem de sucesso
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Sucesso!',
+                                        text: res.message,
+                                      
+                                    });
+
                                     // Removo a conversa do histórico
                                     $(`.historico_chat[data-conversa="${id_conversa}"]`).remove();
 
                                     // Se a conversa excluída for a atual, limpo o chat
-                                    if($('.msgs').attr('data-conversa') == id_conversa) {
+                                    if ($('.msgs').attr('data-conversa') == id_conversa) {
                                         $('.msgs').attr('data-conversa', '');
 
                                         $('.container_msg_usuario').remove();
@@ -1181,6 +1244,13 @@ include_once('../geral/topo.php');
 
                                         $('.msg_padrao').show();
                                     }
+                                }
+                                else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Erro',
+                                        text: res.message,
+                                    });
                                 }
                             }
                         })
