@@ -274,7 +274,7 @@
 
 .container_infos_ia {
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 8px;
   margin-bottom: 12px;
 }

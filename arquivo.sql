@@ -201,8 +201,9 @@ CREATE TABLE conversa (
 CREATE TABLE mensagem (
     id_mensagem INT NOT NULL AUTO_INCREMENT,
     conteudo TEXT NOT NULL,
-    dt_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     remetente VARCHAR(50) NOT NULL,
+    modelo_llm VARCHAR(50),
+    dt_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     conversa_id_conversa INT NOT NULL,
     
     CONSTRAINT pk_mensagem PRIMARY KEY (id_mensagem),

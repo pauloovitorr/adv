@@ -67,31 +67,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
 
 
 
-
-
-
-
     $texto_modelo = '';
     $res = '';
 
 
+    // Busco as mensagens do banco de dados para enviar ao modelo, para ele ter o contexto da conversa
+    $sql_busca_mensagens = "SELECT conteudo, remetente, modelo_llm FROM mensagem WHERE conversa_id_conversa = $id_conversa ORDER BY id_mensagem ASC LIMIT 20";
+    $resultado_mensagens = $conexao->query($sql_busca_mensagens);
+    $mensagens_conversa = [];
+
     if ($provedor == 'groq') {
+
+        // Formatei as mensagens para o formato esperado pela Groq
+        while ($mensagem = $resultado_mensagens->fetch_assoc()) {
+            if ($mensagem['remetente'] === 'ia') {
+                $mensagens_conversa[] = [
+                    'role' => 'assistant',
+                    'content' => $mensagem['conteudo']
+                ];
+            } else {
+                $mensagens_conversa[] = [
+                    'role' => 'user',
+                    'content' => $mensagem['conteudo']
+                ];
+            }
+        }
+
 
         switch ($modelo) {
             case 'Llama-3.3-70b':
-                $retorno = groq_chat_completion($input, 'llama-3.3-70b-versatile');
+                $retorno = groq_chat_completion('llama-3.3-70b-versatile', $mensagens_conversa);
                 break;
 
             case 'Kimi K2':
-                $retorno = groq_chat_completion($input, 'moonshotai/kimi-k2-instruct-0905');
+                $retorno = groq_chat_completion('moonshotai/kimi-k2-instruct-0905', $mensagens_conversa);
                 break;
 
             case 'Gpt-oss-120b':
-                $retorno = groq_chat_completion($input, 'openai/gpt-oss-120b');
+                $retorno = groq_chat_completion('openai/gpt-oss-120b', $mensagens_conversa);
                 break;
 
             case 'Compound-mini':
-                $retorno = groq_chat_completion($input, 'groq/compound-mini');
+                $retorno = groq_chat_completion('groq/compound-mini', $mensagens_conversa);
                 break;
         }
 
@@ -127,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
     // Verifico se teve resposta de algum modelo
     if ($texto_modelo && $texto_modelo !== '') {
 
-        $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, conversa_id_conversa ) VALUES ('$texto_modelo','ia',$id_conversa)";
+        $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, modelo_llm, conversa_id_conversa ) VALUES ('$texto_modelo','ia', '$modelo' , $id_conversa)";
         $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
 
         if (!$retorno_cadastro_ia) {
@@ -171,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
 }
 
 
-function groq_chat_completion($input, $model)
+function groq_chat_completion($model, $mensagens_conversa)
 {
     global $api_groq;
     global $content_ia;
@@ -184,20 +201,20 @@ function groq_chat_completion($input, $model)
     ];
 
     $body = [
-        "messages" => [
+        "messages" => array_merge(
             [
-                "role" => "system",
-                "content" => $content_ia
+                [
+                    "role" => "system",
+                    "content" => $content_ia
+                ]
             ],
-            [
-                "role" => "user",
-                "content" => $input
-            ]
-        ],
+            $mensagens_conversa
+        ),
         "model" => $model,
         "temperature" => 0.5,
         "max_completion_tokens" => 1024,
     ];
+
 
     //  HABILITA FERRAMENTAS APENAS PARA O COMPOUND-MINI
     if ($model === 'groq/compound-mini') {
