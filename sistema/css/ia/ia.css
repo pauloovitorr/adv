@@ -72,6 +72,10 @@
 .titulo_conversa span {
   color: rgb(243, 239, 239);
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+
 }
 
 .titulo_conversa:hover {

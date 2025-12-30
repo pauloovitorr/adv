@@ -195,8 +195,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
     // Verifico se teve resposta de algum modelo
     if ($texto_modelo && $texto_modelo !== '') {
 
-        $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, modelo_llm, conversa_id_conversa ) VALUES ('$texto_modelo','ia', '$modelo' , $id_conversa)";
-        $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
+        // Se o modelo escolhido for Sonar, cadastro a resposta da IA junto com as fontes
+        if ($modelo == 'Sonar') {
+
+            // Pego o array de fontes (search_results) para salvar no banco
+            $fontes =  '';
+
+            if(!empty($retorno['search_results'])) {
+                
+                foreach ($retorno['search_results'] as $fonte) {
+                    $url = $conexao->escape_string(htmlspecialchars($fonte['url']));
+                    $fontes .= $url . ', ';
+                }
+            } 
+
+            $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, modelo_llm, fontes ,conversa_id_conversa ) VALUES ('$texto_modelo','ia', '$modelo' , '$fontes' ,$id_conversa)";
+            $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
+
+        } else {
+            $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, modelo_llm, conversa_id_conversa ) VALUES ('$texto_modelo','ia', '$modelo' , $id_conversa)";
+            $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
+        }
+
+
 
         if (!$retorno_cadastro_ia) {
             echo json_encode([
@@ -610,12 +631,12 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="container_conversas">
-                        <div class="historico_chat">
+                        <!-- <div class="historico_chat">
                             <div class="titulo_conversa">
                                 <span>Como Comprar arroz?</span>
                             </div>
                             <i class="fa-regular fa-trash-can dell_conversa"></i>
-                        </div>
+                        </div> -->
                     </div>
 
                 </aside>
@@ -786,6 +807,7 @@ include_once('../geral/topo.php');
 
                 rolarParaFinalChat();
 
+
                 // Desabilita botão de enviar enquanto IA responde
                 $('.botao-enviar-ia').prop('disabled', true)
 
@@ -808,10 +830,26 @@ include_once('../geral/topo.php');
 
                         if (res.status == 'success') {
 
+                            // Verifico se já possui conversa no histórico com o id da conversa
+                            let qtd_conversa = $('.historico_chat').data('conversa', res.id_conversa).length;
+
+                            if (qtd_conversa == 0) {
+                                // Adiciona nova conversa no histórico
+                                let chat = `
+                                            <div class="historico_chat" data-conversa="${res.id_conversa}">
+                                                <div class="titulo_conversa">
+                                                    <span> ${texto} </span>
+                                                </div>
+                                                <i class="fa-regular fa-trash-can dell_conversa"></i>
+                                            </div>
+                                            `;
+                                $('.container_conversas').prepend(chat);
+                            }
+
                             $('.msgs').attr('data-conversa', res.id_conversa);
 
 
-
+                            // Se for o perplexity, adiciona as fontes
                             let fontes = [];
                             if (res.search_results) {
                                 fontes = res.search_results

@@ -203,6 +203,7 @@ CREATE TABLE mensagem (
     conteudo TEXT NOT NULL,
     remetente VARCHAR(50) NOT NULL,
     modelo_llm VARCHAR(50),
+    fontes TEXT,
     dt_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     conversa_id_conversa INT NOT NULL,
     
