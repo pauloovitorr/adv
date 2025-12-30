@@ -163,7 +163,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
         }
 
     } elseif ($provedor == 'perplexity') {
-        $retorno = perplexity_chat($input);
+
+        while ($mensagem = $resultado_mensagens->fetch_assoc()) {
+            if ($mensagem['remetente'] === 'ia') {
+                $mensagens_conversa[] = [
+                    'role' => 'assistant',
+                    'content' => $mensagem['conteudo']
+                ];
+            } else {
+                $mensagens_conversa[] = [
+                    'role' => 'user',
+                    'content' => $mensagem['conteudo']
+                ];
+            }
+        }
+
+
+
+        $retorno = perplexity_chat($mensagens_conversa);
+
         if ($retorno['status'] === 'success') {
             $texto_modelo = $retorno['content'];
         }
@@ -427,12 +445,14 @@ function openai_chat($mensagens_conversa)
 
 }
 
-function perplexity_chat($input)
+function perplexity_chat($mensagens_conversa)
 {
     global $api_perplexity;
     global $content_ia;
 
     $url = "https://api.perplexity.ai/chat/completions";
+
+
 
     $headers = [
         "Content-Type: application/json",
@@ -441,16 +461,15 @@ function perplexity_chat($input)
 
     $body = [
         "model" => "sonar",
-        "messages" => [
+        "messages" => array_merge(
             [
-                "role" => "system",
-                "content" => $content_ia
+                [
+                    "role" => "system",
+                    "content" => $content_ia
+                ]
             ],
-            [
-                "role" => "user",
-                "content" => $input
-            ],
-        ],
+            $mensagens_conversa
+        ),
 
         "search_mode" => "web",                 // "web" ou "academic" 
         "reasoning_effort" => "medium",
