@@ -37,6 +37,8 @@ Objetivo:
 ";
 
 
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty($_POST['provedor']) && !empty($_POST['input'])) {
 
     $modelo = $conexao->escape_string(htmlspecialchars($_POST['modelo']));
@@ -589,6 +591,46 @@ function perplexity_chat($mensagens_conversa)
 
 }
 
+
+// Pego o id da conversa para excluir mensagens relacionadas e a conversa
+if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['id_conversa']) && $_POST['acao'] == 'excluir_conversa') {
+    $id_conversa = $conexao->escape_string(htmlspecialchars($_POST['id_conversa']));
+
+    try{
+        $conexao->begin_transaction();
+
+        // Excluo as mensagens relacionadas à conversa
+        $sql_excluir_mensagens = "DELETE FROM mensagem WHERE conversa_id_conversa = $id_conversa";
+        $conexao->query($sql_excluir_mensagens);
+
+        // Excluo a conversa
+        $sql_excluir_conversa = "DELETE FROM conversa WHERE id_conversa = $id_conversa";
+        $conexao->query($sql_excluir_conversa);
+
+        $conexao->commit();
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Conversa excluída com sucesso.'
+        ], JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+
+    } catch (Exception $e) {
+        $conexao->rollback();
+
+        echo json_encode([
+            'status' => 'erro',
+            'message' => 'Erro ao excluir conversa: ' . $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+    }
+
+}
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -1097,7 +1139,59 @@ include_once('../geral/topo.php');
     </script>
 
 
+    <script>
+        $(function(){
 
+            // Adiciono evento na tag i para excluir conversas ao ser clicada
+            $(document).on('click', '.dell_conversa', function(){
+                let id_conversa = $(this).closest('.historico_chat').data('conversa');
+
+                Swal.fire({
+                    title: 'Excluir conversa?',
+                    text: "Essa ação não pode ser desfeita.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        // Ajax para excluir conversa
+                        $.ajax({
+                            url: './chat.php',
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+                                id_conversa: id_conversa,
+                                acao: 'excluir_conversa'
+                            },
+                            success: function(res) {
+                                if(res.status == 'success') {
+                                    // Removo a conversa do histórico
+                                    $(`.historico_chat[data-conversa="${id_conversa}"]`).remove();
+
+                                    // Se a conversa excluída for a atual, limpo o chat
+                                    if($('.msgs').attr('data-conversa') == id_conversa) {
+                                        $('.msgs').attr('data-conversa', '');
+
+                                        $('.container_msg_usuario').remove();
+                                        $('.container_msg_ia').remove();
+
+                                        $('.msg_padrao').show();
+                                    }
+                                }
+                            }
+                        })
+
+                    }
+                });
+
+            })
+
+        })
+    </script>
 
 
 </body>
