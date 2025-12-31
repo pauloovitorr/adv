@@ -606,13 +606,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['id_conversa']) && $_P
 
         if ($resultado_verifica->num_rows == 0) {
             $res = [
-            'status' => 'erro',
-            'message' => 'Conversa não encontrada ou não pertence ao usuário.'
-        ];
+                'status' => 'erro',
+                'message' => 'Conversa não encontrada ou não pertence ao usuário.'
+            ];
 
-        echo json_encode($res, JSON_UNESCAPED_UNICODE);
-        $conexao->close();
-        exit;
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->close();
+            exit;
         }
 
         // Excluo as mensagens relacionadas à conversa
@@ -650,7 +650,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['id_conversa']) && $_P
 
 
 // Pego as mensagens de uma conversa específica
-if($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['id_conversa']) && $_GET['acao'] == 'puxar_mensagens') {
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['id_conversa']) && $_GET['acao'] == 'puxar_mensagens') {
     $id_conversa = $conexao->escape_string(htmlspecialchars($_GET['id_conversa']));
 
     // Verifico se a conversa pertence ao usuário
@@ -1268,7 +1268,7 @@ include_once('../geral/topo.php');
                                         icon: 'success',
                                         title: 'Sucesso!',
                                         text: res.message,
-                                      
+
                                     });
 
                                     // Removo a conversa do histórico
@@ -1313,6 +1313,8 @@ include_once('../geral/topo.php');
                 $('.msgs').attr('data-conversa', '');
                 $('.container_msg_usuario').fadeOut();
                 $('.container_msg_ia').fadeOut();
+                $('.container_msg_usuario').remove();
+                $('.container_msg_ia').remove();
                 // $('.msg_padrao').show();
                 $('.msg_padrao').fadeOut(200);
 
@@ -1331,6 +1333,7 @@ include_once('../geral/topo.php');
                             // $('.msgs').fadeOut();
 
                             res.mensagens.forEach(mensagem => {
+
                                 if (mensagem.remetente == 'usuario') {
                                     let msgUsuario = $(`
                                         <div class="container_msg_usuario" style="display:none">
@@ -1350,12 +1353,40 @@ include_once('../geral/topo.php');
                                                 <span>${mensagem.conteudo}</span>
                                             </div>
                                             <div class="container_infos_ia">
-                                                <span class="modelo_resposta">${mensagem.modelo}</span>
+                                                <span class="modelo_resposta">${mensagem.modelo_llm}</span>
                                                 <span class="fonts"></span>
                                             </div>
                                         </div>
                                     `);
                                     $('.msgs').append(msgIA);
+
+
+
+
+                                    // Verifico se o modelo é Perplexity para adicionar as fontes
+                                    if (mensagem.modelo_llm == 'Sonar') {
+                                        let lista_fontes = mensagem.fontes.split(',');
+
+                                        if (lista_fontes.length > 0) {
+                                            let spanFontes = msgIA.find('.fonts');
+                                            lista_fontes.forEach((fonte, index) => {
+                                                if (fonte.trim() != '') {
+                                                    let link = $(`
+                                                <a href="${fonte}" 
+                                                target="_blank" title="Fonte ${index + 1}">
+                                                [${index + 1}]
+                                                </a>
+                                            `);
+
+                                                    spanFontes.append(link);
+                                                }
+                                            });
+                                        }
+                                    }
+
+
+
+
                                 }
                             });
 
