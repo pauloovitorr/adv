@@ -252,8 +252,8 @@ include_once('../geral/topo.php');
                             <option value="">Filtrar</option>
                             <option value="cliente" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'cliente') ? 'selected' : '' ?>>Clientes</option>
                             <option value="contrário" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'contrário') ? 'selected' : '' ?>>Partes Contrárias</option>
-                            <option value="com_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'com_andamento') ? 'selected' : '' ?>>Com Processo em Andamento</option>
-                            <option value="sem_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'sem_andamento') ? 'selected' : '' ?>>Sem Processo em Andamento</option>
+                            <!-- <option value="com_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'com_andamento') ? 'selected' : '' ?>>Com Processo em Andamento</option>
+                            <option value="sem_andamento" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'sem_andamento') ? 'selected' : '' ?>>Sem Processo em Andamento</option> -->
                         </select>
                     </div>
 

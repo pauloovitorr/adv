@@ -209,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
         exit;
     }
 
-    $stmt->close();
+    // $stmt->close();
 }
 
 
@@ -299,7 +299,7 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;
     if ($result->num_rows == 1) {
         $dados_processo = $result->fetch_assoc();
         // print_r($dados_processo);
-        $conexao->close();
+        // $conexao->close();
     } else {
         header('location: ./processos.php');
         $conexao->close();
@@ -547,7 +547,7 @@ include_once('../geral/topo.php');
 
                                     <div class="container_input">
                                         <label for="resultado_processo">Resultado Processo</label>
-                                        <select name="resultado_processo" id="resultado_processo" required>
+                                        <select name="resultado_processo" id="resultado_processo" >
                                             <option></option>
                                             <option value="Sentença favorável" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Sentença favorável' ? 'selected' : ''; ?>>
                                                 Sentença favorável

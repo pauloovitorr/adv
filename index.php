@@ -25,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email']) &&  !empty
         $_SESSION['email'] = $registro['email'];
         $_SESSION['cod'] = $registro['id_usuario_config'];
 
+        session_regenerate_id(true); // Evita fixação de sessão
+
         $res = [
             'status' => 'success',
             'message' => 'login realizado'

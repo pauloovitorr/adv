@@ -186,7 +186,7 @@
                     <p>RELATÓRIOS</p>
                 </div>
             </a></li>
-        <li id="configuracoes"><a href="">
+        <li id="configuracoes"><a href="/adv/sistema/configuracoes/configuracoes.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/config.png" alt="">
                     <p>CONFIGURAÇÕES</p>
                 </div>

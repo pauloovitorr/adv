@@ -154,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['acao']) && !empty($_GE
     if ($result->num_rows == 1) {
         $dados_pessoa = $result->fetch_assoc();
         // var_dump($dados_pessoa);
-        $conexao->close();
+        // $conexao->close();
     } else {
         header('location: ./pessoas.php');
         exit;

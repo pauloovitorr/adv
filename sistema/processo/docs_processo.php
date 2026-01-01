@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['tkn'])) {
         $sql_busca_docs = "SELECT * FROM documento_processo where id_processo = $id_processo and usuario_config_id_usuario_config = $id_user";
 
         $lista_docs = $conexao->query($sql_busca_docs);
-        $conexao->close();
+        // $conexao->close();
     } else {
         header('location: ./processos.php');
     }

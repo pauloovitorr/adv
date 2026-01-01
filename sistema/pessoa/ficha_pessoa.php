@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
 
 
 
-        $conexao->close();
+        // $conexao->close();
     } else {
         header('location: ./pessoas.php');
         exit;

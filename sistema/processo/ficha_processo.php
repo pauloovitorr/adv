@@ -110,7 +110,7 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
             }
         }
 
-        $conexao->close();
+        // $conexao->close();
     } else {
         header('location: ./processos.php');
         exit;

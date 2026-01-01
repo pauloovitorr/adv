@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['tkn'])) {
         $sql_busca_docs = "SELECT * FROM documento where id_pessoa = $id_pessoa and usuario_config_id_usuario_config = $id_user";
 
         $lista_docs = $conexao->query($sql_busca_docs);
-        $conexao->close();
+        // $conexao->close();
     } else {
         header('location: ./pessoas.php');
     }

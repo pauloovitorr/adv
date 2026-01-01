@@ -4,7 +4,7 @@ CREATE TABLE usuario_config (
     tk VARCHAR(32) NOT NULL,
     nome VARCHAR(150) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    tell VARCHAR(14) NOT NULL,
+    tell VARCHAR(16) NOT NULL,
     senha VARCHAR(250) NOT NULL,
     primeiro_acesso VARCHAR(3) NOT NULL DEFAULT 'sim',
     cpf VARCHAR(14) NULL,
