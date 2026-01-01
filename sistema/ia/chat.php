@@ -48,6 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
 
     if (isset($_POST['id_conversa']) && $_POST['id_conversa'] != '') {
         $id_conversa = $conexao->escape_string(htmlspecialchars($_POST['id_conversa']));
+
+        // Verifico se a conversa pertence ao usuário
+        $sql_verifica_conversa = "SELECT id_conversa FROM conversa WHERE id_conversa = $id_conversa AND usuario_config_id_usuario_config = $id_user";
+        $resultado_verifica = $conexao->query($sql_verifica_conversa);
+        if ($resultado_verifica->num_rows == 0) {
+            $res = [
+                'status' => 'erro',
+                'message' => 'Conversa não encontrada ou não pertence ao usuário.'
+            ];
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->close();
+            exit;
+        }
+
     } else {
         $sql_cadastra_conversa = "INSERT INTO conversa (usuario_config_id_usuario_config) VALUES ($id_user)";
         $conexao->query($sql_cadastra_conversa);
@@ -55,15 +69,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
     }
 
 
-    // Com o ID da conversa, eu cadastro a mensagem do usuário
-    $sql_cadastra_mensagem_user = "INSERT INTO mensagem (conteudo, remetente, conversa_id_conversa ) VALUES ('$input','usuario',$id_conversa)";
-    $retorno_cadastro_user = $conexao->query($sql_cadastra_mensagem_user);
+    $sql_cadastra_mensagem_user = "INSERT INTO mensagem (conteudo, remetente, conversa_id_conversa) VALUES ('$input', 'usuario', $id_conversa)";
 
+    $retorno_cadastro_user = $conexao->query($sql_cadastra_mensagem_user);
     if (!$retorno_cadastro_user) {
-        echo json_encode([
+        $res = [
             'status' => 'erro',
             'message' => 'Erro ao cadastrar mensagem do usuário.'
-        ], JSON_UNESCAPED_UNICODE);
+        ];
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
         $conexao->close();
         exit;
     }
@@ -182,7 +196,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
         }
 
 
-
         $retorno = perplexity_chat($mensagens_conversa);
 
         if ($retorno['status'] === 'success') {
@@ -205,7 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
             $fontes = '';
 
             if (!empty($retorno['search_results'])) {
-
                 foreach ($retorno['search_results'] as $fonte) {
                     $url = $conexao->escape_string(htmlspecialchars($fonte['url']));
                     $fontes .= $url . ', ';
@@ -219,7 +231,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['modelo']) && !empty(
             $sql_cadastra_mensagem_ia = "INSERT INTO mensagem (conteudo, remetente, modelo_llm, conversa_id_conversa ) VALUES ('$texto_modelo','ia', '$modelo' , $id_conversa)";
             $retorno_cadastro_ia = $conexao->query($sql_cadastra_mensagem_ia);
         }
-
 
 
         if (!$retorno_cadastro_ia) {
@@ -749,7 +760,10 @@ include_once('../geral/topo.php');
                 <aside class="historico">
 
                     <div class="topo_conversas">
-                        <h3>Conversas</h3>
+                        <div class="container_titulo">
+                            <h3>Conversas</h3>
+                            <i class="fa-solid fa-plus" id="add_conversa"></i>
+                        </div>
                     </div>
 
                     <div class="container_conversas">
@@ -797,7 +811,7 @@ include_once('../geral/topo.php');
                         <div class="msg_padrao">
                             <h2>Comece uma conversa</h2>
                             <p>
-                                Explique seu caso ou dúvida jurídica e anexe arquivos se precisar.
+                                Explique seu caso ou dúvida jurídica, desfrute do modelos de IA.
                             </p>
                         </div>
 
@@ -861,15 +875,13 @@ include_once('../geral/topo.php');
                                         </div>
                                     </div>
 
-                                    <label for="arquivos" class="botao-icone-input" id="container_arquivos">
+                                    <!-- Desuso no momento -->
+                                    <!-- <label for="arquivos" class="botao-icone-input" id="container_arquivos">
                                         <span id="qtd_arquivos"></span>
                                         <i class="fa fa-paperclip" aria-hidden="true"></i>
                                     </label>
 
-                                    <input type="file" id="arquivos" multiple hidden
-                                        accept=".txt,.pdf,.doc,.docx,.xls,.xlsx">
-
-
+                                    <input type="file" id="arquivos" hidden accept=".txt,.pdf,.doc,.docx,.xls,.xlsx"> -->
 
                                     <button type="button" class="botao-icone-input" id="microfone">
                                         <i class="fa fa-microphone" aria-hidden="true"></i>
@@ -905,6 +917,14 @@ include_once('../geral/topo.php');
                 let texto = $input.val().trim();
                 let modelo = $('.llm-item.active').data('model')
                 let provedor = $('.llm-item.active').data('local')
+
+                // Desuso no momento
+                // let arquivos = ''
+
+                // if (modelo == 'Sonar') {
+                //     arquivos = $('#arquivos')[0].files;
+                // }
+
 
                 if (texto === '') return;
 
@@ -950,16 +970,27 @@ include_once('../geral/topo.php');
                 $input.val('');
 
                 // Ajax para o modelo
+
+                let formData = new FormData();
+                formData.append('modelo', modelo);
+                formData.append('provedor', provedor);
+                formData.append('input', texto);
+                formData.append('id_conversa', id_conversa);
+
+                // Se a quantidade de arquivos for maior que 0, anexo ao formData
+                // if (arquivos && arquivos.length > 0) {
+                //     formData.append('arquivos', arquivos[0]);
+                // }
+
+
+
                 $.ajax({
                     url: './chat.php',
                     method: 'POST',
                     dataType: 'json',
-                    data: {
-                        modelo: modelo,
-                        provedor: provedor,
-                        input: texto,
-                        id_conversa: id_conversa
-                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function (res) {
                         $('.dots-container').remove()
 
@@ -1043,15 +1074,19 @@ include_once('../geral/topo.php');
                 // monta as fontes com links
                 if (fontes.length > 0) {
                     fontes.forEach((fonte, index) => {
-                        let link = $(`
-                <a href="${fonte.url}" 
-                   target="_blank" 
-                   title="${fonte.title}">
-                   [${index + 1}]
-                </a>
-            `);
+                        // Adiciono se a fonte não for vazia
+                        if (fonte.url !== '') {
+                            let link = $(`
+                                <a href="${fonte.url}" 
+                                target="_blank" 
+                                title="${fonte.title}">
+                                [${index + 1}]
+                                </a>
+                            `);
 
-                        spanFontes.append(link);
+                            spanFontes.append(link);
+                        }
+
                     });
                 }
 
@@ -1117,6 +1152,14 @@ include_once('../geral/topo.php');
 
                 let modelo = $(this).data('model');
                 $('.modelo_llm').html(`<span class="dot"></span> ${modelo}`);
+
+                // Se o modelo for o sonar, eu exibido a opção de encaminhar arquivos
+                if (modelo == 'Sonar') {
+                    $('#container_arquivos').fadeIn(150);
+                    $('#container_arquivos').css({ display: 'flex' });
+                } else {
+                    $('#container_arquivos').fadeOut(150);
+                }
 
 
                 $('.llm-dropdown').fadeOut(150);
@@ -1212,10 +1255,27 @@ include_once('../geral/topo.php');
 
 
             $('#arquivos').on('change', function () {
-                $('#qtd_arquivos').text(this.files.length)
-                $('#qtd_arquivos').fadeIn()
-                $('#qtd_arquivos').css({ 'display': 'flex' })
-            })
+                const maxSize = 3 * 1024 * 1024; // 3 MB
+                const files = this.files;
+
+                if (files.length > 0 && files[0].size > maxSize) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Arquivo muito grande',
+                        text: 'O arquivo deve ter no máximo 3 MB.'
+                    });
+
+                    // limpa o input
+                    $(this).val('');
+                    $('#qtd_arquivos').fadeOut();
+                    return;
+                }
+
+                $('#qtd_arquivos').text(files.length);
+                $('#qtd_arquivos').fadeIn();
+                $('#qtd_arquivos').css({ display: 'flex' });
+            });
+
 
 
             function rolarParaFinalChat() {
@@ -1406,6 +1466,17 @@ include_once('../geral/topo.php');
                 })
 
             });
+        
+            $('#add_conversa').on('click', function(){
+                // Limpo o chat
+                $('.msgs').attr('data-conversa', '');
+                $('.container_msg_usuario').fadeOut();
+                $('.container_msg_ia').fadeOut();
+                $('.container_msg_usuario').remove();
+                $('.container_msg_ia').remove();
+                $('.msg_padrao').fadeIn(200);
+            });
+        
         })
     </script>
 
