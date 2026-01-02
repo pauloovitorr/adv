@@ -4,16 +4,15 @@
 include_once('./scripts.php');
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($_POST['email']) && !empty($_POST['tell']) && !empty($_POST['senha']) && !empty($_POST['confirmasenha'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome']) && !empty($_POST['email']) && !empty($_POST['tell']) && !empty($_POST['senha']) && !empty($_POST['confirmasenha'])) {
 
-    $nome   = $conexao->escape_string(htmlspecialchars($_POST['nome']));
-    $email  = $conexao->escape_string(htmlspecialchars($_POST['email']));
-    $tell   = $conexao->escape_string(htmlspecialchars($_POST['tell']));
-    $senha  = $conexao->escape_string(htmlspecialchars($_POST['senha']));
-    $confirma_senha  = $conexao->escape_string(htmlspecialchars($_POST['confirmasenha']));
+    $nome = $conexao->escape_string(htmlspecialchars($_POST['nome']));
+    $email = $conexao->escape_string(htmlspecialchars($_POST['email']));
+    $tell = $conexao->escape_string(htmlspecialchars($_POST['tell']));
+    $senha = $conexao->escape_string(htmlspecialchars($_POST['senha']));
+    $confirma_senha = $conexao->escape_string(htmlspecialchars($_POST['confirmasenha']));
     $ip = $_SERVER['REMOTE_ADDR'];
     $token = bin2hex(random_bytes(64 / 2));
-
 
 
     if ($senha !== $confirma_senha) {
@@ -27,70 +26,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
         exit;
     }
 
-    try{
+    try {
         $conexao->begin_transaction();
 
         $sql_verifica_email = "SELECT email FROM usuario_config WHERE email = ?";
-    
+
         $sql_verificacao = $conexao->prepare($sql_verifica_email);
         $sql_verificacao->bind_param('s', $email);
         $sql_verificacao->execute();
         $verificacao = $sql_verificacao->get_result();
-    
-        
-    
+
+
+
         if ($verificacao->num_rows < 1) {
 
             $sql_verifica_ip = "SELECT COUNT('ip_log') AS qtd_cadastro_recente from log where ip_log = '$ip' AND acao_log = 'Criar Conta' AND dt_acao_log >= NOW() - INTERVAL 10 MINUTE";
 
             $result_verificacao = $conexao->query($sql_verifica_ip);
-            $result_ip = $result_verificacao->fetch_assoc();   
-            
+            $result_ip = $result_verificacao->fetch_assoc();
+
             $qtd_ip = $result_ip['qtd_cadastro_recente'];
 
-            if($qtd_ip >= 3){
+            if ($qtd_ip >= 3) {
                 $conexao->rollback();
-    
+
                 $res = [
                     'status' => 'erro',
                     'message' => 'Aguarde! Você tentou criar muitas contas'
                 ];
-    
+
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
                 exit;
             }
-    
+
             $sql_insert_usuario = 'INSERT INTO usuario_config (tk,nome, email,tell, senha, dt_cadastro_usuario, dt_atualizacao_usuario ) VALUES (?,?,?,?,?, NOW(), NOW()) ';
-    
+
             $stmt = $conexao->prepare($sql_insert_usuario);
-            $stmt->bind_param('sssss', $token, $nome, $email, $tell, $senha,);
-    
+            $stmt->bind_param('sssss', $token, $nome, $email, $tell, $senha, );
+
             if ($stmt->execute()) {
 
-                $id_ultimo_cadastro = $conexao->insert_id;                
+                $id_ultimo_cadastro = $conexao->insert_id;
 
-                if(cadastro_log('Criou Conta', $nome ,$ip,$id_ultimo_cadastro )){
+                if (cadastro_log('Criou Conta', $nome, $ip, $id_ultimo_cadastro)) {
                     $conexao->commit();
                     $conexao->close();
-        
+
                     $res = [
                         'status' => 'success',
                         'message' => 'Conta cadastrada com sucesso!'
                     ];
                     echo json_encode($res, JSON_UNESCAPED_UNICODE);
                     exit;
-                } else{
+                } else {
                     $conexao->rollback();
                     $conexao->close();
                     $res = [
                         'status' => 'erro',
                         'message' => 'Erro ao abrir conta, aguarde alguns minutos!'
                     ];
-        
+
                     echo json_encode($res, JSON_UNESCAPED_UNICODE);
                     exit;
                 }
-    
+
 
             } else {
                 $conexao->rollback();
@@ -99,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                     'status' => 'erro',
                     'message' => 'Erro ao abrir conta, tente novamente!'
                 ];
-    
-    
+
+
                 echo json_encode($res, JSON_UNESCAPED_UNICODE);
                 exit;
             }
@@ -111,13 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                 'status' => 'erro',
                 'message' => 'E-mail já cadastrado no sistema!'
             ];
-    
-    
+
+
             echo json_encode($res, JSON_UNESCAPED_UNICODE);
             exit;
         }
-    }
-    catch (Exception $err){
+    } catch (Exception $err) {
 
         $conexao->rollback();
         $conexao->close();
@@ -159,32 +157,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
 
                         <div class="container_conteudo_form">
                             <span>Nome Completo:</span>
-                            <input type="text" name="nome" placeholder="Ex: José Carlos Henrique" minlength="4" maxlength="150" required>
+                            <input type="text" name="nome" placeholder="Ex: José Carlos Henrique" minlength="4"
+                                maxlength="150" required>
                             <p></p>
                         </div>
 
                         <div class="container_conteudo_form">
                             <span>E-mail:</span>
-                            <input type="email" name="email" placeholder="Ex: jose@gmail.com" minlength="4" maxlength="100" required>
+                            <input type="email" name="email" placeholder="Ex: jose@gmail.com" minlength="4"
+                                maxlength="100" required>
                             <p></p>
                         </div>
 
                         <div class="container_conteudo_form">
                             <span>Telefone:</span>
-                            <input type="tell" name="tell" placeholder="Ex: (99)99999-9999" minlength="13" maxlength="14" required>
+                            <input type="tell" name="tell" placeholder="Ex: (99)99999-9999" minlength="13"
+                                maxlength="14" required>
                             <p></p>
                         </div>
 
                         <div class="container_senhas">
                             <div class="container_conteudo_form">
                                 <span>Senha:</span>
-                                <input type="password" name="senha" placeholder="**********" minlength="8" maxlength="16" required>
+                                <input type="password" name="senha" placeholder="**********" minlength="8"
+                                    maxlength="16" required>
                                 <p></p>
                             </div>
 
                             <div class="container_conteudo_form">
                                 <span>Confirmar Senha: </span>
-                                <input type="password" name="confirmasenha" placeholder="**********" minlength="8" maxlength="16" required>
+                                <input type="password" name="confirmasenha" placeholder="**********" minlength="8"
+                                    maxlength="16" required>
                                 <p></p>
                             </div>
                         </div>
@@ -220,21 +223,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
 
 
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Máscara para o telefone
             $('input[name="tell"]').mask('(00) 00000-0000');
 
             // Ao perder o foco (blur), valida individualmente cada campo
-            $('input').on('blur', function() {
+            $('input').on('blur', function () {
                 validateField($(this));
             });
 
             // Validação ao submeter o formulário
-            $('form').on('submit', function(e) {
+            $('form').on('submit', function (e) {
 
                 $('#abrir_conta').attr('disabled', true)
 
@@ -250,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                 let isValid = true;
 
                 // Valida todos os campos
-                $('input').each(function() {
+                $('input').each(function () {
                     if (!validateField($(this))) {
                         isValid = false;
                     }
@@ -265,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                         method: $(this).attr('method'),
                         data: dados_form,
                         dataType: 'json',
-                        success: function(res) {
+                        success: function (res) {
                             if (res.status === 'erro') {
 
                                 if (res.message == 'E-mail já cadastrado no sistema!') {
@@ -285,30 +289,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
 
                             } else if (res.status === 'success') {
                                 Swal.close();
-                                
+
                                 setTimeout(() => {
                                     Swal.fire({
                                         title: "Sucesso!",
                                         text: res.message,
                                         icon: "success"
                                     }).then((result) => {
-                                            window.location.href = "./index.php";
+                                        window.location.href = "./index.php";
                                     });
                                 }, 300);
                             }
 
 
                         },
-                        error: function(err) {
+                        error: function (err) {
                             Swal.fire({
                                 icon: "error",
                                 title: "Erro",
                                 text: err.message,
                             });
                         },
-                        complete: function() {
+                        complete: function () {
                             $('#abrir_conta').attr('disabled', false)
-                            
+
                         }
                     })
 
@@ -316,12 +320,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['nome'])  && !empty($
                     $('#abrir_conta').attr('disabled', false)
                     Swal.close();
 
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         Swal.fire({
-                        icon: "error",
-                        title: "Erro",
-                        text: 'Preencha os dados da forma correta!',
-                    });
+                            icon: "error",
+                            title: "Erro",
+                            text: 'Preencha os dados da forma correta!',
+                        });
                     }, 150)
 
                 }
