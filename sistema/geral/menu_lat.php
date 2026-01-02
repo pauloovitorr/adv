@@ -88,59 +88,8 @@
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
 
 <nav class="menu_lateral">
+
     <!-- <ul>
-        <li id="painel"><a href="/adv/sistema/geral/home.php">
-                <div class="div_opcao_menu_lat"><img src="../../img/painel.png" alt="">
-                    <p>PAINEL</p>
-                </div>
-            </a></li>
-        <li id="crm"><a href="/adv/sistema/crm/crm_processo.php">
-                 <div class="div_opcao_menu_lat"><img src="../../img/crm.png" alt="">
-                    <p>CRM</p>
-                </div>
-            </a></li>
-        <li id="pessoas"><a href="/adv/sistema/pessoa/pessoas.php">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-users" aria-hidden="true"></i>
-                    <p>PESSOAS</p>
-                </div>
-            </a></li>
-        <li id="processos"><a href="/adv/sistema/processo/processos.php">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
-                    <p>PROCESSOS</p>
-                </div>
-            </a></li>
-        <li id="agenda"><a href="/adv/sistema/agenda/agenda.php">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-                    <p>AGENDA</p>
-                </div>
-            </a></li>
-        <li id="site"><a href="/adv/sistema/site/modelos.php">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-globe" aria-hidden="true"></i>
-                    <p>SITE</p>
-                </div>
-            </a></li>
-        <li id="leads"><a href="">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-                    <p>LEADS</p>
-                </div>
-            </a></li>
-        <li id="financeiro"><a href="">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-sack-dollar" aria-hidden="true"></i>
-                    <p>FINANCEIRO</p>
-                </div>
-            </a></li>
-        <li id="relatorios"><a href="">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-file-lines" aria-hidden="true"></i>
-                    <p>RELATÓRIOS</p>
-                </div>
-            </a></li>
-        <li id="configuracoes"><a href="">
-                <div class="div_opcao_menu_lat"><i class="fa-solid fa-gear" aria-hidden="true"></i>
-                    <p>CONFIGURAÇÕES</p>
-                </div>
-            </a></li>
-    </ul> -->
-    <ul>
         <li id="painel"><a href="/adv/sistema/geral/home.php">
                 <div class="div_opcao_menu_lat"><img src="../../img/painel.png" alt="">
                     <p>PAINEL</p>
@@ -171,12 +120,26 @@
                     <p>SITE</p>
                 </div>
             </a></li>
+
+            <li id="ia"><a href="/adv/sistema/ia/chat.php">
+                <div class="div_opcao_menu_lat"><img src="../../img/iaa.png" alt="">
+                    <p>Leads</p>
+                </div>
+            </a></li>
+
         <li id="ia"><a href="/adv/sistema/ia/chat.php">
-                <div class="div_opcao_menu_lat"><img src="../../img/ia.png" alt="">
+                <div class="div_opcao_menu_lat"><img src="../../img/iaa.png" alt="">
                     <p>IA</p>
                 </div>
             </a></li>
-        <li id="financeiro"><a href="">
+       
+        <li id="configuracoes"><a href="/adv/sistema/configuracoes/configuracoes.php">
+                <div class="div_opcao_menu_lat"><img src="../../img/config.png" alt="">
+                    <p>CONFIGURAÇÕES</p>
+                </div>
+            </a></li>
+
+             <li id="financeiro"><a href="">
                 <div class="div_opcao_menu_lat"><img src="../../img/financeiro.png" alt="">
                     <p>FINANCEIRO</p>
                 </div>
@@ -186,12 +149,77 @@
                     <p>RELATÓRIOS</p>
                 </div>
             </a></li>
-        <li id="configuracoes"><a href="/adv/sistema/configuracoes/configuracoes.php">
-                <div class="div_opcao_menu_lat"><img src="../../img/config.png" alt="">
-                    <p>CONFIGURAÇÕES</p>
-                </div>
-            </a></li>
-    </ul>
+    </ul> -->
 
+<ul>
+    <li id="painel"><a href="/adv/sistema/geral/home.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="layout-dashboard"></i>
+            <p>PAINEL</p>
+        </div>
+    </a></li>
+    
+    <li id="crm"><a href="/adv/sistema/crm/crm_processo.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="funnel"></i> 
+            <p>CRM</p>
+        </div>
+    </a></li>
+    
+    <li id="pessoas"><a href="/adv/sistema/pessoa/pessoas.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="users"></i>
+            <p>PESSOAS</p>
+        </div>
+    </a></li>
+    
+    <li id="processos"><a href="/adv/sistema/processo/processos.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="folder-open"></i>
+            <p>PROCESSOS</p>
+        </div>
+    </a></li>
+    
+    <li id="agenda"><a href="/adv/sistema/agenda/agenda.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="calendar"></i>
+            <p>AGENDA</p>
+        </div>
+    </a></li>
+    
+    <li id="site"><a href="/adv/sistema/site/modelos.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="globe"></i>
+            <p>SITE</p>
+        </div>
+    </a></li>
+    
+    <li id="leads"><a href="/adv/sistema/ia/chat.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="user-plus"></i>
+            <p>Leads</p>
+        </div>
+    </a></li>
+    
+    <li id="ia"><a href="/adv/sistema/ia/chat.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="sparkles"></i>
+            <p>IA</p>
+        </div>
+    </a></li>
+    
+    <li id="configuracoes"><a href="/adv/sistema/configuracoes/configuracoes.php">
+        <div class="div_opcao_menu_lat">
+            <i data-lucide="settings"></i>
+            <p>CONFIGURAÇÕES</p>
+        </div>
+    </a></li>
+</ul>
+
+<!-- Script CDN Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    lucide.createIcons();
+</script>
 
 </nav>

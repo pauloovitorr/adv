@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "processos",
     "agenda",
     "site",
+    "leads",
     "ia",
     "financeiro",
     "relatorios",
