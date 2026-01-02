@@ -317,7 +317,7 @@
 
     .opcoes_add ul li {
         width: 100%;
-        padding: 8px;
+        
         transition: 0.3s;
         font-size: 14px;
     }
@@ -326,12 +326,18 @@
         background-color: rgb(235, 235, 235);
     }
 
+    .opcoes_add ul li a {
+        text-decoration: none;
+        color: rgb(58, 58, 58);
+        display: block;
+        padding: 8px;
+    }
+
     .btn_add:hover .opcoes_add,
     .btn_add .opcoes_add:hover {
         opacity: 1;
         pointer-events: auto;
     }
-
 
     .search-container {
         position: relative;
@@ -398,7 +404,7 @@
         <div class="infos_menu">
 
             <div class="header-right">
-                <a href="<?php echo $link_modelo ?? '' ?>" target="_blank" style="text-decoration:none"><span class="header-link">Visualizar site</span></a>
+                <a href="<?php echo $link_modelo ?? '' ?>" id="visualizar_site" target="_blank" style="text-decoration:none"><span class="header-link">Visualizar site</span></a>
                 <i class="fas fa-bell notification-icon"></i>
             </div>
 
@@ -407,9 +413,9 @@
 
                 <div class="opcoes_add">
                     <ul>
-                        <li>aaaaa</li>
-                        <li>aaaaa</li>
-                        <li>aaaaa</li>
+                        <li><a href="/adv/sistema/pessoa/cadastro_pessoa.php">Pessoa</a></li>
+                        <li><a href="/adv/sistema/processo/cadastro_processo.php">Processo</a></li>
+                        <li><a href="/adv/sistema/agenda/agenda.php">Compromisso</a></li>
                     </ul>
                 </div>
 
@@ -419,11 +425,10 @@
                 <div class="user"><?php echo substr($_SESSION['nome'], 0, 2) ?></div>
                 <div class="opcoes_perfil">
                     <ul>
-                        <li>Perfil</li>
-                        <li>Configurações</li>
-                        <a href="/adv/sistema/geral/logout.php">
-                            <li>Sair</li>
-                        </a>
+                        <a href="/adv/sistema/site/modelos.php"> <li>Modelos de Site</li></a>
+                        <a href="/adv/sistema/ia/chat.php"> <li>Chat com IA</li></a>
+                        <a href="/adv/sistema/configuracoes/configuracoes.php"> <li>Configurações</li></a>
+                        <a href="/adv/sistema/geral/logout.php"> <li>Sair</li></a>
                     </ul>
                 </div>
             </div>

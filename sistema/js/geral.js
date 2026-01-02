@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     placement: "right",
   });
 
- 
-
-
-
+  tippy(`#visualizar_site`, {
+    content: "Necessário ter configurado um modelo!",
+    placement: "left",
+  });
 });

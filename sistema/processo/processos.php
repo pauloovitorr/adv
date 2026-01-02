@@ -34,7 +34,7 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
         $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
-        $sql_filtros = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+        $sql_filtros = "SELECT p.tipo_acao, p.status, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
         FROM processo as p 
         INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
         WHERE p.usuario_config_id_usuario_config = $id_user";
@@ -306,8 +306,7 @@ include_once('../geral/topo.php');
                                         }
                                         ?>
 
-                                        
-
+                                    
                                         <div class="dados_processo <?php echo $classeChance?> <?php echo $proceso['status'] == 'inativo' ? 'inativo': 'ativo' ?> " onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'  ">
                                             <div class="conteudo_pessoa container_tipo_acao">
                                                 <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?></div>

@@ -47,7 +47,7 @@ body {
 
 .container_principal {
   width: calc(100% - 80px);
-  min-height: calc(100vh - 90px);
+  min-height: calc(100vh - 140px);
   margin-left: 80px;
   border: 1px solid transparent;
 }
@@ -60,7 +60,7 @@ body {
   width: 96%;
   max-width: 1260px;
   margin: 0 auto;
-  padding-bottom: 32px;
+  padding-bottom: 24px;
 }
 
 .btn_cadastrar {

@@ -14,8 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else {
         $dados_modelo = [];
     }
-}
-;
+};
 
 
 // Atualizando os dados da conta do usuário logado
@@ -142,7 +141,7 @@ include_once('../geral/topo.php');
 
                 <div class="cadastro-modelo__form-wrapper">
 
-                    <form action="" method="POST" id="atualizar_configuracoes_form">
+                    <form id="atualizar_configuracoes_form">
                         <fieldset>
                             <legend>Dados da Conta</legend>
 
@@ -261,13 +260,29 @@ include_once('../geral/topo.php');
                     return;
                 }
 
+                // swal de carregango
+                 Swal.showLoading();
+
                 $.ajax({
                     type: 'POST',
                     url: './configuracoes.php',
                     dataType: 'json',
                     data: $(this).serialize(),
                     success: function (res) {
-                        console.log(res);
+                        
+                        if (res.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso',
+                                text: res.mensagem
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: res.mensagem
+                            });
+                        }
                     },
                     error: function () {
                         alert('Erro ao enviar formulário');
