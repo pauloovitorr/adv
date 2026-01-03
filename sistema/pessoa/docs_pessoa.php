@@ -350,15 +350,19 @@ include_once('../geral/topo.php');
 
                             <?php while ($doc = $lista_docs->fetch_assoc()): ?>
 
-                                <?php $ext = strtolower(pathinfo($doc["caminho_arquivo"], PATHINFO_EXTENSION)); ?>
+                                <?php $ext = strtolower(pathinfo($doc["caminho_arquivo"], PATHINFO_EXTENSION));
+                                
+                                $caminho_arquivo = "/adv/sistema/" . $doc["caminho_arquivo"];
+                                
+                                ?>
 
-                                <a href="..<?php echo $doc["caminho_arquivo"] ?>" target="__blank">
+                                <a href="<?php echo $caminho_arquivo ?>" target="__blank">
                                     <div class="doc">
                                         <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
                                             <span class="dz-remove remove_documento">X
                                                 <input type="hidden" class="token" value="<?php echo $doc['id_documento'] ?>">
                                             </span>
-                                            <img class="img_bg_doc" src="<?php echo $doc["caminho_arquivo"] ?>" alt="" srcset="">
+                                            <img class="img_bg_doc" src="<?php echo $caminho_arquivo ?>" alt="" srcset="">
                                             <div class="nome_arquivo"><span><?php echo $doc["nome_original"] ?></span></div>
 
                                         <?php else: ?>
