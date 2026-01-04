@@ -140,7 +140,7 @@ CREATE TABLE eventos_crm (
     id_evento_crm INT NOT NULL AUTO_INCREMENT,
     titulo VARCHAR(100) NOT NULL,
     descricao TEXT NOT NULL,
-    all_day TINYINT(1) DEFAULT 0,
+    all_day VARCHAR(3) NOT NULL,
     data_inicio DATETIME NOT NULL,
     data_fim DATETIME NOT NULL,
     cor VARCHAR(20) DEFAULT '#007bff',

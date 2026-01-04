@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['start']) && !empty($_G
 
     // Converte as datas de GET para formato datetime do MySQL
     $dt_start = date('Y-m-d H:i:s', strtotime($_GET['start']));
-    $dt_end   = date('Y-m-d H:i:s', strtotime($_GET['end']));
+    $dt_end = date('Y-m-d H:i:s', strtotime($_GET['end']));
 
     // Consulta os eventos do usuário no intervalo
     $sql_busca_eventos = "
@@ -35,9 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['start']) && !empty($_G
                 "id" => $evento["id_evento_crm"],
                 "title" => $evento["titulo"],
                 "start" => str_replace(' ', 'T', $evento["data_inicio"]),
-                "end"   => str_replace(' ', 'T', $end),
+                "end" => str_replace(' ', 'T', $end),
                 "allDay" => strtolower($evento["all_day"]) === 'sim',
-                "color"  => $evento["cor"],
+                "color" => $evento["cor"],
                 "extendedProps" => [
                     "descricao" => $evento["descricao"]
                 ]
@@ -53,12 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['start']) && !empty($_G
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($_POST['description']) && !empty($_POST['start']) && !empty($_POST['end']) && !empty($_POST['color'])) {
-    $title       = $conexao->real_escape_string(htmlspecialchars($_POST['title']));
+    $title = $conexao->real_escape_string(htmlspecialchars($_POST['title']));
     $description = $conexao->real_escape_string(htmlspecialchars($_POST['description']));
-    $allDay      = $conexao->real_escape_string(htmlspecialchars($_POST['allDay']));
-    $start       = $conexao->real_escape_string(htmlspecialchars($_POST['start']));
-    $end         = $conexao->real_escape_string(htmlspecialchars($_POST['end']));
-    $color       = $conexao->real_escape_string(htmlspecialchars($_POST['color']));
+    $allDay = $conexao->real_escape_string(htmlspecialchars($_POST['allDay']));
+    $start = $conexao->real_escape_string(htmlspecialchars($_POST['start']));
+    $end = $conexao->real_escape_string(htmlspecialchars($_POST['end']));
+    $color = $conexao->real_escape_string(htmlspecialchars($_POST['color']));
+
+
 
     // Query preparada
     $sql = "INSERT INTO eventos_crm 
@@ -71,19 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($
         if ($stmt->execute()) {
             $res = [
                 'status' => 'success',
-                'message'    => 'Evento salvo com sucesso!',
-                'id'     => $stmt->insert_id
+                'message' => 'Evento salvo com sucesso!',
+                'id' => $stmt->insert_id
             ];
         } else {
             $res = [
                 'status' => 'error',
-                'message'    => 'Erro ao salvar evento: ' . $stmt->error
+                'message' => 'Erro ao salvar evento: ' . $stmt->error
             ];
         }
     } else {
         $res = [
             'status' => 'error',
-            'message'    => 'Erro ao preparar statement: ' . $conexao->error
+            'message' => 'Erro ao preparar statement: ' . $conexao->error
         ];
     }
 
@@ -94,12 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title']) && !empty($
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&  !empty($_POST['start']) && !empty($_POST['end']) && isset($_POST['all_day'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) && !empty($_POST['start']) && !empty($_POST['end']) && isset($_POST['all_day'])) {
 
     $id_compromisso = (int) $_POST['id_compromisso'];
-    $allDay         = ($_POST['all_day'] == 'true') ? 'sim' : 'nao';
+    $allDay = ($_POST['all_day'] == 'true') ? 'sim' : 'nao';
     $start = $conexao->real_escape_string($_POST['start']);
-    $end   = $conexao->real_escape_string($_POST['end']);
+    $end = $conexao->real_escape_string($_POST['end']);
 
     // Converte para o formato correto do MySQL
 
@@ -122,12 +124,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&
     if ($conexao->query($sql)) {
         $res = [
             'status' => 'success',
-            'message'    => 'Evento atualizado com sucesso!'
+            'message' => 'Evento atualizado com sucesso!'
         ];
     } else {
         $res = [
             'status' => 'error',
-            'message'    => 'Erro ao atualizar evento: '
+            'message' => 'Erro ao atualizar evento: '
         ];
     }
 
@@ -137,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&  !empty($_POST['acao']) && $_POST['acao'] == 'excluir') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) && !empty($_POST['acao']) && $_POST['acao'] == 'excluir') {
 
     $id_compromisso = $conexao->real_escape_string($_POST['id_compromisso']);
     $sql_delete_compromisso = "DELETE FROM eventos_crm WHERE id_evento_crm = $id_compromisso AND usuario_config_id_usuario_config = $id_user";
@@ -145,12 +147,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id_compromisso']) &&
     if ($conexao->query($sql_delete_compromisso)) {
         $res = [
             'status' => 'success',
-            'message'    => 'Evento excluído com sucesso!'
+            'message' => 'Evento excluído com sucesso!'
         ];
     } else {
         $res = [
             'status' => 'error',
-            'message'    => 'Erro ao excluir evento: '
+            'message' => 'Erro ao excluir evento: '
         ];
     }
 
@@ -199,7 +201,7 @@ include_once('../geral/topo.php');
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -239,10 +241,10 @@ include_once('../geral/topo.php');
                 // Eventos
                 events: './agenda.php',
 
-                select: function(info) {
+                select: function (info) {
 
-                        Swal.fire({
-                            html: `
+                    Swal.fire({
+                        html: `
                            <form id="eventForm" method="post">
                 <h2>Novo Compromisso</h2>
 
@@ -287,132 +289,131 @@ include_once('../geral/topo.php');
                 <button type="submit" class="btn" id="salvarEvento">Salvar Evento</button>
             </form>
                            `,
-                            confirmButtonText: 'Fechar',
-                            confirmButtonColor: " #06112483",
-                            didOpen: () => {
-                                $(document).ready(function() {
+                        confirmButtonText: 'Fechar',
+                        confirmButtonColor: " #06112483",
+                        didOpen: () => {
+                            $(document).ready(function () {
 
-                                    const allDayRadio = document.getElementById('allDay');
-                                    const partDayRadio = document.getElementById('partDay');
-                                    const startInput = document.getElementById('start');
-                                    const endInput = document.getElementById('end');
+                                const allDayRadio = document.getElementById('allDay');
+                                const partDayRadio = document.getElementById('partDay');
+                                const startInput = document.getElementById('start');
+                                const endInput = document.getElementById('end');
 
-                                    const startDate = new Date(info.startStr);
-                                    const endDate = new Date(info.endStr);
-                                    const displayEndDate = new Date(endDate);
-                                    displayEndDate.setDate(endDate.getDate() - 1);
+                                const startDate = new Date(info.startStr);
+                                const endDate = new Date(info.endStr);
+                                const displayEndDate = new Date(endDate);
+                                displayEndDate.setDate(endDate.getDate() - 1);
 
-                                    // Funções de formatação
-                                    const formatDate = (d) => d.toISOString().slice(0, 10); // YYYY-MM-DD
-                                    const formatDateTime = (d) => {
-                                        const pad = (n) => n.toString().padStart(2, '0');
-                                        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                                // Funções de formatação
+                                const formatDate = (d) => d.toISOString().slice(0, 10); // YYYY-MM-DD
+                                const formatDateTime = (d) => {
+                                    const pad = (n) => n.toString().padStart(2, '0');
+                                    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                                }
+
+                                // Preenche os inputs inicialmente como date
+                                startInput.type = endInput.type = 'date';
+                                startInput.value = formatDate(startDate);
+                                endInput.value = formatDate(displayEndDate);
+
+                                // Função para alternar tipo mantendo valor
+                                function toggleInputType(isAllDay) {
+                                    if (isAllDay) {
+                                        // Muda para date mantendo somente a data
+                                        const start = new Date(startInput.value);
+                                        const end = new Date(endInput.value);
+                                        startInput.type = endInput.type = 'date';
+                                        startInput.value = formatDate(start);
+                                        endInput.value = formatDate(end);
+                                    } else {
+                                        // Muda para datetime-local mantendo a hora
+                                        const parseDateTime = (val) => {
+                                            const [year, month, day] = val.split('-').map(Number);
+                                            return new Date(year, month - 1, day, 0, 0);
+                                        };
+                                        const start = parseDateTime(startInput.value);
+                                        const end = parseDateTime(endInput.value);
+                                        startInput.type = endInput.type = 'datetime-local';
+                                        startInput.value = formatDateTime(start);
+                                        endInput.value = formatDateTime(end);
                                     }
+                                }
 
-                                    // Preenche os inputs inicialmente como date
-                                    startInput.type = endInput.type = 'date';
-                                    startInput.value = formatDate(startDate);
-                                    endInput.value = formatDate(displayEndDate);
-
-                                    // Função para alternar tipo mantendo valor
-                                    function toggleInputType(isAllDay) {
-                                        if (isAllDay) {
-                                            // Muda para date mantendo somente a data
-                                            const start = new Date(startInput.value);
-                                            const end = new Date(endInput.value);
-                                            startInput.type = endInput.type = 'date';
-                                            startInput.value = formatDate(start);
-                                            endInput.value = formatDate(end);
-                                        } else {
-                                            // Muda para datetime-local mantendo a hora
-                                            // Se já era date, adiciona hora 00:00
-                                            const parseDateTime = (val) => {
-                                                const d = new Date(val);
-                                                return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0);
-                                            }
-                                            const start = parseDateTime(startInput.value);
-                                            const end = parseDateTime(endInput.value);
-                                            startInput.type = endInput.type = 'datetime-local';
-                                            startInput.value = formatDateTime(start);
-                                            endInput.value = formatDateTime(end);
-                                        }
-                                    }
-
-                                    // Listeners
-                                    allDayRadio.addEventListener('change', () => toggleInputType(allDayRadio.checked));
-                                    partDayRadio.addEventListener('change', () => toggleInputType(!partDayRadio.checked));
+                                // Listeners
+                                allDayRadio.addEventListener('change', () => toggleInputType(allDayRadio.checked));
+                                partDayRadio.addEventListener('change', () => toggleInputType(!partDayRadio.checked));
 
 
-                                    startInput.addEventListener('change', function() {
-                                        endInput.setAttribute('min', startInput.value)
-                                    })
+                                startInput.addEventListener('change', function () {
+                                    endInput.setAttribute('min', startInput.value)
+                                })
 
 
 
-                                    const colorChoices = document.querySelectorAll('.color-choice');
-                                    const colorInput = document.getElementById('eventColor');
+                                const colorChoices = document.querySelectorAll('.color-choice');
+                                const colorInput = document.getElementById('eventColor');
 
-                                    colorChoices.forEach(choice => {
-                                        choice.addEventListener('click', () => {
-                                            colorChoices.forEach(c => c.classList.remove('selected'));
-                                            choice.classList.add('selected');
-                                            colorInput.value = choice.getAttribute('data-color');
-                                        });
+                                colorChoices.forEach(choice => {
+                                    choice.addEventListener('click', () => {
+                                        colorChoices.forEach(c => c.classList.remove('selected'));
+                                        choice.classList.add('selected');
+                                        colorInput.value = choice.getAttribute('data-color');
                                     });
+                                });
 
-                                    // Define a primeira cor como selecionada por padrão
-                                    colorChoices[0].classList.add('selected');
+                                // Define a primeira cor como selecionada por padrão
+                                colorChoices[0].classList.add('selected');
 
 
 
 
-                                    // !--Ajax do crud de eventos-- >
-                                    $('#eventForm').on('submit', function(e) {
-                                        e.preventDefault()
+                                // !--Ajax do crud de eventos-- >
+                                $('#eventForm').on('submit', function (e) {
+                                    e.preventDefault()
 
-                                        $('#salvarEvento').attr('disabled', 'true')
+                                    $('#salvarEvento').attr('disabled', 'true')
 
-                                        $.ajax({
-                                            url: './agenda.php',
-                                            method: 'POST',
-                                            dataType: 'JSON',
-                                            data: $(this).serialize(),
-                                            success: function(res) {
-                                                if (res.status == 'error') {
-                                                    Swal.fire({
-                                                        icon: "error",
-                                                        title: "Erro ao cadastrar evento!",
-                                                        text: res.message
-                                                    });
-                                                } else {
-                                                    Swal.fire({
-                                                        title: "Sucesso",
-                                                        text: "Evento cadastrado com sucesso!",
-                                                        icon: "success"
-                                                    });
-                                                }
-
-                                                setTimeout(() => {
-                                                    window.location.reload()
-                                                }, 1500)
-
+                                    $.ajax({
+                                        url: './agenda.php',
+                                        method: 'POST',
+                                        dataType: 'JSON',
+                                        data: $(this).serialize(),
+                                        success: function (res) {
+                                            if (res.status == 'error') {
+                                                Swal.fire({
+                                                    icon: "error",
+                                                    title: "Erro ao cadastrar evento!",
+                                                    text: res.message
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: "Sucesso",
+                                                    text: "Evento cadastrado com sucesso!",
+                                                    icon: "success"
+                                                });
                                             }
-                                        })
 
+                                            setTimeout(() => {
+                                                window.location.reload()
+                                            }, 1500)
 
+                                        }
                                     })
-                                    // !-- FIM Ajax do crud de eventos-- >
-
-
 
 
                                 })
-                            }
-                        })
+                                // !-- FIM Ajax do crud de eventos-- >
 
-                    }
 
-                    ,
+
+
+                            })
+                        }
+                    })
+
+                }
+
+                ,
 
                 // Callback quando clicar em um dia
                 // dateClick: function(info) {
@@ -421,7 +422,7 @@ include_once('../geral/topo.php');
                 // },
 
                 // Callback quando clicar em um evento
-                eventClick: function(info) {
+                eventClick: function (info) {
                     const evento = info.event;
 
                     let id_evento = evento._def.publicId
@@ -535,8 +536,8 @@ include_once('../geral/topo.php');
                                 placement: "right",
                             });
 
-                            $(document).ready(function() {
-                                $('.dz-remove').on('click', function() {
+                            $(document).ready(function () {
+                                $('.dz-remove').on('click', function () {
                                     dados = {
                                         id_compromisso: $(this).find('.codigo_evento').val(),
                                         acao: 'excluir'
@@ -547,7 +548,7 @@ include_once('../geral/topo.php');
                                         method: 'POST',
                                         dataType: 'json',
                                         data: dados,
-                                        success: function(res) {
+                                        success: function (res) {
                                             if (res.status == 'error') {
                                                 Swal.fire({
                                                     icon: "error",
@@ -578,42 +579,42 @@ include_once('../geral/topo.php');
                 },
 
                 // Callback ao arrastar evento
-                eventDrop: function(info) {
-                        const evento = info.event;
+                eventDrop: function (info) {
+                    const evento = info.event;
 
-                        // Captura os dados formatados no padrão do backend (Y-m-d H:i:s)
-                        const formatDateTime = (date) => {
-                            return date.toISOString().slice(0, 19).replace('T', ' ');
-                        };
-
-
-                        const dados = {
-                            id_compromisso: evento.id,
-                            start: formatDateTime(evento.start),
-                            end: evento.end ? formatDateTime(evento.end) : formatDateTime(evento.start),
-                            all_day: evento.allDay ? 'true' : 'false'
-                        };
-
-                        $.ajax({
-                            url: './agenda.php',
-                            method: 'POST',
-                            dataType: 'JSON',
-                            data: dados,
-
-                            success: function(res) {
-
-                                console.log(res)
-
-                                // setTimeout(() => {
-                                //     window.location.reload()
-                                // }, 1500)
-                            }
+                    // Captura os dados formatados no padrão do backend (Y-m-d H:i:s)
+                    const formatDateTime = (date) => {
+                        return date.toISOString().slice(0, 19).replace('T', ' ');
+                    };
 
 
-                        })
-                    }
+                    const dados = {
+                        id_compromisso: evento.id,
+                        start: formatDateTime(evento.start),
+                        end: evento.end ? formatDateTime(evento.end) : formatDateTime(evento.start),
+                        all_day: evento.allDay ? 'true' : 'false'
+                    };
 
-                    ,
+                    $.ajax({
+                        url: './agenda.php',
+                        method: 'POST',
+                        dataType: 'JSON',
+                        data: dados,
+
+                        success: function (res) {
+
+                            console.log(res)
+
+                            // setTimeout(() => {
+                            //     window.location.reload()
+                            // }, 1500)
+                        }
+
+
+                    })
+                }
+
+                ,
 
             });
 

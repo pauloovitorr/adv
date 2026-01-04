@@ -39,14 +39,14 @@
     font-weight: 700;
     color: #ffffff;
     margin: 0 0 8px 0;
-    animation: fadeInDown 0.8s ease-out;
+    /* animation: fadeInDown 0.8s ease-out; */
 }
 
 .welcome-subtitle {
     font-size: 16px;
     color: #f0f0f0;
     margin: 0;
-    animation: fadeInUp 0.8s ease-out;
+    /* animation: fadeInUp 0.8s ease-out; */
 }
 
 /* Grid de Gráficos */
