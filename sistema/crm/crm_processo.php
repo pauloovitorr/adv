@@ -683,9 +683,6 @@ include_once('../geral/topo.php');
                             <option value="Sentença favorável">Sentença favorável</option>
                             <option value="Acordo homologado">Acordo homologado</option>
                             <option value="Improcedente">Improcedente</option>
-                            <option value="Parcialmente Procedente">Parcialmente procedente</option>
-                            <option value="Extinto sem julgamento do mérito">Extinto sem julgamento do mérito</option>
-                            <option value="Recurso interposto">Recurso interposto</option>
                         </select>
 
                         <label for="resultado">Honorário</label>

@@ -69,12 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $numero_protocolo    = $conexao->escape_string(htmlspecialchars($_POST['num_protocolo'] ?? ''));
     $processo_originario = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
     $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
-    $valor_honorarios    = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
     $etapa_kanban        = (int)($conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? 0)));
     $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
     $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
-    $resultado_processo  = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
     $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
+    $valor_honorarios = isset($_POST['valor_honorarios']) && $_POST['valor_honorarios'] !== ''
+    ? $_POST['valor_honorarios'] : NULL;
+     $resultado_processo = isset($_POST['resultado_processo']) && $_POST['resultado_processo'] !== ''
+    ? $_POST['resultado_processo'] : NULL;
 
     $sql = "INSERT INTO processo (
         cliente_id,
@@ -145,14 +147,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $num_protocolo        = $conexao->escape_string(htmlspecialchars($_POST['num_protocolo'] ?? ''));
     $processo_originario  = $conexao->escape_string(htmlspecialchars($_POST['processo_originario'] ?? ''));
     $valor_causa          = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
-    $valor_honorarios     = $conexao->escape_string(htmlspecialchars($_POST['valor_honorarios'] ?? ''));
     $etapa_kanban         = $conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? ''));
     $contingenciamento    = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
     $data_requerimento    = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
-    $resultado_processo   = $conexao->escape_string(htmlspecialchars($_POST['resultado_processo'] ?? ''));
     $observacao           = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
     $acao                 = $conexao->escape_string(htmlspecialchars($_POST['acao'] ?? ''));
     $pro_id               = $conexao->escape_string(htmlspecialchars($_POST['pro_id'] ?? ''));
+
+    $valor_honorarios = isset($_POST['valor_honorarios']) && $_POST['valor_honorarios'] !== ''
+    ? $_POST['valor_honorarios'] : NULL;
+     $resultado_processo = isset($_POST['resultado_processo']) && $_POST['resultado_processo'] !== ''
+    ? $_POST['resultado_processo'] : NULL;
 
     $sql = "UPDATE processo 
                SET cliente_id = ?, 
@@ -558,15 +563,7 @@ include_once('../geral/topo.php');
                                             <option value="Improcedente" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Improcedente' ? 'selected' : ''; ?>>
                                                 Improcedente
                                             </option>
-                                            <option value="Parcialmente procedente" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Parcialmente procedente' ? 'selected' : ''; ?>>
-                                                Parcialmente procedente
-                                            </option>
-                                            <option value="Extinto sem julgamento do mérito" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Extinto sem julgamento do mérito' ? 'selected' : ''; ?>>
-                                                Extinto sem julgamento do mérito
-                                            </option>
-                                            <option value="Recurso interposto" <?php echo ($dados_processo['resultado_processo'] ?? '') == 'Recurso interposto' ? 'selected' : ''; ?>>
-                                                Recurso interposto
-                                            </option>
+                                            
                                         </select>
                                     </div>
 
