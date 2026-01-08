@@ -129,6 +129,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
                 }
             }
 
+            // Deleta todas as anotações vinculadas ao processo
+            $sql_deleta_anotacoes = "DELETE FROM anotacoes_crm WHERE processo_id_processo = $id_processo";
+            $res_dell_anotacoes = $conexao->query($sql_deleta_anotacoes); 
+            
+
+
             $sql_delete_processo = 'DELETE FROM processo WHERE tk = ? AND usuario_config_id_usuario_config = ?';
             $stmt = $conexao->prepare($sql_delete_processo);
             $stmt->bind_param('si', $token, $id_user);
