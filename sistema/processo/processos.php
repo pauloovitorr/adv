@@ -6,8 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     // Páginação
     $limite = 20;
-    $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-    if ($pagina < 1) $pagina = 1;
+    $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
+    if ($pagina < 1)
+        $pagina = 1;
     $offset = ($pagina - 1) * $limite;
 
     $sql_quantidade_processos = "SELECT 
@@ -20,17 +21,17 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
 
 
     if ($res_qtd->num_rows == 1) {
-        $res_qtd        = mysqli_fetch_assoc($res_qtd);
-        $total          = $res_qtd["total_processo"];
-        $chance_alta    = $res_qtd["chance_alta"];
-        $chance_media   = $res_qtd["chance_media"];
-        $chance_baixa   = $res_qtd["chance_baixa"];
+        $res_qtd = mysqli_fetch_assoc($res_qtd);
+        $total = $res_qtd["total_processo"];
+        $chance_alta = $res_qtd["chance_alta"];
+        $chance_media = $res_qtd["chance_media"];
+        $chance_baixa = $res_qtd["chance_baixa"];
 
         // var_dump($res_qtd);
     }
 
     if (count($_GET) > 0) {
-        $tipo_acao    = isset($_GET['buscar_tipo_acao']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_tipo_acao'])) : null;
+        $tipo_acao = isset($_GET['buscar_tipo_acao']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_tipo_acao'])) : null;
         $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
         $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
@@ -40,18 +41,18 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         WHERE p.usuario_config_id_usuario_config = $id_user";
 
         $params = [];
-        $types  = "";
+        $types = "";
 
         if (!empty($tipo_acao)) {
             $sql_filtros .= " AND tipo_acao LIKE ?";
             $params[] = "%$tipo_acao%";
-            $types   .= "s";
+            $types .= "s";
         }
 
         if (!empty($filtrar)) {
             $sql_filtros .= " AND grupo_acao = ?";
             $params[] = $filtrar;
-            $types   .= "s";
+            $types .= "s";
         }
 
         switch ($ordenar) {
@@ -131,8 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
             // Deleta todas as anotações vinculadas ao processo
             $sql_deleta_anotacoes = "DELETE FROM anotacoes_crm WHERE processo_id_processo = $id_processo";
-            $res_dell_anotacoes = $conexao->query($sql_deleta_anotacoes); 
-            
+            $res_dell_anotacoes = $conexao->query($sql_deleta_anotacoes);
+
 
 
             $sql_delete_processo = 'DELETE FROM processo WHERE tk = ? AND usuario_config_id_usuario_config = ?';
@@ -181,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
     <title>ADV Conectado</title>
 
     <style>
-        .inativo{
+        .inativo {
             background-color: #d5d5d53b;
         }
     </style>
@@ -206,19 +207,23 @@ include_once('../geral/topo.php');
         <div class="pai_conteudo">
 
             <div class="infos_pagina">
-                <button> <i class="fa-regular fa-folder"></i> <?php echo $total <= 1 ?  "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
-                <button> <i class="fa-regular fa-folder"></i> <?php echo  "$chance_alta chance alta" ?> </button>
-                <button> <i class="fa-regular fa-folder"></i> <?php echo  "$chance_media chance média" ?> </button>
-                <button> <i class="fa-regular fa-folder"></i> <?php echo  "$chance_baixa chance baixa" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i>
+                    <?php echo $total <= 1 ? "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i> <?php echo "$chance_alta chance alta" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i> <?php echo "$chance_media chance média" ?> </button>
+                <button> <i class="fa-regular fa-folder"></i> <?php echo "$chance_baixa chance baixa" ?> </button>
             </div>
 
             <div class="opcoes_funcoes">
-                <button class="btn_adicionar" id="add_processo"> <i class="fa-solid fa-plus"></i> Novo Processo </button>
+                <button class="btn_adicionar" id="add_processo"> <i class="fa-solid fa-plus"></i> Novo Processo
+                </button>
 
                 <form action="" method="get">
 
                     <div class="div_pai_funcoes">
-                        <input type="text" id="buscar_tipo_acao" name="buscar_tipo_acao" value="<?= isset($_GET['buscar_tipo_acao']) ? htmlspecialchars($_GET['buscar_tipo_acao']) : '' ?>" placeholder="Buscar Por Tipo de Ação">
+                        <input type="text" id="buscar_tipo_acao" name="buscar_tipo_acao"
+                            value="<?= isset($_GET['buscar_tipo_acao']) ? htmlspecialchars($_GET['buscar_tipo_acao']) : '' ?>"
+                            placeholder="Buscar Por Tipo de Ação">
                         <i class="fa-regular fa-pen-to-square"></i>
                     </div>
 
@@ -251,9 +256,12 @@ include_once('../geral/topo.php');
                         </select>
                     </div>
 
-                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;" for="buscar_tipo_acao"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
+                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;"
+                            for="buscar_tipo_acao"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
 
-                    <button type="submit" class="btn_pesquisar"><a href="./processos.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_tipo_acao"><i class="fa-solid fa-broom"></i></label> </a></button>
+                    <button type="submit" class="btn_pesquisar"><a href="./processos.php"
+                            style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;"
+                                for="buscar_tipo_acao"><i class="fa-solid fa-broom"></i></label> </a></button>
                 </form>
 
                 <!-- <div class="div_pai_funcoes">
@@ -288,12 +296,12 @@ include_once('../geral/topo.php');
                         <?php
 
                         // var_dump($res);
-
+                        
                         if ($res->num_rows):
 
                             while ($proceso = mysqli_fetch_assoc($res)):
 
-                        ?>
+                                ?>
 
                                 <tr>
 
@@ -312,10 +320,12 @@ include_once('../geral/topo.php');
                                         }
                                         ?>
 
-                                    
-                                        <div class="dados_processo <?php echo $classeChance?> <?php echo $proceso['status'] == 'inativo' ? 'inativo': 'ativo' ?> " onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'  ">
+
+                                        <div class="dados_processo <?php echo $classeChance ?> <?php echo $proceso['status'] == 'inativo' ? 'inativo' : 'ativo' ?> "
+                                            onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'  ">
                                             <div class="conteudo_pessoa container_tipo_acao">
-                                                <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?></div>
+                                                <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?>
+                                                </div>
                                                 <div class="nome_pessoa">
                                                     <p> <?php echo $proceso['tipo_acao']; ?> </p>
                                                     <span> <?php echo $proceso['nome']; ?> </span>
@@ -342,21 +352,25 @@ include_once('../geral/topo.php');
 
                                                     <div class="opcoes_pessoa">
                                                         <ul>
-                                                            <a href="./ficha_processo.php?tkn=<?php echo $proceso['tk'] ?>  " target="_blank">
+                                                            <a href="./ficha_processo.php?tkn=<?php echo $proceso['tk'] ?>  "
+                                                                target="_blank">
                                                                 <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                             </a>
 
-                                                            <a href="./docs_processo.php?tkn=<?php echo $proceso['tk'] ?>" target="_blank">
+                                                            <a href="./docs_processo.php?tkn=<?php echo $proceso['tk'] ?>"
+                                                                target="_blank">
                                                                 <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                             </a>
 
 
-                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $proceso['tk'] ?>" target="_blank">
+                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $proceso['tk'] ?>"
+                                                                target="_blank">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 
                                                             <a href="javascript:void(0)" class="excluir_processo">
-                                                                <input type="hidden" class="token" value="<?php echo $proceso['tk'] ?>">
+                                                                <input type="hidden" class="token"
+                                                                    value="<?php echo $proceso['tk'] ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
                                                         </ul>
@@ -369,7 +383,7 @@ include_once('../geral/topo.php');
                                     </td>
                                 </tr>
 
-                            <?php
+                                <?php
                             endwhile;
                         else:
                             ?>
@@ -384,7 +398,7 @@ include_once('../geral/topo.php');
 
                             </tr>
 
-                        <?php
+                            <?php
                         endif;
                         ?>
 
@@ -394,10 +408,10 @@ include_once('../geral/topo.php');
 
             </section>
 
-            <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
+            <div class="pagination-container"
+                style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
                 <?php if ($pagina > 1): ?>
-                    <a href="?pagina=<?php echo $pagina - 1; ?>"
-                        class="pagination-btn">← Anterior</a>
+                    <a href="?pagina=<?php echo $pagina - 1; ?>" class="pagination-btn">← Anterior</a>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
@@ -409,8 +423,7 @@ include_once('../geral/topo.php');
                 <?php endfor; ?>
 
                 <?php if ($pagina < $total_paginas): ?>
-                    <a href="?pagina=<?php echo $pagina + 1; ?>"
-                        class="pagination-btn">Próxima →</a>
+                    <a href="?pagina=<?php echo $pagina + 1; ?>" class="pagination-btn">Próxima →</a>
                 <?php endif; ?>
             </div>
 
@@ -422,8 +435,8 @@ include_once('../geral/topo.php');
 
     <!-- Script para exibir as opções quando os 3 prontinhos da ação são clicados -->
     <script>
-        $(document).ready(function() {
-            $('.opcoes_acao').on('click', function(e) {
+        $(document).ready(function () {
+            $('.opcoes_acao').on('click', function (e) {
                 e.stopPropagation(); // Impede o clique no elemento de propagar para o documento
 
                 var opcoesPessoa = $(this).find('.opcoes_pessoa');
@@ -436,7 +449,7 @@ include_once('../geral/topo.php');
                 }
             });
 
-            $(document).on('click', function() {
+            $(document).on('click', function () {
                 // Esconde qualquer menu aberto ao clicar fora
                 $('.opcoes_pessoa').hide();
             });
@@ -444,16 +457,16 @@ include_once('../geral/topo.php');
     </script>
 
     <script>
-        $(document).ready(function() {
-            $('#add_processo').click(function() {
+        $(document).ready(function () {
+            $('#add_processo').click(function () {
                 window.open('./cadastro_processo.php', '_self');
             })
         })
     </script>
 
     <script>
-        $(function() {
-            $('.excluir_processo').on('click', function() {
+        $(function () {
+            $('.excluir_processo').on('click', function () {
                 let tk = $(this).find('.token').val()
 
 
@@ -476,7 +489,7 @@ include_once('../geral/topo.php');
                                 token: tk
                             },
                             dataType: 'json',
-                            success: function(res) {
+                            success: function (res) {
 
                                 if (res.status == "success") {
                                     Swal.fire({

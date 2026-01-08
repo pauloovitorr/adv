@@ -771,8 +771,8 @@ include_once('../geral/topo.php');
                         <?php
                         if (!empty($conversas)):
                             foreach ($conversas as $conversa): ?>
-                                <div class="historico_chat" data-conversa="<?php echo $conversa['id_conversa']; ?>">
-                                    <div class="titulo_conversa">
+                                <div class="historico_chat">
+                                    <div class="titulo_conversa" data-conversa="<?php echo $conversa['id_conversa']; ?>">
                                         <span> <?php echo ucfirst($conversa['primeira_mensagem']); ?> </span>
                                     </div>
                                     <i class="fa-regular fa-trash-can dell_conversa"></i>
@@ -997,13 +997,13 @@ include_once('../geral/topo.php');
                         if (res.status == 'success') {
 
                             // Verifico se já possui conversa no histórico com o id da conversa
-                            let qtd_conversa = $(`.historico_chat[data-conversa="${res.id_conversa}"]`).length;
+                            let qtd_conversa = $(`.titulo_conversa[data-conversa="${res.id_conversa}"]`).length;
 
                             if (qtd_conversa == 0) {
                                 // Adiciona nova conversa no histórico
                                 let chat = `
-                                            <div class="historico_chat" data-conversa="${res.id_conversa}">
-                                                <div class="titulo_conversa">
+                                            <div class="historico_chat" >
+                                                <div class="titulo_conversa" data-conversa="${res.id_conversa}">
                                                     <span> ${texto} </span>
                                                 </div>
                                                 <i class="fa-regular fa-trash-can dell_conversa"></i>
@@ -1296,7 +1296,7 @@ include_once('../geral/topo.php');
 
             // Adiciono evento na tag i para excluir conversas ao ser clicada
             $(document).on('click', '.dell_conversa', function () {
-                let id_conversa = $(this).closest('.historico_chat').data('conversa');
+                let id_conversa = $(this).closest('.historico_chat').find('.titulo_conversa').data('conversa');
 
                 Swal.fire({
                     title: 'Excluir conversa?',
@@ -1321,20 +1321,22 @@ include_once('../geral/topo.php');
                             },
                             success: function (res) {
 
+                                console.log(res)
+
 
                                 if (res.status == 'success') {
-                                    // Swal exibindo a mensagem de sucesso
                                     Swal.fire({
                                         icon: 'success',
                                         title: 'Sucesso!',
                                         text: res.message,
-
                                     });
 
-                                    // Removo a conversa do histórico
-                                    $(`.historico_chat[data-conversa="${id_conversa}"]`).remove();
+                                    // Remove a conversa do histórico
+                                    $(`.titulo_conversa[data-conversa="${id_conversa}"]`)
+                                        .closest('.historico_chat')
+                                        .remove();
 
-                                    // Se a conversa excluída for a atual, limpo o chat
+                                    // Se a conversa excluída for a atual, limpa o chat
                                     if ($('.msgs').attr('data-conversa') == id_conversa) {
                                         $('.msgs').attr('data-conversa', '');
 
@@ -1344,6 +1346,7 @@ include_once('../geral/topo.php');
                                         $('.msg_padrao').show();
                                     }
                                 }
+
                                 else {
                                     Swal.fire({
                                         icon: 'error',
@@ -1361,7 +1364,7 @@ include_once('../geral/topo.php');
 
 
             // Crio lógica para puxar mensagens ao clicar na conversa do histórico
-            $(document).on('click', '.historico_chat', function () {
+            $(document).on('click', '.titulo_conversa', function () {
                 let id_conversa = $(this).data('conversa');
 
                 // Se já estiver na conversa, não faz nada
@@ -1466,8 +1469,8 @@ include_once('../geral/topo.php');
                 })
 
             });
-        
-            $('#add_conversa').on('click', function(){
+
+            $('#add_conversa').on('click', function () {
                 // Limpo o chat
                 $('.msgs').attr('data-conversa', '');
                 $('.container_msg_usuario').fadeOut();
@@ -1476,7 +1479,7 @@ include_once('../geral/topo.php');
                 $('.container_msg_ia').remove();
                 $('.msg_padrao').fadeIn(200);
             });
-        
+
         })
     </script>
 
