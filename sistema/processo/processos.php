@@ -35,7 +35,7 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
         $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
-        $sql_filtros = "SELECT p.tipo_acao, p.status, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+        $sql_filtros = "SELECT p.id_processo, p.valor_honorarios, p.tipo_acao, p.status, p.grupo_acao, p.referencia, p.tk , p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
         FROM processo as p 
         INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
         WHERE p.usuario_config_id_usuario_config = $id_user";
@@ -81,7 +81,7 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $res = $stmt->get_result();
     } else {
 
-        $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.status, p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
+        $sql_busca_pessoas = "SELECT p.id_processo, p.valor_honorarios, p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.status, p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
 FROM processo as p 
 INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
 WHERE p.usuario_config_id_usuario_config = $id_user  
@@ -172,6 +172,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 }
 
 
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['token']) && $_POST['acao'] == 'ativar_processo') {
+
+    $token = htmlspecialchars($conexao->real_escape_string($_POST['token']));
+
+    $sql_ativa_processo = "UPDATE processo SET status = 'ativo' 
+    WHERE tk = '$token' 
+    AND usuario_config_id_usuario_config = $id_user";
+
+    $retorno = $conexao->query($sql_ativa_processo);
+
+    if ($retorno) {
+        $res = [
+            'status' => 'success',
+            'message' => 'Processo ativado com sucesso!',
+        ];
+
+    } else {
+        $res = [
+            'status' => 'erro',
+            'message' => 'Erro ao ativar o processo!',
+        ];
+    }
+
+    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    $conexao->close();
+    exit;
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -186,6 +216,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
     <style>
         .inativo {
             background-color: #d5d5d53b;
+        }
+
+        .container_encerra {
+            max-width: 700px;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+
+        .container_form_encerra {
+            border-radius: 8px;
+            border: 1px solid #f1f1f1;
+            padding: 25px;
+        }
+
+        .container_form_encerra form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .container_form_encerra select,
+        .container_form_encerra input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e6e6e6;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .container_form_encerra label {
+            text-align: start;
         }
     </style>
 
@@ -233,7 +294,7 @@ include_once('../geral/topo.php');
 
                         <select name="filtrar" id="filtrar" style="width: 200px;">
                             <option value="">Filtrar</option>
-                            <option value="todos" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'todos') ? 'selected' : '' ?>>Todos os processos</option>
+                           
                             <option value="administrativo" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'administrativo') ? 'selected' : '' ?>>Administrativo</option>
                             <option value="trabalhista" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'trabalhista') ? 'selected' : '' ?>>Trabalhista</option>
                             <option value="civil" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'civil') ? 'selected' : '' ?>>Civil</option>
@@ -298,11 +359,9 @@ include_once('../geral/topo.php');
 
                         <?php
 
-                        // var_dump($res);
-                        
                         if ($res->num_rows):
 
-                            while ($proceso = mysqli_fetch_assoc($res)):
+                            while ($processo = mysqli_fetch_assoc($res)):
 
                                 ?>
 
@@ -311,7 +370,7 @@ include_once('../geral/topo.php');
                                     <td colspan="5">
 
                                         <?php
-                                        switch ($proceso["contingenciamento"]) {
+                                        switch ($processo["contingenciamento"]) {
                                             case 'provável/chance alta':
                                                 $classeChance = 'processo_chance_alta';
                                                 break;
@@ -324,28 +383,28 @@ include_once('../geral/topo.php');
                                         ?>
 
 
-                                        <div class="dados_processo <?php echo $classeChance ?> <?php echo $proceso['status'] == 'inativo' ? 'inativo' : 'ativo' ?> "
-                                            onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $proceso['tk']; ?>'  ">
+                                        <div class="dados_processo <?php echo $classeChance ?> <?php echo $processo['status'] == 'inativo' ? 'inativo' : 'ativo' ?> "
+                                            onclick="window.location.href='./ficha_processo.php?tkn=<?php echo $processo['tk']; ?>'  ">
                                             <div class="conteudo_pessoa container_tipo_acao">
-                                                <div class="icone"><?php echo strtoupper(substr($proceso['nome'], 0, 2)); ?>
+                                                <div class="icone"><?php echo strtoupper(substr($processo['nome'], 0, 2)); ?>
                                                 </div>
                                                 <div class="nome_pessoa">
-                                                    <p> <?php echo $proceso['tipo_acao']; ?> </p>
-                                                    <span> <?php echo $proceso['nome']; ?> </span>
+                                                    <p> <?php echo $processo['tipo_acao']; ?> </p>
+                                                    <span> <?php echo $processo['nome']; ?> </span>
                                                 </div>
                                             </div>
 
                                             <div class="conteudo_pessoa container_grupo">
-                                                <p><?php echo ucfirst($proceso['grupo_acao']); ?></p>
+                                                <p><?php echo ucfirst($processo['grupo_acao']); ?></p>
 
                                             </div>
 
                                             <div class="conteudo_pessoa container_ref">
-                                                <p><?php echo $proceso['referencia']; ?></p>
+                                                <p><?php echo $processo['referencia']; ?></p>
                                             </div>
 
                                             <div class="conteudo_pessoa container_chance">
-                                                <p> <?php echo ucfirst($proceso['contingenciamento']); ?> </p>
+                                                <p> <?php echo ucfirst($processo['contingenciamento']); ?> </p>
                                             </div>
 
 
@@ -355,27 +414,47 @@ include_once('../geral/topo.php');
 
                                                     <div class="opcoes_pessoa">
                                                         <ul>
-                                                            <a href="./ficha_processo.php?tkn=<?php echo $proceso['tk'] ?>  "
+                                                            <a href="./ficha_processo.php?tkn=<?php echo $processo['tk'] ?>  "
                                                                 target="_blank">
                                                                 <li><i class="fa-regular fa-file-lines"></i> Ficha</li>
                                                             </a>
 
-                                                            <a href="./docs_processo.php?tkn=<?php echo $proceso['tk'] ?>"
+                                                            <a href="./docs_processo.php?tkn=<?php echo $processo['tk'] ?>"
                                                                 target="_blank">
                                                                 <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                             </a>
 
+                                                            <?php if ($processo['status'] == 'ativo'): ?>
+                                                                <a href="javascript:void(0)" class="finalizar_processo">
+                                                                    <input type="hidden" class="id_processo"
+                                                                        value="<?php echo $processo['id_processo'] ?>">
+                                                                    <input type="hidden" class="valor_honorarios"
+                                                                        value="<?php echo $processo['valor_honorarios'] ?>">
+                                                                    <li><i class="fa-regular fa-clipboard"></i> Encerrar
+                                                                    </li>
+                                                                </a>
+                                                            <?php else: ?>
+                                                                <a href="javascript:void(0)" class="ativar_processo">
+                                                                    <input type="hidden" class="token"
+                                                                        value="<?php echo $processo['tk'] ?>">
+                                                                    <li><i class="fa-regular fa-circle-check"></i> Ativar</li>
+                                                                </a>
 
-                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $proceso['tk'] ?>"
+                                                            <?php endif ?>
+
+                                                            <a href="./cadastro_processo.php?acao=editar&amp;tkn=<?php echo $processo['tk'] ?>"
                                                                 target="_blank">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 
                                                             <a href="javascript:void(0)" class="excluir_processo">
                                                                 <input type="hidden" class="token"
-                                                                    value="<?php echo $proceso['tk'] ?>">
+                                                                    value="<?php echo $processo['tk'] ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
+
+
+
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -435,7 +514,7 @@ include_once('../geral/topo.php');
     </main>
 
 
-
+    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"></script>
     <!-- Script para exibir as opções quando os 3 prontinhos da ação são clicados -->
     <script>
         $(document).ready(function () {
@@ -522,6 +601,167 @@ include_once('../geral/topo.php');
             })
         })
     </script>
+
+    <!-- Ativo processos -->
+    <script>
+        $(function () {
+            $('.ativar_processo').on('click', function () {
+
+                let tk = $(this).find('.token').val()
+
+                Swal.fire({
+                    title: "Deseja realmente ativar o processo?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: " #d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Sim, ativar!",
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        $.ajax({
+                            url: './processos.php',
+                            type: 'POST',
+                            data: {
+                                token: tk,
+                                acao: 'ativar_processo'
+                            },
+                            dataType: 'json',
+                            success: function (res) {
+
+                                if (res.status == "success") {
+                                    Swal.fire({
+                                        title: "Ativação",
+                                        text: res.message,
+                                        icon: "success"
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: res.message
+                                    });
+                                }
+
+
+
+                                setTimeout(() => {
+                                    Swal.close()
+                                    window.location.reload()
+                                }, 1000)
+
+                            }
+                        })
+                    }
+                });
+            })
+        })
+    </script>
+
+
+
+    <!-- Formulário para finalizar processo -->
+    <script>
+        $(document).ready(function () {
+            $('.finalizar_processo').on('click', function () {
+                let id_finalizar = $(this).find('.id_processo').val()
+                let honorarios = $(this).find('.valor_honorarios').val()
+
+
+
+                Swal.fire({
+                    title: 'Finalizar Processo',
+                    html: `
+              <div class="container_encerra">
+              
+                <div class="container_form_encerra">
+                    <form id="formEncerrarProcesso" autocomplete="off">
+
+                        <label for="resultado">Resultado do Processo</label>
+                        <select name="resultado_processo" id="resultado" required>
+                            <option value=""></option>
+                            <option value="Sentença favorável">Sentença favorável</option>
+                            <option value="Acordo homologado">Acordo homologado</option>
+                            <option value="Improcedente">Improcedente</option>
+                        </select>
+
+                        <label for="resultado">Honorário</label>
+                        <input type="text" name="valor_honorarios" id="valor_honorarios" value="${honorarios}" placeholder="Ex: 30.000,00" maxlength="14" required>
+                        <input type="hidden" name="id_processo" id="id_processo" value="${id_finalizar}">
+                        <button type="submit" class="btn_adicionar" style="display:flex; justify-content: center; max-width:250px; margin: 0 auto ">
+                            <i class="fa-solid fa-check"></i> Encerrar Processo
+                        </button>
+                    </form>
+                </div>
+                
+            </div>
+            `,
+                    showCancelButton: true,
+                    showConfirmButton: false,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: " #3085d6",
+                    cancelButtonColor: "#d33",
+                    didOpen: () => {
+                        $('#valor_honorarios').mask('000.000.000,00', {
+                            reverse: true
+                        });
+
+                        $('#formEncerrarProcesso').on('submit', function (e) {
+                            e.preventDefault()
+
+                            let resultado = $('#resultado').val()
+                            let valor_honorarios = $('#valor_honorarios').val()
+                            let id_processo = $('#id_processo').val()
+                            let status = 'inativo'
+
+                            $.ajax({
+                                url: '/adv/sistema/crm/crm_processo.php',
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    "resultado": resultado,
+                                    "honorarios": valor_honorarios,
+                                    "id_processo": id_processo,
+                                    "status": status
+                                },
+                                success: function (res) {
+                                    if (res.status !== 'success') {
+
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Oops...",
+                                            text: res.message,
+                                        });
+
+                                    } else {
+                                        Swal.fire({
+                                            title: "Encerrado!",
+                                            text: res.message,
+                                            icon: "success"
+                                        });
+                                    }
+
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 1500)
+
+
+                                }
+
+                            })
+
+
+                        })
+
+                    }
+
+
+                })
+            })
+        })
+    </script>
+
 
 </body>
 

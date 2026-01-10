@@ -1,13 +1,5 @@
 <?php include_once('../../scripts.php');
 
-/*
-
-
-Implementar a troca do status do processo
-Ao excluir processo (Excluir suas anotações vinculadas)
-
-
-*/
 
 $id_user = $_SESSION['cod'];
 
