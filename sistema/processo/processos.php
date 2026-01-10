@@ -84,7 +84,9 @@ FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
         $sql_busca_pessoas = "SELECT p.tipo_acao, p.grupo_acao, p.referencia, p.tk , p.status, p.contingenciamento, p.cliente_id , pes.nome, pes.id_pessoa
 FROM processo as p 
 INNER JOIN pessoas as pes ON p.cliente_id = pes.id_pessoa
-WHERE p.usuario_config_id_usuario_config = $id_user  ORDER BY p.dt_cadastro_processo DESC LIMIT $limite OFFSET $offset";
+WHERE p.usuario_config_id_usuario_config = $id_user  
+AND p.status = 'ativo'
+ORDER BY p.dt_cadastro_processo DESC LIMIT $limite OFFSET $offset";
         $res = $conexao->query($sql_busca_pessoas);
     }
 
@@ -231,6 +233,7 @@ include_once('../geral/topo.php');
 
                         <select name="filtrar" id="filtrar" style="width: 200px;">
                             <option value="">Filtrar</option>
+                            <option value="todos" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'todos') ? 'selected' : '' ?>>Todos os processos</option>
                             <option value="administrativo" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'administrativo') ? 'selected' : '' ?>>Administrativo</option>
                             <option value="trabalhista" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'trabalhista') ? 'selected' : '' ?>>Trabalhista</option>
                             <option value="civil" <?= (isset($_GET['filtrar']) && $_GET['filtrar'] === 'civil') ? 'selected' : '' ?>>Civil</option>

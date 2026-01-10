@@ -5,7 +5,7 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
 
-    $token_processo  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
+    $token_processo = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
 
     $sql_busca_processo_tkn = 'SELECT 
     p.id_processo AS id_processo,
@@ -70,42 +70,42 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
             if (empty($dados_processo)) {
 
                 $dados_processo = [
-                    'id_processo'                  => $row['id_processo'],
-                    'tk'                           => $row['tk'],
-                    'grupo_acao'                   => $row['grupo_acao'],
-                    'status'                       => $row['status'],
-                    'tipo_acao'                    => $row['tipo_acao'],
-                    'referencia'                   => $row['referencia'],
-                    'num_processo'                 => $row['num_processo'],
-                    'num_protocolo'                => $row['num_protocolo'],
-                    'processo_originario'          => $row['processo_originario'],
-                    'valor_causa'                  => $row['valor_causa'],
-                    'valor_honorarios'             => $row['valor_honorarios'],
-                    'etapa_kanban'                 => $row['etapa_kanban'],
-                    'contingenciamento'            => $row['contingenciamento'],
-                    'data_requerimento'            => $row['data_requerimento'],
-                    'resultado_processo'           => $row['resultado_processo'],
-                    'observacao'                   => $row['observacao'],
-                    'dt_cadastro_processo'         => $row['dt_cadastro_processo'],
-                    'dt_atualizacao_processo'      => $row['dt_atualizacao_processo'],
-                    'cliente_id'                   => $row['cliente_id'],
-                    'cliente_nome'                 => $row['cliente_nome'],
-                    'cliente_tk'                   => $row['cliente_tk'],
-                    'cliente_tipo_parte'           => $row['cliente_tipo_parte'],
-                    'contrario_id'                 => $row['contrario_id'],
-                    'contrario_nome'               => $row['contrario_nome'],
-                    'contrario_tk'                 => $row['contrario_tk'],
-                    'contrario_tipo_parte'         => $row['contrario_tipo_parte'],
+                    'id_processo' => $row['id_processo'],
+                    'tk' => $row['tk'],
+                    'grupo_acao' => $row['grupo_acao'],
+                    'status' => $row['status'],
+                    'tipo_acao' => $row['tipo_acao'],
+                    'referencia' => $row['referencia'],
+                    'num_processo' => $row['num_processo'],
+                    'num_protocolo' => $row['num_protocolo'],
+                    'processo_originario' => $row['processo_originario'],
+                    'valor_causa' => $row['valor_causa'],
+                    'valor_honorarios' => $row['valor_honorarios'],
+                    'etapa_kanban' => $row['etapa_kanban'],
+                    'contingenciamento' => $row['contingenciamento'],
+                    'data_requerimento' => $row['data_requerimento'],
+                    'resultado_processo' => $row['resultado_processo'],
+                    'observacao' => $row['observacao'],
+                    'dt_cadastro_processo' => $row['dt_cadastro_processo'],
+                    'dt_atualizacao_processo' => $row['dt_atualizacao_processo'],
+                    'cliente_id' => $row['cliente_id'],
+                    'cliente_nome' => $row['cliente_nome'],
+                    'cliente_tk' => $row['cliente_tk'],
+                    'cliente_tipo_parte' => $row['cliente_tipo_parte'],
+                    'contrario_id' => $row['contrario_id'],
+                    'contrario_nome' => $row['contrario_nome'],
+                    'contrario_tk' => $row['contrario_tk'],
+                    'contrario_tipo_parte' => $row['contrario_tipo_parte'],
                 ];
             }
 
 
             if (!empty($row['id_documento'])) {
                 $documentos[] = [
-                    'id_documento'   => $row['id_documento'],
-                    'nome_original'  => $row['nome_original'],
+                    'id_documento' => $row['id_documento'],
+                    'nome_original' => $row['nome_original'],
                     'caminho_arquivo' => $row['caminho_arquivo'],
-                    'dt_criacao'     => $row['dt_criacao']
+                    'dt_criacao' => $row['dt_criacao']
                 ];
             }
         }
@@ -131,7 +131,7 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
     <title>ADV Conectado</title>
 
     <style>
-        .inativo{
+        .inativo {
             color: #b51010 !important;
         }
     </style>
@@ -164,26 +164,31 @@ include_once('../geral/topo.php');
 
 
                     <div class="profile-title-section">
-                        <div class="profile-photo-container" style="width: 100px; height: 100px; background-color:#959595; border-radius: 12px; display:flex; justify-content:center; align-items: center ">
-                            <i class="fa-solid fa-folder"  style="color: #ffffffff; font-size:60px"></i>
+                        <div class="profile-photo-container"
+                            style="width: 100px; height: 100px; background-color:#959595; border-radius: 12px; display:flex; justify-content:center; align-items: center ">
+                            <i class="fa-solid fa-folder" style="color: #ffffffff; font-size:60px"></i>
 
                         </div>
 
                         <div class="profile-info">
-                            <h1 class="profile-name"><?php echo htmlspecialchars($dados_processo['tipo_acao'] ?? '') ?></h1>
+                            <h1 class="profile-name"><?php echo htmlspecialchars($dados_processo['tipo_acao'] ?? '') ?>
+                            </h1>
 
                             <div class="profile-meta">
                                 <span class="profile-type">
-                                    <i class="fa-solid fa-folder"></i> Tipo de ação: <?php echo ucfirst(htmlspecialchars($dados_processo['grupo_acao'] ?? '')) ?>
+                                    <i class="fa-solid fa-folder"></i> Tipo de ação:
+                                    <?php echo ucfirst(htmlspecialchars($dados_processo['grupo_acao'] ?? '')) ?>
                                 </span>
 
                                 <span class="profile-origin">
-                                    <i class="fas fa-tag"></i> Referência: <?= htmlspecialchars($dados_processo['referencia'] ?? '') ?>
+                                    <i class="fas fa-tag"></i> Referência:
+                                    <?= htmlspecialchars($dados_processo['referencia'] ?? '') ?>
                                 </span>
 
 
-                                <span class="profile-status <?php echo $dados_processo["status"] == 'ativo' ? 'active': 'inativo' ?>">
-                                    <i class="fas fa-circle"></i> <?php echo ucfirst($dados_processo["status"])?>
+                                <span
+                                    class="profile-status <?php echo $dados_processo["status"] == 'ativo' ? 'active' : 'inativo' ?>">
+                                    <i class="fas fa-circle"></i> <?php echo ucfirst($dados_processo["status"]) ?>
                                 </span>
                             </div>
 
@@ -217,7 +222,8 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="profile-actions">
-                        <a href="./cadastro_processo.php?acao=editar&tkn=<?= urlencode($dados_processo['tk'] ?? '') ?>" style="text-decoration: none;">
+                        <a href="./cadastro_processo.php?acao=editar&tkn=<?= urlencode($dados_processo['tk'] ?? '') ?>"
+                            style="text-decoration: none;">
                             <button class="btn-secondary">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
@@ -258,70 +264,106 @@ include_once('../geral/topo.php');
                                 <div class="info-card">
                                     <div class="info-item">
                                         <label class="info-label">Cliente</label>
-                                        <a class="pessoas_processo" href="../pessoa/ficha_pessoa.php?tkn=<?php echo htmlspecialchars($dados_processo['cliente_tk'] ?? '') ?>" target="__blank">
-                                            <div class="info-value"><?= htmlspecialchars($dados_processo['cliente_nome'] ?? '') ?></div>
+                                        <a class="pessoas_processo"
+                                            href="../pessoa/ficha_pessoa.php?tkn=<?php echo htmlspecialchars($dados_processo['cliente_tk'] ?? '') ?>"
+                                            target="__blank">
+                                            <div class="info-value">
+                                                <?= htmlspecialchars($dados_processo['cliente_nome'] ?? '') ?>
+                                            </div>
                                         </a>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Contrário</label>
-                                        <a class="pessoas_processo" href="../pessoa/ficha_pessoa.php?tkn=<?php echo htmlspecialchars($dados_processo['contrario_tk'] ?? '') ?>" target="__blank">
-                                            <div class="info-value"><?= htmlspecialchars($dados_processo['contrario_nome'] ?? '') ?></div>
+                                        <a class="pessoas_processo"
+                                            href="../pessoa/ficha_pessoa.php?tkn=<?php echo htmlspecialchars($dados_processo['contrario_tk'] ?? '') ?>"
+                                            target="__blank">
+                                            <div class="info-value">
+                                                <?= htmlspecialchars($dados_processo['contrario_nome'] ?? '') ?>
+                                            </div>
                                         </a>
                                     </div>
 
 
                                     <div class="info-item">
                                         <label class="info-label">Contingenciamento</label>
-                                        <div class="info-value"><?php echo ucfirst(htmlspecialchars($dados_processo['contingenciamento'] ?? '')) ?></div>
+                                        <div class="info-value">
+                                            <?php echo ucfirst(htmlspecialchars($dados_processo['contingenciamento'] ?? '')) ?>
+                                        </div>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Número do protocolo</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['num_protocolo'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['num_protocolo'] ?? '') ?>
+                                        </div>
                                     </div>
 
 
                                     <div class="info-item">
                                         <label class="info-label">Número do processo</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['num_processo'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['num_processo'] ?? '') ?>
+                                        </div>
                                     </div>
 
 
 
                                     <div class="info-item">
                                         <label class="info-label">Processo originário</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['processo_originario'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['processo_originario'] ?? '') ?>
+                                        </div>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Valor da causa</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['valor_causa'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['valor_causa'] ?? '') ?>
+                                        </div>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Valor dos honorários</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['valor_honorarios'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['valor_honorarios'] ?? '') ?>
+                                        </div>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Etapa Kanban</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['etapa_kanban'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['etapa_kanban'] ?? '') ?>
+                                        </div>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Data de requerimento</label>
-                                        <div class="info-value"><?= date('d/m/Y', strtotime($dados_processo['data_requerimento'] ?? '')) ?></div>
+                                        <div class="info-value">
+                                            <?= (
+                                                !empty($dados_processo['data_requerimento']) &&
+                                                $dados_processo['data_requerimento'] !== '0000-00-00'
+                                            )
+                                                ? date('d/m/Y', strtotime($dados_processo['data_requerimento']))
+                                                : ''
+                                                ?>
+                                        </div>
+
+
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Resultado do processo</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['resultado_processo'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['resultado_processo'] ?? '') ?>
+                                        </div>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Observação</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_processo['observacao'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_processo['observacao'] ?? '') ?>
+                                        </div>
                                     </div>
 
 
@@ -337,7 +379,8 @@ include_once('../geral/topo.php');
                             <div class="processes-section">
                                 <div class="section-header">
                                     <h3>Documentos do Processo</h3>
-                                    <a href="./docs_processo.php?tkn=<?= urlencode($_GET['tkn']) ?>" style="text-decoration: none;">
+                                    <a href="./docs_processo.php?tkn=<?= urlencode($_GET['tkn']) ?>"
+                                        style="text-decoration: none;">
                                         <button class="btn-secondary">
                                             <i class="fas fa-plus"></i> Novo Documento
                                         </button>
@@ -352,11 +395,16 @@ include_once('../geral/topo.php');
                                                 <div class="doc">
 
                                                     <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
-                                                        <img class="img_bg_doc" src="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
-                                                        <div class="nome_arquivo"><span><?= htmlspecialchars($doc["nome_original"]) ?></span></div>
+                                                        <img class="img_bg_doc"
+                                                            src="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
+                                                        <div class="nome_arquivo">
+                                                            <span><?= htmlspecialchars($doc["nome_original"]) ?></span>
+                                                        </div>
                                                     <?php else: ?>
                                                         <i class="fa-regular fa-folder" style="font-size: 30px;"></i>
-                                                        <div class="nome_arquivo"><span><?= htmlspecialchars($doc["nome_original"]) ?></span></div>
+                                                        <div class="nome_arquivo">
+                                                            <span><?= htmlspecialchars($doc["nome_original"]) ?></span>
+                                                        </div>
                                                     <?php endif; ?>
                                                 </div>
                                             </a>
@@ -387,13 +435,13 @@ include_once('../geral/topo.php');
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Tab functionality
             const tabItems = document.querySelectorAll('.tab-item');
             const tabPanes = document.querySelectorAll('.tab-pane');
 
             tabItems.forEach(tab => {
-                tab.addEventListener('click', function() {
+                tab.addEventListener('click', function () {
                     const targetTab = this.getAttribute('data-tab');
 
                     // Remove active class from all tabs and panes

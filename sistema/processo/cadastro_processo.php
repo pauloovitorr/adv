@@ -71,7 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     $valor_causa         = $conexao->escape_string(htmlspecialchars($_POST['valor_causa'] ?? ''));
     $etapa_kanban        = (int)($conexao->escape_string(htmlspecialchars($_POST['etapa_kanban'] ?? 0)));
     $contingenciamento   = $conexao->escape_string(htmlspecialchars($_POST['contingenciamento'] ?? ''));
-    $data_requerimento   = $conexao->escape_string(htmlspecialchars($_POST['data_requerimento'] ?? ''));
+
+    $data_requerimento = $_POST['data_requerimento'] ?? null;
+
     $observacao          = $conexao->escape_string(htmlspecialchars($_POST['observacao'] ?? ''));
     $valor_honorarios = isset($_POST['valor_honorarios']) && $_POST['valor_honorarios'] !== ''
     ? $_POST['valor_honorarios'] : NULL;
@@ -105,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cliente']) && !empty
     }
 
     $stmt->bind_param(
-        "iissssssssssssssi",  // String CORRIGIDA
+        "iissssssssssssssi",  
         $cliente,             // 1  - i
         $contrario,           // 2  - i
         $token,               // 3  - s
