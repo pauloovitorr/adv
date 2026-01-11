@@ -1,63 +1,82 @@
 <?php
 
-date_default_timezone_set('America/Sao_Paulo');
-
-require __DIR__ . '/../../../vendor/autoload.php';
-
-require_once '../enviar_emails_modelos.php';
+include_once('../config.php');
 
 
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../');
-$dotenv->load();
+if ($_SERVER['REQUEST_METHOD'] === 'POST'   && !empty($_POST['name'])  && !empty($_POST['email']) 
+    && !empty($_POST['phone'])  && !empty($_POST['message'])  && !empty($_POST['modelo'])
+) {
 
-$host = $_ENV['DB_HOST'];
-$user = $_ENV['DB_USER'];
-$password = $_ENV['DB_PASS'];
-$data_base = $_ENV['DB_BASE'];
+    $nome_lead     = $conexao->escape_string(htmlspecialchars($_POST['name']));
+    $email_lead    = $conexao->escape_string(htmlspecialchars($_POST['email']));
+    $telefone_lead = $conexao->escape_string(htmlspecialchars($_POST['phone']));
+    $mensagem_lead = $conexao->escape_string(htmlspecialchars($_POST['message']));
+    $modelo        = $conexao->escape_string(htmlspecialchars($_POST['modelo'])); // token
 
-$conexao = new mysqli($host, $user, $password, $data_base);
-$conexao->set_charset("utf8");
+    // Busca dados do dono do site
+    $sql_usuario = "
+        SELECT id_usuario_config, email 
+        FROM usuario_config 
+        WHERE tk = '$modelo'
+        LIMIT 1
+    ";
 
-// if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-// var_dump($_POST);
-// die();
-// }
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['phone']) && !empty($_POST['message']) && !empty($_POST['modelo'])) {
-
-
-
-    $nome_lead = $conexao->escape_string(htmlspecialchars($_POST['name'] ?? ''));
-    $email_lead = $conexao->escape_string(htmlspecialchars($_POST['email'] ?? ''));
-    $telefone_lead = $conexao->escape_string(htmlspecialchars($_POST['phone'] ?? ''));
-    $mensagem_lead = $conexao->escape_string(htmlspecialchars($_POST['message'] ?? ''));
-    // Chamo de modelo, mas é o token do usuário
-    $modelo = $conexao->escape_string(htmlspecialchars($_POST['modelo'] ?? ''));
-
-    $sql_email_usuario_adm = "SELECT email from usuario_config WHERE tk = '$modelo'";
-    $res = $conexao->query($sql_email_usuario_adm);
+    $res = $conexao->query($sql_usuario);
 
     if ($res && $res->num_rows > 0) {
-        $email_dono_site = $res->fetch_assoc()["email"];
 
+        $usuario = $res->fetch_assoc();
+        $email_dono_site = $usuario['email'];
+        $id_usuario_config = $usuario['id_usuario_config'];
+
+        // Captura dados do cliente
+        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+
+        // INSERT DO LEAD
+        $sql_cadastra_leads = "
+            INSERT INTO leads (
+                nome,
+                email,
+                telefone,
+                mensagem,
+                ip,
+                user_agent,
+                usuario_config_id_usuario_config
+            ) VALUES (
+                '$nome_lead',
+                '$email_lead',
+                '$telefone_lead',
+                '$mensagem_lead',
+                '$ip',
+                '$user_agent',
+                $id_usuario_config
+            )
+        ";
+
+        $conexao->query($sql_cadastra_leads);
+
+        // Envio de e-mail
         if (envia_email($nome_lead, $email_lead, $telefone_lead, $mensagem_lead, $email_dono_site)) {
-            $res = [
+            $resposta = [
                 'status' => 'success',
-                'message' => 'E-mail encaminhado com sucesso!',
+                'message' => 'Mensagem enviada com sucesso!',
             ];
         } else {
-            $res = [
+            $resposta = [
                 'status' => 'erro',
-                'message' => 'Falha ao enviar e-mail, tente entrar em contato pelo whatsApp!',
+                'message' => 'Falha ao enviar e-mail, tente pelo WhatsApp!',
             ];
         }
-        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+
+        echo json_encode($resposta, JSON_UNESCAPED_UNICODE);
     }
 
     $conexao->close();
     exit;
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {
 
@@ -130,7 +149,7 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
     <link rel="stylesheet" href="style.css" />
     <meta name="theme-color" content="#121212" />
 
-    
+
     <?php
 
     $schema = [
@@ -375,11 +394,13 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
                 <div class="contact-form-wrapper">
                     <h4>Envie sua Mensagem</h4>
                     <form action="./index.php" id="contact-form" method="post">
-                        <input type="text" name="name" placeholder="Nome" required>
-                        <input type="email" name="email" placeholder="E-mail" required>
-                        <input type="tel" name="phone" placeholder="Telefone / WhatsApp" id="tell" required>
+                        <input type="text" name="name" placeholder="Nome" required minlength="4" maxlength="150">
+                        <input type="email" name="email" placeholder="E-mail" required minlength="4" maxlength="150">
+                        <input type="tel" name="phone" placeholder="Telefone / WhatsApp" id="tell" minlength="14"
+                            required>
                         <input type="hidden" id="modelo" name="modelo" value="<?php echo $_GET['modelo'] ?? '' ?>">
-                        <textarea name="message" placeholder="Mensagem" rows="4" required></textarea>
+                        <textarea name="message" placeholder="Mensagem" rows="4" required minlength="4"
+                            maxlength="250"></textarea>
                         <button type="submit" class="cta-button" id="enviar_msg">Enviar Mensagem</button>
                     </form>
                 </div>
@@ -418,7 +439,7 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
     </footer>
 
     <!-- Botão WhatsApp Flutuante -->
-     <a href="https://wa.me/55<?php echo $telefone_limpo; ?>" target="_blank" class="whatsapp-float"> 
+    <a href="https://wa.me/55<?php echo $telefone_limpo; ?>" target="_blank" class="whatsapp-float">
         <i class="fa-brands fa-whatsapp" style="font-size: 32px;color: white;"></i>
     </a>
 
@@ -435,6 +456,8 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
 
             $('#contact-form').on('submit', function (e) {
                 e.preventDefault();
+                
+                Swal.showLoading();
 
                 const $btn = $('#enviar_msg');
                 $btn.prop('disabled', true);
@@ -450,6 +473,23 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
                     $btn.prop('disabled', false);
                     return;
                 }
+
+
+                let telefone = $('#tell').cleanVal(); 
+
+                if (telefone.length < 11) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Telefone inválido',
+                        text: 'Digite um número de WhatsApp válido.',
+                        confirmButtonText: 'Ok'
+                    });
+                    $btn.prop('disabled', false);
+                    return
+                }
+
+
+
 
                 $.ajax({
                     url: './index.php',
@@ -481,8 +521,8 @@ $areas_atuacao = $config_modelo['areas_atuacao'] ?? null;
 
 
 
-<!--  Puxa os códigos de estilização personalizados -->
-<?php echo $config_modelo["estilizacao"] ?? ''; ?>
+    <!--  Puxa os códigos de estilização personalizados -->
+    <?php echo $config_modelo["estilizacao"] ?? ''; ?>
 
 </body>
 

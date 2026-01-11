@@ -194,7 +194,7 @@
         </div>
     </a></li>
     
-    <li id="leads"><a href="/adv/sistema/ia/chat.php">
+    <li id="leads"><a href="/adv/sistema/leads/leads.php">
         <div class="div_opcao_menu_lat">
             <i data-lucide="user-plus"></i>
             <p>Leads</p>

@@ -210,3 +210,21 @@ CREATE TABLE mensagem (
     CONSTRAINT pk_mensagem PRIMARY KEY (id_mensagem),
     CONSTRAINT fk_mensagem_conversa FOREIGN KEY (conversa_id_conversa) REFERENCES conversa(id_conversa)
 );
+
+
+CREATE TABLE leads (
+    id_lead     INT NOT NULL AUTO_INCREMENT,
+    nome        VARCHAR(150) NOT NULL,
+    email       VARCHAR(150) NOT NULL,
+    telefone    VARCHAR(15) NOT NULL,
+    mensagem    TEXT NOT NULL,
+    ip          VARCHAR(45),
+    user_agent  VARCHAR(255),
+    dt_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+    usuario_config_id_usuario_config INT NOT NULL,
+
+    CONSTRAINT pk_id_lead PRIMARY KEY (id_lead),
+    CONSTRAINT fk_leads_usuario_config 
+        FOREIGN KEY (usuario_config_id_usuario_config)
+        REFERENCES usuario_config(id_usuario_config)
+);
