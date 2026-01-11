@@ -203,7 +203,8 @@
   border-bottom-left-radius: 8px;
 }
 
-.processo_chance_media::before {
+.processo_chance_media::before,
+.lead::before{
   content: "";
   position: absolute;
   width: 5px;

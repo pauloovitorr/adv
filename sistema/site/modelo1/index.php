@@ -4,37 +4,47 @@ include_once('../config.php');
 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST'   && !empty($_POST['name'])  && !empty($_POST['email']) 
-    && !empty($_POST['phone'])  && !empty($_POST['message'])  && !empty($_POST['modelo'])
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && !empty($_POST['name'])
+    && !empty($_POST['email'])
+    && !empty($_POST['phone'])
+    && !empty($_POST['message'])
+    && !empty($_POST['modelo'])
 ) {
 
-    $nome_lead     = $conexao->escape_string(htmlspecialchars($_POST['name']));
-    $email_lead    = $conexao->escape_string(htmlspecialchars($_POST['email']));
-    $telefone_lead = $conexao->escape_string(htmlspecialchars($_POST['phone']));
-    $mensagem_lead = $conexao->escape_string(htmlspecialchars($_POST['message']));
-    $modelo        = $conexao->escape_string(htmlspecialchars($_POST['modelo'])); // token
+
+    $nome_lead     = trim($_POST['name']);
+    $email_lead    = trim($_POST['email']);
+    $telefone_lead = trim($_POST['phone']);
+    $mensagem_lead = trim($_POST['message']);
+    $modelo        = trim($_POST['modelo']); // token
 
     // Busca dados do dono do site
     $sql_usuario = "
-        SELECT id_usuario_config, email 
-        FROM usuario_config 
-        WHERE tk = '$modelo'
+        SELECT id_usuario_config, email
+        FROM usuario_config
+        WHERE tk = ?
         LIMIT 1
     ";
 
-    $res = $conexao->query($sql_usuario);
+    $stmtUsuario = $conexao->prepare($sql_usuario);
+    $stmtUsuario->bind_param("s", $modelo);
+    $stmtUsuario->execute();
+    $res = $stmtUsuario->get_result();
 
     if ($res && $res->num_rows > 0) {
 
         $usuario = $res->fetch_assoc();
         $email_dono_site = $usuario['email'];
-        $id_usuario_config = $usuario['id_usuario_config'];
+        $id_usuario_config = (int) $usuario['id_usuario_config'];
 
         // Captura dados do cliente
         $ip = $_SERVER['REMOTE_ADDR'] ?? null;
         $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
-        // INSERT DO LEAD
+        // INSERT DO LEAD 
+
         $sql_cadastra_leads = "
             INSERT INTO leads (
                 nome,
@@ -44,20 +54,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'   && !empty($_POST['name'])  && !empty
                 ip,
                 user_agent,
                 usuario_config_id_usuario_config
-            ) VALUES (
-                '$nome_lead',
-                '$email_lead',
-                '$telefone_lead',
-                '$mensagem_lead',
-                '$ip',
-                '$user_agent',
-                $id_usuario_config
-            )
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
         ";
 
-        $conexao->query($sql_cadastra_leads);
+        $stmtLead = $conexao->prepare($sql_cadastra_leads);
+        $stmtLead->bind_param(
+            "ssssssi",
+            $nome_lead,
+            $email_lead,
+            $telefone_lead,
+            $mensagem_lead,
+            $ip,
+            $user_agent,
+            $id_usuario_config
+        );
+
+        $stmtLead->execute();
+        $stmtLead->close();
+
 
         // Envio de e-mail
+
         if (envia_email($nome_lead, $email_lead, $telefone_lead, $mensagem_lead, $email_dono_site)) {
             $resposta = [
                 'status' => 'success',
@@ -73,9 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'   && !empty($_POST['name'])  && !empty
         echo json_encode($resposta, JSON_UNESCAPED_UNICODE);
     }
 
+    $stmtUsuario->close();
     $conexao->close();
     exit;
 }
+
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && !empty($_GET['modelo'])) {

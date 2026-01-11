@@ -4,33 +4,41 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-    // Páginação
+    // Paginação
     $limite = 20;
     $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
     if ($pagina < 1)
         $pagina = 1;
     $offset = ($pagina - 1) * $limite;
 
-    $sql_quantidade_pessoas = "SELECT 
-    COUNT(*) AS total_pessoas,
-    COUNT(CASE WHEN tipo_parte = 'cliente' THEN 1 END) AS total_clientes,
-    COUNT(CASE WHEN tipo_parte = 'contrário' THEN 1 END) AS total_contrarias
-FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
-";
-    $res_qtd = $conexao->query($sql_quantidade_pessoas);
-    if ($res_qtd->num_rows == 1) {
+    // Quantidade de leads
+    $sql_quantidade_leads = " SELECT COUNT(*) AS total_leads FROM leads  WHERE usuario_config_id_usuario_config = $id_user";
+
+    $res_qtd = $conexao->query($sql_quantidade_leads);
+    if ($res_qtd && $res_qtd->num_rows == 1) {
         $res_qtd = mysqli_fetch_assoc($res_qtd);
-        $total = $res_qtd["total_pessoas"];
-        $cliente = $res_qtd["total_clientes"];
-        $contrario = $res_qtd["total_contrarias"];
+        $total = $res_qtd["total_leads"];
     }
 
+    // Filtros
     if (count($_GET) > 0) {
-        $nome = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
-        $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
-        $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
-        $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
+        $nome = isset($_GET['buscar_leads']) ? trim($_GET['buscar_leads']) : null;
+        $ordenar = isset($_GET['ordenar']) ? trim($_GET['ordenar']) : null;
+
+
+        $sql_filtros = "
+            SELECT 
+                id_lead,
+                nome,
+                email,
+                telefone,
+                mensagem,
+                dt_cadastro
+            FROM leads 
+            WHERE usuario_config_id_usuario_config = $id_user
+        ";
+
         $params = [];
         $types = "";
 
@@ -40,30 +48,23 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
             $types .= "s";
         }
 
-        if (!empty($filtrar)) {
-            if ($filtrar === "cliente" || $filtrar === "contrário") {
-                $sql_filtros .= " AND tipo_parte = ?";
-                $params[] = $filtrar;
-                $types .= "s";
-            }
-        }
-
         switch ($ordenar) {
             case "nome":
                 $sql_filtros .= " ORDER BY nome ASC";
                 break;
             case "recentes":
-                $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
+                $sql_filtros .= " ORDER BY dt_cadastro DESC";
                 break;
             case "antigos":
-                $sql_filtros .= " ORDER BY dt_cadastro_pessoa ASC";
+                $sql_filtros .= " ORDER BY dt_cadastro ASC";
                 break;
             default:
-                $sql_filtros .= " ORDER BY dt_cadastro_pessoa DESC";
+                $sql_filtros .= " ORDER BY dt_cadastro DESC";
                 break;
         }
 
         $sql_filtros .= " LIMIT $limite OFFSET $offset";
+
         $stmt = $conexao->prepare($sql_filtros);
 
         if (!empty($params)) {
@@ -72,15 +73,25 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
 
         $stmt->execute();
         $res = $stmt->get_result();
+
     } else {
 
-        $sql_busca_pessoas = "SELECT id_pessoa, tk, nome, tipo_parte, dt_cadastro_pessoa, telefone_principal, logradouro, bairro 
-        FROM pessoas 
-        WHERE usuario_config_id_usuario_config = $id_user 
-        ORDER BY dt_cadastro_pessoa DESC 
-        LIMIT $limite OFFSET $offset";
+        // Busca padrão
+        $sql_busca_leads = "
+            SELECT 
+                id_lead,
+                nome,
+                email,
+                telefone,
+                mensagem,
+                dt_cadastro
+            FROM leads
+            WHERE usuario_config_id_usuario_config = $id_user
+            ORDER BY dt_cadastro DESC
+            LIMIT $limite OFFSET $offset
+        ";
 
-        $res = $conexao->query($sql_busca_pessoas);
+        $res = $conexao->query($sql_busca_leads);
     }
 
     // Total de páginas
@@ -88,6 +99,75 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
 }
 
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) && $_POST['acao'] == 'excluir_lead') {
+
+    $id_lead = $conexao->real_escape_string($_POST['id_lead']);
+
+    if ($id_lead) {
+
+        try {
+            $conexao->begin_transaction();
+
+            // Busca o lead para verificar se existe e pertence ao usuário
+            $sql_busca_lead = "SELECT id_lead, nome, email FROM leads WHERE id_lead = '$id_lead' AND usuario_config_id_usuario_config = $id_user";
+            $res = $conexao->query($sql_busca_lead);
+
+            if ($res->num_rows == 0) {
+                $res = [
+                    'status' => 'error',
+                    'message' => 'Lead não encontrado ou você não tem permissão para excluí-lo!'
+                ];
+                echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                $conexao->rollback();
+                $conexao->close();
+                exit;
+            }
+
+            $lead_exclusao = $res->fetch_assoc();
+            $lead_nome_exclusao = $lead_exclusao['nome'];
+            $lead_id_exclusao = $lead_exclusao['id_lead'];
+
+            // Prepara e executa a exclusão do lead
+            $sql_delete_lead = 'DELETE FROM leads WHERE id_lead = ? AND usuario_config_id_usuario_config = ?';
+            $stmt = $conexao->prepare($sql_delete_lead);
+            $stmt->bind_param('ii', $lead_id_exclusao, $id_user);
+
+            if ($stmt->execute()) {
+
+                $ip = $_SERVER['REMOTE_ADDR'];
+
+                if (cadastro_log('Excluiu Lead', $lead_nome_exclusao, $ip, $id_user)) {
+                    $res = [
+                        'status' => 'success',
+                        'message' => 'Lead excluído com sucesso!'
+                    ];
+                    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                    $conexao->commit();
+                    $conexao->close();
+                    exit;
+                }
+            }
+
+        } catch (Exception $err) {
+            $res = [
+                'status' => 'error',
+                'message' => 'Erro: ' . $err->getMessage()
+            ];
+            echo json_encode($res, JSON_UNESCAPED_UNICODE);
+            $conexao->rollback();
+            $conexao->close();
+            exit;
+        }
+    } else {
+        $res = [
+            'status' => 'error',
+            'message' => 'ID do lead não informado!'
+        ];
+        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+        $conexao->close();
+        exit;
+    }
+}
 
 
 ?>
@@ -100,6 +180,19 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pessoas/pessoas.css">
     <title>ADV Conectado</title>
+
+    <style>
+        .mensagem_leads {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4em;
+            max-height: 2.8em;
+        }
+    </style>
+
 </head>
 
 <?php
@@ -130,8 +223,8 @@ include_once('../geral/topo.php');
                 <form action="" method="get">
 
                     <div class="div_pai_funcoes">
-                        <input type="text" id="buscar_pessoas" name="buscar_pessoas"
-                            value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>"
+                        <input type="text" id="buscar_leads" name="buscar_leads"
+                            value="<?= isset($_GET['buscar_leads']) ? htmlspecialchars($_GET['buscar_leads']) : '' ?>"
                             placeholder="Buscar Por Nome">
                         <i class="fa-regular fa-pen-to-square"></i>
                     </div>
@@ -149,7 +242,7 @@ include_once('../geral/topo.php');
                     <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;"
                             for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
 
-                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php"
+                    <button type="submit" class="btn_pesquisar"><a href="./leads.php"
                             style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;"
                                 for="buscar_pessoas"><i class="fa-solid fa-broom"></i></label> </a></button>
                 </form>
@@ -166,87 +259,68 @@ include_once('../geral/topo.php');
                             <td>Nome</td>
                             <td>Contato</td>
                             <td>E-mail</td>
-                            <td>Data de Cadastro</td>
+                            <td>Mensagem</td>
                             <td>Ações</td>
                         </tr>
                     </thead>
 
                     <tbody>
 
-                        <?php
+                        <?php if ($res->num_rows > 0): ?>
 
-                        if ($res->num_rows > 0):
-
-                            while ($pessoa = mysqli_fetch_assoc($res)):
-
-                                ?>
+                            <?php while ($lead = mysqli_fetch_assoc($res)): ?>
                                 <tr>
-
                                     <td colspan="5">
 
-                                        <div class="dados_pessoa">
+                                        <div class="dados_pessoa lead">
 
+                                            <!-- Nome -->
                                             <div class="conteudo_pessoa container_nome">
-                                                <div class="icone"><?php echo strtoupper(substr($pessoa['nome'], 0, 2)); ?>
+                                                <div class="icone">
+                                                    <?= htmlspecialchars(strtoupper(substr($lead['nome'], 0, 2)), ENT_QUOTES, 'UTF-8'); ?>
                                                 </div>
                                                 <div class="nome_pessoa">
-                                                    <p> <?php echo $pessoa['nome'] ?> </p>
-                                                    <span> Lead </span>
+                                                    <p><?= htmlspecialchars($lead['nome'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                                    <span>Lead</span>
                                                 </div>
                                             </div>
 
+                                            <!-- Contato -->
                                             <div class="conteudo_pessoa container_contato">
-                                                <?php
-                                                if ($pessoa['telefone_principal']):
+                                                <?php if (!empty($lead['telefone'])):
 
-                                                    $telefone = $pessoa['telefone_principal'];
-
-                                                    // Remove tudo que não for número
-                                                    $telefoneLimpo = preg_replace('/\D/', '', $telefone);
-
-                                                    // Adiciona o DDI do Brasil (55) se ainda não tiver
+                                                    $telefoneLimpo = preg_replace('/\D/', '', $lead['telefone']);
                                                     if (strpos($telefoneLimpo, '55') !== 0) {
                                                         $telefoneLimpo = '55' . $telefoneLimpo;
                                                     }
                                                     ?>
-                                                    <a href="https://wa.me/send?phone=<?= $telefoneLimpo ?>" target="__blak"
-                                                        class="whatsapp">
+                                                    <a href="https://wa.me/send?phone=<?= htmlspecialchars($telefoneLimpo, ENT_QUOTES, 'UTF-8'); ?>"
+                                                        target="_blank" class="whatsapp">
                                                         <img src="../../img/whatsapp.png" alt="whatsapp">
-                                                        <?= $pessoa['telefone_principal'] ?>
+                                                        <?= htmlspecialchars($lead['telefone'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </a>
-
-                                                    <?php
-                                                else:
-                                                    ?>
+                                                <?php else: ?>
                                                     <p style="font-size: 14px; color:rgb(94, 94, 94);">Não foi cadastrado</p>
-
-                                                    <?php
-                                                endif;
-                                                ?>
+                                                <?php endif; ?>
                                             </div>
 
+                                            <!-- Email -->
                                             <div class="conteudo_pessoa container_cidade">
-
-                                                <?php
-                                                if ($pessoa['logradouro'] || $pessoa['bairro']):
-                                                    ?>
-                                                    <p><?php echo $pessoa['logradouro'] . '/' . $pessoa['bairro'] ?></p>
-
-                                                    <?php
-                                                else:
-                                                    ?>
+                                                <?php if (!empty($lead['email'])): ?>
+                                                    <p><?= htmlspecialchars($lead['email'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                                <?php else: ?>
                                                     <p style="font-size: 14px; color:rgb(94, 94, 94);">Não foi cadastrado</p>
-
-                                                    <?php
-                                                endif;
-                                                ?>
+                                                <?php endif; ?>
                                             </div>
 
+                                            <!-- Mensagem -->
                                             <div class="conteudo_pessoa container_dt">
-                                                <p><?php echo date('d-m-Y', strtotime($pessoa['dt_cadastro_pessoa'])); ?></p>
+                                                <p class="mensagem_leads">
+                                                    <?= nl2br(htmlspecialchars($lead['mensagem'], ENT_QUOTES, 'UTF-8')); ?>
+                                                </p>
                                             </div>
 
-
+                                            <!-- Ações -->
                                             <div class="conteudo_pessoa container_acao">
                                                 <div class="opcoes_acao">
                                                     <i class="fa fa-ellipsis-h"></i>
@@ -254,52 +328,51 @@ include_once('../geral/topo.php');
                                                     <div class="opcoes_pessoa">
                                                         <ul>
 
-                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                            <a href="./converter_lead.php?id=<?= (int) $lead['id_lead']; ?>">
                                                                 <li><i class="fa-regular fa-user"></i> Criar Pessoa</li>
                                                             </a>
 
-                                                            <a href="javascript:void(0)" class="excluir_pessoa">
+                                                            <a href="javascript:void(0)" class="excluir_lead">
                                                                 <input type="hidden" class="token"
-                                                                    value="<?php echo $pessoa['tk'] ?>">
+                                                                    value="<?= (int) $lead['id_lead']; ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
+
                                                         </ul>
                                                     </div>
                                                 </div>
-
                                             </div>
 
                                         </div>
                                     </td>
                                 </tr>
+                            <?php endwhile; ?>
 
-                                <?php
-                            endwhile;
-                        else:
-                            ?>
-
+                        <?php else: ?>
                             <tr>
                                 <td colspan="5">
                                     <div class="sem_pessoas">
-                                        <p>Nenhuma Pessoa Cadastrada</p>
+                                        <p>Nenhum Lead Cadastrado</p>
                                         <img src="../../img/listagem_pessoas.png" alt="" style="max-width: 200px;">
                                     </div>
                                 </td>
-
                             </tr>
-
-                            <?php
-                        endif;
-                        ?>
-
-
-
+                        <?php endif; ?>
 
                     </tbody>
+
+
+
 
                 </table>
 
             </section>
+
+
+
+
+
+
 
             <div class="pagination-container"
                 style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
@@ -351,27 +424,14 @@ include_once('../geral/topo.php');
     </script>
 
 
-    <!-- <script>
-        $(document).ready(function() {
-            $('#add_pessoa').click(function() {
-                window.open('./cadastro_pessoa.php', '_self');
-            })
-
-            $('.whatsapp').click(function(e){
-                e.stopPropagation()
-            })
-
-
-        })
-    </script>
 
     <script>
-        $(function() {
-            $('.excluir_pessoa').on('click', function() {
-                let tk = $(this).find('.token').val()
+        $(function () {
+            $('.excluir_lead').on('click', function () {
+                let id_lead = $(this).find('.token').val()
 
                 Swal.fire({
-                    title: "Deseja realmente excluir a pessoa?",
+                    title: "Deseja realmente excluir o lead?",
                     text: "A ação é irreversível!",
                     icon: "warning",
                     showCancelButton: true,
@@ -383,36 +443,40 @@ include_once('../geral/topo.php');
                     if (result.isConfirmed) {
 
                         $.ajax({
-                            url: './pessoas.php?acao=deletar',
+                            url: './leads.php',
                             type: 'POST',
                             data: {
-                                token: tk
+                                id_lead: id_lead,
+                                acao: 'excluir_lead'
                             },
                             dataType: 'json',
-                            success: function(res) {
-
-                                // console.log(res)
+                            success: function (res) {
 
                                 if (res.status == "success") {
                                     Swal.fire({
                                         title: "Exclusão",
-                                        text: "Pessoa excluída com sucesso!",
+                                        text: "Lead excluído com sucesso!",
                                         icon: "success"
                                     });
+
+                                    setTimeout(() => {
+                                        Swal.close()
+                                        window.location.reload()
+                                    }, 1000)
+
                                 } else {
                                     Swal.fire({
                                         icon: "error",
                                         title: "Oops...",
                                         text: res.message
                                     });
+
+
                                 }
 
 
 
-                                // setTimeout(() => {
-                                //     Swal.close()
-                                //     window.location.reload()
-                                // }, 1000)
+
 
                             }
                         })
@@ -420,7 +484,7 @@ include_once('../geral/topo.php');
                 });
             })
         })
-    </script> -->
+    </script>
 
 </body>
 

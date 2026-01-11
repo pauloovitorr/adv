@@ -6,8 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     // Páginação
     $limite = 20;
-    $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-    if ($pagina < 1) $pagina = 1;
+    $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
+    if ($pagina < 1)
+        $pagina = 1;
     $offset = ($pagina - 1) * $limite;
 
     $sql_quantidade_pessoas = "SELECT 
@@ -25,25 +26,25 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
     }
 
     if (count($_GET) > 0) {
-        $nome    = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
+        $nome = isset($_GET['buscar_pessoas']) ? htmlspecialchars($conexao->real_escape_string($_GET['buscar_pessoas'])) : null;
         $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
         $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
         $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
         $params = [];
-        $types  = "";
+        $types = "";
 
         if (!empty($nome)) {
             $sql_filtros .= " AND nome LIKE ?";
             $params[] = "%$nome%";
-            $types   .= "s";
+            $types .= "s";
         }
 
         if (!empty($filtrar)) {
             if ($filtrar === "cliente" || $filtrar === "contrário") {
                 $sql_filtros .= " AND tipo_parte = ?";
                 $params[] = $filtrar;
-                $types   .= "s";
+                $types .= "s";
             }
         }
 
@@ -117,8 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
                 $tipo_acao = [];
 
                 while ($processo = $pessoa_processo->fetch_assoc()) {
-                    $ref_processos[]    = $processo['referencia'];
-                    $tipo_acao[]        = $processo['tipo_acao'];
+                    $ref_processos[] = $processo['referencia'];
+                    $tipo_acao[] = $processo['tipo_acao'];
                 }
 
                 // Transforma o array em string, separado por vírgulas
@@ -161,9 +162,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
                 }
             }
 
-            if (file_exists('../..' . $pessoa_exclusao['foto_pessoa'])) {
-                unlink('../..' . $pessoa_exclusao['foto_pessoa']);
+            $caminhoFoto = __DIR__ . '/../../..' . $pessoa_exclusao['foto_pessoa'];
+
+            if (!empty($pessoa_exclusao['foto_pessoa']) && is_file($caminhoFoto)) {
+                unlink($caminhoFoto);
             }
+
 
 
             $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
@@ -231,9 +235,12 @@ include_once('../geral/topo.php');
         <div class="pai_conteudo">
 
             <div class="infos_pagina">
-                <button> <i class="fa-regular fa-user"></i> <?php echo $total <= 1 ?  "$total Pessoa Cadastrada" : "$total Pessoas Cadastradas" ?> </button>
-                <button> <i class="fa-regular fa-user"></i> <?php echo $cliente <= 1 ?  "$cliente Cliente" : "$cliente Clientes " ?> </button>
-                <button> <i class="fa-regular fa-user"></i> <?php echo $contrario <= 1 ?  "$contrario Contrário " : "$contrario Contrários " ?> </button>
+                <button> <i class="fa-regular fa-user"></i>
+                    <?php echo $total <= 1 ? "$total Pessoa Cadastrada" : "$total Pessoas Cadastradas" ?> </button>
+                <button> <i class="fa-regular fa-user"></i>
+                    <?php echo $cliente <= 1 ? "$cliente Cliente" : "$cliente Clientes " ?> </button>
+                <button> <i class="fa-regular fa-user"></i>
+                    <?php echo $contrario <= 1 ? "$contrario Contrário " : "$contrario Contrários " ?> </button>
             </div>
 
             <div class="opcoes_funcoes">
@@ -242,7 +249,9 @@ include_once('../geral/topo.php');
                 <form action="" method="get">
 
                     <div class="div_pai_funcoes">
-                        <input type="text" id="buscar_pessoas" name="buscar_pessoas" value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>" placeholder="Buscar Por Nome">
+                        <input type="text" id="buscar_pessoas" name="buscar_pessoas"
+                            value="<?= isset($_GET['buscar_pessoas']) ? htmlspecialchars($_GET['buscar_pessoas']) : '' ?>"
+                            placeholder="Buscar Por Nome">
                         <i class="fa-regular fa-pen-to-square"></i>
                     </div>
 
@@ -268,9 +277,12 @@ include_once('../geral/topo.php');
                         </select>
                     </div>
 
-                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
+                    <button type="submit" class="btn_pesquisar">Pesquisar <label style="cursor: pointer;"
+                            for="buscar_pessoas"><i class="fa-solid fa-magnifying-glass"></i></label> </button>
 
-                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php" style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;" for="buscar_pessoas"><i class="fa-solid fa-broom"></i></label> </a></button>
+                    <button type="submit" class="btn_pesquisar"><a href="./pessoas.php"
+                            style="text-decoration: none;color: white;">Limpar <label style="cursor: pointer;"
+                                for="buscar_pessoas"><i class="fa-solid fa-broom"></i></label> </a></button>
                 </form>
 
                 <!-- <div class="div_pai_funcoes">
@@ -308,17 +320,17 @@ include_once('../geral/topo.php');
 
                             while ($pessoa = mysqli_fetch_assoc($res)):
 
-                        ?>
+                                ?>
                                 <tr>
 
                                     <td colspan="5">
 
-                                        <div
-                                            class="dados_pessoa <?php echo ($pessoa['tipo_parte'] === 'cliente' ? 'cliente' : 'contrario'); ?>"
+                                        <div class="dados_pessoa <?php echo ($pessoa['tipo_parte'] === 'cliente' ? 'cliente' : 'contrario'); ?>"
                                             onclick="window.location.href='./ficha_pessoa.php?tkn=<?php echo $pessoa['tk']; ?>'">
 
                                             <div class="conteudo_pessoa container_nome">
-                                                <div class="icone"><?php echo strtoupper(substr($pessoa['nome'], 0, 2)); ?></div>
+                                                <div class="icone"><?php echo strtoupper(substr($pessoa['nome'], 0, 2)); ?>
+                                                </div>
                                                 <div class="nome_pessoa">
                                                     <p> <?php echo $pessoa['nome'] ?> </p>
                                                     <span> <?php echo $pessoa['tipo_parte'] ?> </span>
@@ -338,17 +350,19 @@ include_once('../geral/topo.php');
                                                     if (strpos($telefoneLimpo, '55') !== 0) {
                                                         $telefoneLimpo = '55' . $telefoneLimpo;
                                                     }
-                                                ?>
-                                                    <a href="https://wa.me/send?phone=<?= $telefoneLimpo ?>" target="__blak" class="whatsapp">
-                                                        <img src="../../img/whatsapp.png" alt="whatsapp"> <?= $pessoa['telefone_principal'] ?>
+                                                    ?>
+                                                    <a href="https://wa.me/send?phone=<?= $telefoneLimpo ?>" target="__blak"
+                                                        class="whatsapp">
+                                                        <img src="../../img/whatsapp.png" alt="whatsapp">
+                                                        <?= $pessoa['telefone_principal'] ?>
                                                     </a>
 
-                                                <?php
+                                                    <?php
                                                 else:
-                                                ?>
+                                                    ?>
                                                     <p style="font-size: 14px; color:rgb(94, 94, 94);">Não foi cadastrado</p>
 
-                                                <?php
+                                                    <?php
                                                 endif;
                                                 ?>
                                             </div>
@@ -357,15 +371,15 @@ include_once('../geral/topo.php');
 
                                                 <?php
                                                 if ($pessoa['logradouro'] || $pessoa['bairro']):
-                                                ?>
+                                                    ?>
                                                     <p><?php echo $pessoa['logradouro'] . '/' . $pessoa['bairro'] ?></p>
 
-                                                <?php
+                                                    <?php
                                                 else:
-                                                ?>
+                                                    ?>
                                                     <p style="font-size: 14px; color:rgb(94, 94, 94);">Não foi cadastrado</p>
 
-                                                <?php
+                                                    <?php
                                                 endif;
                                                 ?>
                                             </div>
@@ -393,12 +407,14 @@ include_once('../geral/topo.php');
                                                                 <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
                                                             </a>
 
-                                                            <a href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
+                                                            <a
+                                                                href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-pen-to-square"></i> Editar</li>
                                                             </a>
 
                                                             <a href="javascript:void(0)" class="excluir_pessoa">
-                                                                <input type="hidden" class="token" value="<?php echo $pessoa['tk'] ?>">
+                                                                <input type="hidden" class="token"
+                                                                    value="<?php echo $pessoa['tk'] ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
                                                         </ul>
@@ -411,7 +427,7 @@ include_once('../geral/topo.php');
                                     </td>
                                 </tr>
 
-                            <?php
+                                <?php
                             endwhile;
                         else:
                             ?>
@@ -426,7 +442,7 @@ include_once('../geral/topo.php');
 
                             </tr>
 
-                        <?php
+                            <?php
                         endif;
                         ?>
 
@@ -439,10 +455,10 @@ include_once('../geral/topo.php');
 
             </section>
 
-            <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
+            <div class="pagination-container"
+                style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 6px;">
                 <?php if ($pagina > 1): ?>
-                    <a href="?pagina=<?php echo $pagina - 1; ?>"
-                        class="pagination-btn">← Anterior</a>
+                    <a href="?pagina=<?php echo $pagina - 1; ?>" class="pagination-btn">← Anterior</a>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
@@ -454,8 +470,7 @@ include_once('../geral/topo.php');
                 <?php endfor; ?>
 
                 <?php if ($pagina < $total_paginas): ?>
-                    <a href="?pagina=<?php echo $pagina + 1; ?>"
-                        class="pagination-btn">Próxima →</a>
+                    <a href="?pagina=<?php echo $pagina + 1; ?>" class="pagination-btn">Próxima →</a>
                 <?php endif; ?>
             </div>
 
@@ -468,8 +483,8 @@ include_once('../geral/topo.php');
 
     <!-- Script para exibir as opções quando os 3 prontinhos da ação são clicados -->
     <script>
-        $(document).ready(function() {
-            $('.opcoes_acao').on('click', function(e) {
+        $(document).ready(function () {
+            $('.opcoes_acao').on('click', function (e) {
                 e.stopPropagation(); // Impede o clique no elemento de propagar para o documento
 
                 var opcoesPessoa = $(this).find('.opcoes_pessoa');
@@ -482,7 +497,7 @@ include_once('../geral/topo.php');
                 }
             });
 
-            $(document).on('click', function() {
+            $(document).on('click', function () {
                 // Esconde qualquer menu aberto ao clicar fora
                 $('.opcoes_pessoa').hide();
             });
@@ -490,12 +505,12 @@ include_once('../geral/topo.php');
     </script>
 
     <script>
-        $(document).ready(function() {
-            $('#add_pessoa').click(function() {
+        $(document).ready(function () {
+            $('#add_pessoa').click(function () {
                 window.open('./cadastro_pessoa.php', '_self');
             })
 
-            $('.whatsapp').click(function(e){
+            $('.whatsapp').click(function (e) {
                 e.stopPropagation()
             })
 
@@ -504,8 +519,8 @@ include_once('../geral/topo.php');
     </script>
 
     <script>
-        $(function() {
-            $('.excluir_pessoa').on('click', function() {
+        $(function () {
+            $('.excluir_pessoa').on('click', function () {
                 let tk = $(this).find('.token').val()
 
                 Swal.fire({
@@ -527,9 +542,7 @@ include_once('../geral/topo.php');
                                 token: tk
                             },
                             dataType: 'json',
-                            success: function(res) {
-
-                                // console.log(res)
+                            success: function (res) {
 
                                 if (res.status == "success") {
                                     Swal.fire({
@@ -537,6 +550,12 @@ include_once('../geral/topo.php');
                                         text: "Pessoa excluída com sucesso!",
                                         icon: "success"
                                     });
+
+                                    setTimeout(() => {
+                                    Swal.close()
+                                    window.location.reload()
+                                }, 1000)
+
                                 } else {
                                     Swal.fire({
                                         icon: "error",
@@ -547,10 +566,7 @@ include_once('../geral/topo.php');
 
 
 
-                                // setTimeout(() => {
-                                //     Swal.close()
-                                //     window.location.reload()
-                                // }, 1000)
+                                
 
                             }
                         })
