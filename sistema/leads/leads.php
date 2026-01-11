@@ -98,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $total_paginas = ceil($total / $limite);
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) && $_POST['acao'] == 'excluir_lead') {
 
     $id_lead = $conexao->real_escape_string($_POST['id_lead']);
@@ -167,6 +166,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST) && $_POST['acao'] ==
         $conexao->close();
         exit;
     }
+}
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'adicionar_pessoa' && !empty($_POST['id_lead'])
+) {
+
+    $id_lead = (int) $_POST['id_lead'];
+
+    try {
+
+        $conexao->begin_transaction();
+
+        //  Buscar dados do Lead
+        $sqlLead = "
+            SELECT nome, email, telefone
+            FROM leads
+            WHERE id_lead = ?
+              AND usuario_config_id_usuario_config = ?
+            LIMIT 1
+        ";
+
+        $stmtLead = $conexao->prepare($sqlLead);
+        $stmtLead->bind_param('ii', $id_lead, $id_user);
+        $stmtLead->execute();
+        $resLead = $stmtLead->get_result();
+
+        if ($resLead->num_rows === 0) {
+            throw new Exception('Lead não encontrado.');
+        }
+
+        $lead = $resLead->fetch_assoc();
+        $stmtLead->close();
+
+        //  Dados padrão da Pessoa
+        $token = bin2hex(random_bytes(32));
+        $origem = 'Site';
+        $tipo_pessoa = 'fisica';
+        $tipo_parte = 'cliente';
+
+        //  Inserir Pessoa
+        $sqlPessoa = "
+            INSERT INTO pessoas (
+                tk,
+                nome,
+                origem,
+                dt_cadastro_pessoa,
+                dt_atualizacao_pessoa,
+                telefone_principal,
+                email,
+                tipo_pessoa,
+                tipo_parte,
+                usuario_config_id_usuario_config
+            ) VALUES (
+                ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?
+            )
+        ";
+
+        $stmtPessoa = $conexao->prepare($sqlPessoa);
+        $stmtPessoa->bind_param(
+            'sssssssi',
+            $token,
+            $lead['nome'],
+            $origem,
+            $lead['telefone'],
+            $lead['email'],
+            $tipo_pessoa,
+            $tipo_parte,
+            $id_user
+        );
+
+
+        if (!$stmtPessoa->execute()) {
+            throw new Exception('Erro ao cadastrar pessoa.');
+        }
+
+        $stmtPessoa->close();
+
+        //  Log
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        if (!cadastro_log('Converteu Lead em Pessoa', $lead['nome'], $ip, $id_user)) {
+            throw new Exception('Erro ao registrar log.');
+        }
+
+        //  Excluir Lead
+        $sqlDelete = "
+            DELETE FROM leads
+            WHERE id_lead = ?
+              AND usuario_config_id_usuario_config = ?
+        ";
+
+        $stmtDelete = $conexao->prepare($sqlDelete);
+        $stmtDelete->bind_param('ii', $id_lead, $id_user);
+        $stmtDelete->execute();
+        $stmtDelete->close();
+
+        //  Commit
+        $conexao->commit();
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Pessoa cadastrada com sucesso!',
+            'token' => $token
+        ], JSON_UNESCAPED_UNICODE);
+
+    } catch (Exception $e) {
+
+        $conexao->rollback();
+
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    exit;
 }
 
 
@@ -328,12 +443,14 @@ include_once('../geral/topo.php');
                                                     <div class="opcoes_pessoa">
                                                         <ul>
 
-                                                            <a href="./converter_lead.php?id=<?= (int) $lead['id_lead']; ?>">
+                                                            <a href="javascript:void(0)" class="add_pessoa">
+                                                                <input type="hidden" class="lead_id"
+                                                                    value="<?= (int) $lead['id_lead']; ?>">
                                                                 <li><i class="fa-regular fa-user"></i> Criar Pessoa</li>
                                                             </a>
 
                                                             <a href="javascript:void(0)" class="excluir_lead">
-                                                                <input type="hidden" class="token"
+                                                                <input type="hidden" class="lead_id"
                                                                     value="<?= (int) $lead['id_lead']; ?>">
                                                                 <li><i class="fa-regular fa-trash-can"></i> Excluir</li>
                                                             </a>
@@ -428,7 +545,7 @@ include_once('../geral/topo.php');
     <script>
         $(function () {
             $('.excluir_lead').on('click', function () {
-                let id_lead = $(this).find('.token').val()
+                let id_lead = $(this).find('.lead_id').val()
 
                 Swal.fire({
                     title: "Deseja realmente excluir o lead?",
@@ -483,6 +600,59 @@ include_once('../geral/topo.php');
                     }
                 });
             })
+
+
+            $('.add_pessoa').on('click', function () {
+                let id_lead = $(this).find('.lead_id').val()
+
+                Swal.fire({
+                    title: "Deseja realmente adicionar como Pessoa?",
+                    text: "Ao confirmar o registro será efetuado e o mesmo sairá da listagem de leads!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Sim, excluir!",
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        $.ajax({
+                            url: './leads.php',
+                            type: 'POST',
+                            data: {
+                                id_lead: id_lead,
+                                acao: 'adicionar_pessoa'
+                            },
+                            dataType: 'json',
+                            success: function (res) {
+
+                                if (res.status == "success") {
+                                    Swal.fire({
+                                        title: "Cadastro",
+                                        text: "Pessoa cadastrada com sucesso!",
+                                        icon: "success"
+                                    });
+
+                                    setTimeout(() => {
+                                        Swal.close()
+                                        window.location.reload()
+                                    }, 1500)
+
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: res.message
+                                    });
+
+                                }
+                            }
+                        })
+                    }
+                });
+            })
+
         })
     </script>
 

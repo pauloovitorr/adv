@@ -446,40 +446,47 @@ include_once('../geral/topo.php');
         $(function () {
             lucide.createIcons();
 
-            // // Efeito de Confetti
-            // function launchConfetti() {
-            //     var end = Date.now() + (1 * 1000); // 1 segundos
+            // Efeito de Confetti
+            function launchConfetti() {
+                var end = Date.now() + (1 * 2000); // 2 segundos
 
-            //     var colors = ['#061124', '#ffffff'];
+                var colors = ['#061124', '#ffffff'];
 
-            //     (function frame() {
-            //         confetti({
-            //             particleCount: 2,
-            //             angle: 60,
-            //             spread: 55,
-            //             origin: { x: 0 },
-            //             colors: colors
-            //         });
+                (function frame() {
+                    confetti({
+                        particleCount: 2,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: colors
+                    });
 
-            //         confetti({
-            //             particleCount: 2,
-            //             angle: 120,
-            //             spread: 55,
-            //             origin: { x: 1 },
-            //             colors: colors
-            //         });
+                    confetti({
+                        particleCount: 2,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: colors
+                    });
 
-            //         if (Date.now() < end) {
-            //             requestAnimationFrame(frame);
-            //         }
-            //     })();
-            // }
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                })();
+            }
 
 
-            // // Lançar confetti ao carregar a página
-            // window.addEventListener('load', function () {
-            //     setTimeout(launchConfetti, 1000);
-            // });
+            // Lançar confetti ao carregar a página (1 vez por dia)
+            window.addEventListener('load', function () {
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                const lastRun = localStorage.getItem('confettiLastRun');
+
+                if (lastRun !== today) {
+                    setTimeout(launchConfetti, 1000);
+                    localStorage.setItem('confettiLastRun', today);
+                }
+            });
+
         })
 
     </script>

@@ -569,6 +569,7 @@ include_once('../geral/topo.php');
                                             <option value="Indicação" <?php echo ($dados_pessoa['origem'] ?? '') == 'Indicação' ? 'selected' : '' ?>>Indicação</option>
                                             <option value="Anúncio" <?php echo ($dados_pessoa['origem'] ?? '') == 'Anúncio' ? 'selected' : '' ?>>Anúncio</option>
                                             <option value="Facebook" <?php echo ($dados_pessoa['origem'] ?? '') == 'Facebook' ? 'selected' : '' ?>>Facebook</option>
+                                            <option value="Site" <?php echo ($dados_pessoa['origem'] ?? '') == 'Site' ? 'selected' : '' ?>>Site</option>
                                         </select>
                                     </div>
                                 </div>
