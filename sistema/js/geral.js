@@ -32,3 +32,26 @@ document.addEventListener("DOMContentLoaded", () => {
     placement: "left",
   });
 });
+
+$(".search-input").on("input", function () {
+  // Pelo menos 3 caracteres
+  if ($(this).val().length > 1) {
+    let valor = $(this).val();
+
+    $.ajax({
+      url: "/adv/sistema/geral/filtro_pesquisa_topo.php",
+      method: "POST",
+      dataType: "JSON",
+      data: {
+        valor: valor,
+        acao: 'pesquisar_dados'
+      },
+      success: function (res) {
+        
+        
+      },
+    });
+
+
+  }
+});

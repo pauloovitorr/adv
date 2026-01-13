@@ -1,29 +1,9 @@
-
 <?php
-    
-    $link_modelo = "";
 
-    // Função que adiciona o link do modelo no "visualizar site"
-    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        $sql_dados_modelo_site = "SELECT tk, modelo FROM usuario_config WHERE id_usuario_config = $id_user";
+$link_modelo = "";
 
-        $resposta = $conexao->query($sql_dados_modelo_site);
 
-        if($resposta && $resposta->num_rows > 0) {
-            $dados = $resposta->fetch_assoc();
 
-            if(isset($dados["tk"]) && !empty($dados["tk"]) && isset($dados["modelo"]) && !empty($dados["modelo"]) ) {
-
-                $num_modelo = $dados["modelo"];
-                $tk         = $dados["tk"];
-
-                if($num_modelo == 1) {
-                    $link_modelo = "../site/modelo1/index.php?modelo=$tk" ;
-                }
-        }
-
-    }
-}
 
 ?>
 
@@ -33,9 +13,12 @@
 <!-- <link rel="stylesheet" href="../css/topo_funcoes.css"> -->
 
 <!-- Font awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 <!-- Jquery  -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <!-- sweetalert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -178,6 +161,8 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
+
+
     .opcoes_perfil::before {
         content: '';
         position: absolute;
@@ -317,7 +302,7 @@
 
     .opcoes_add ul li {
         width: 100%;
-        
+
         transition: 0.3s;
         font-size: 14px;
     }
@@ -359,6 +344,44 @@
         background: white;
     }
 
+    .container_resultados {
+        position: absolute;
+        /* margin-top: 12px; */
+        width: 100%;
+        height: auto;
+        /* padding: 10px; */
+        background-color: white;
+        border-radius: 8px;
+        z-index: 101;
+        border: 1px solid #c3c3c3;
+        border-top: none;
+        transition: opacity 0.3s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .container_resultados ul {
+        list-style: none;
+        overflow: hidden;
+    }
+
+    .container_resultados ul li {
+        font-size: 14px;
+         overflow: hidden;
+    }
+
+    .container_resultados ul li:hover {
+        background-color: rgb(235, 235, 235);
+    }
+
+    .container_resultados ul li a {
+        text-decoration: none;
+        color: rgb(58, 58, 58);
+        display: block;
+        padding: 8px;
+        width: 100%;
+        height: 100%;
+    }
+
     .search-icon {
         position: absolute;
         left: 12px;
@@ -385,6 +408,10 @@
         font-size: 18px;
         cursor: pointer;
     }
+
+    .search-container input::placeholder {
+        font-size: 12px;
+    }
 </style>
 
 <header class="container_topo">
@@ -394,8 +421,28 @@
             <img src="../../img/logo.png" alt="logo">
 
             <div class="search-container">
-                <input type="text" placeholder="Pesquisar" class="search-input">
-                <i class="fas fa-search search-icon"></i>
+                <div>
+                    <input type="text" placeholder="Pesquise nome pessoa ou ref processo" class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="container_resultados">
+                    <ul>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                        <li><a href="">Paulo Vitor</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -404,7 +451,8 @@
         <div class="infos_menu">
 
             <div class="header-right">
-                <a href="<?php echo $link_modelo ?? '' ?>" id="visualizar_site" target="_blank" style="text-decoration:none"><span class="header-link">Visualizar site</span></a>
+                <a href="<?php echo $link_modelo ?? '' ?>" id="visualizar_site" target="_blank"
+                    style="text-decoration:none"><span class="header-link">Visualizar site</span></a>
                 <i class="fas fa-bell notification-icon"></i>
             </div>
 
@@ -425,10 +473,18 @@
                 <div class="user"><?php echo substr($_SESSION['nome'], 0, 2) ?></div>
                 <div class="opcoes_perfil">
                     <ul>
-                        <a href="/adv/sistema/site/modelos.php"> <li>Modelos de Site</li></a>
-                        <a href="/adv/sistema/ia/chat.php"> <li>Chat com IA</li></a>
-                        <a href="/adv/sistema/configuracoes/configuracoes.php"> <li>Configurações</li></a>
-                        <a href="/adv/sistema/geral/logout.php"> <li>Sair</li></a>
+                        <a href="/adv/sistema/site/modelos.php">
+                            <li>Modelos de Site</li>
+                        </a>
+                        <a href="/adv/sistema/ia/chat.php">
+                            <li>Chat com IA</li>
+                        </a>
+                        <a href="/adv/sistema/configuracoes/configuracoes.php">
+                            <li>Configurações</li>
+                        </a>
+                        <a href="/adv/sistema/geral/logout.php">
+                            <li>Sair</li>
+                        </a>
                     </ul>
                 </div>
             </div>
@@ -439,4 +495,3 @@
 
 
 </header>
-
