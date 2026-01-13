@@ -316,6 +316,7 @@ $link_modelo = "";
         color: rgb(58, 58, 58);
         display: block;
         padding: 8px;
+        font-size: 12px;
     }
 
     .btn_add:hover .opcoes_add,
@@ -357,16 +358,17 @@ $link_modelo = "";
         border-top: none;
         transition: opacity 0.3s;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+         overflow: hidden;
     }
 
     .container_resultados ul {
         list-style: none;
-        overflow: hidden;
+        
     }
 
     .container_resultados ul li {
         font-size: 14px;
-         overflow: hidden;
+         
     }
 
     .container_resultados ul li:hover {
@@ -427,20 +429,7 @@ $link_modelo = "";
                 </div>
                 <div class="container_resultados">
                     <ul>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
-                        <li><a href="">Paulo Vitor</a></li>
+                        
                     </ul>
                 </div>
             </div>

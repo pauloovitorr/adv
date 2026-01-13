@@ -44,14 +44,55 @@ $(".search-input").on("input", function () {
       dataType: "JSON",
       data: {
         valor: valor,
-        acao: 'pesquisar_dados'
+        acao: "pesquisar_dados",
       },
       success: function (res) {
-        
-        
+        let container = $(".container_resultados");
+        let ul = container.find("ul");
+
+        ul.empty(); // limpa resultados anteriores
+
+        if (res.status === "success") {
+          $.each(res.dados, function (index, item) {
+            let link = "#";
+            let li = "";
+
+            // Define o link conforme o tipo
+            if (item.tipo_resultado === "pessoa") {
+              link = "/adv/sistema/pessoa/ficha_pessoa.php?tkn" + item.tk;
+
+              li = `
+                        <li class="resultado ${item.tipo_resultado}">
+                            <a href="${link}">
+                                ${item.nome}
+                                <span class="tipo">(${item.tipo_parte})</span>
+                            </a>
+                        </li>
+                    `;
+            } else if (item.tipo_resultado === "processo") {
+              link = "/adv/sistema/processo/ficha_processo.php?tkn" + item.tk;
+
+              li = `
+                        <li class="resultado ${item.tipo_resultado}">
+                            <a href="${link}">
+                                ${item.referencia}
+                                <span class="tipo">(${item.tipo_acao})</span>
+                            </a>
+                        </li>
+                    `;
+            }
+
+            ul.append(li);
+          });
+
+          container.show();
+        } else {
+          ul.append(
+            '<li class="sem_resultado">Nenhum resultado encontrado</li>'
+          );
+          container.show();
+        }
       },
     });
-
-
   }
 });
