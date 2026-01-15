@@ -34,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['valor']) && $_POST['
         SELECT
             pr.tk,
             pr.referencia,
-            pr.tipo_acao
+            pr.tipo_acao,
+            'processo' AS tipo_resultado
         FROM processo pr
         WHERE pr.referencia LIKE '%$pesquisa%'
         LIMIT 20

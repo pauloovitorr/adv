@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
 $(".search-input").on("input", function () {
   // Pelo menos 3 caracteres
   if ($(this).val().length > 1) {
+
+    console.log($(this).val().length)
+
     let valor = $(this).val();
 
     $.ajax({
@@ -57,29 +60,30 @@ $(".search-input").on("input", function () {
             let link = "#";
             let li = "";
 
-            // Define o link conforme o tipo
             if (item.tipo_resultado === "pessoa") {
-              link = "/adv/sistema/pessoa/ficha_pessoa.php?tkn" + item.tk;
+              link = "/adv/sistema/pessoa/ficha_pessoa.php?tkn=" + item.tk;
 
               li = `
-                        <li class="resultado ${item.tipo_resultado}">
-                            <a href="${link}">
-                                ${item.nome}
-                                <span class="tipo">(${item.tipo_parte})</span>
-                            </a>
-                        </li>
-                    `;
-            } else if (item.tipo_resultado === "processo") {
-              link = "/adv/sistema/processo/ficha_processo.php?tkn" + item.tk;
+    <li class="resultado pessoa">
+      <a href="${link}" target='_blank'>
+        ${item.nome}
+        <span class="tipo">(${item.tipo_parte})</span>
+      </a>
+    </li>
+  `;
+            }
+
+            if (item.tipo_resultado === "processo") {
+              link = "/adv/sistema/processo/ficha_processo.php?tkn=" + item.tk;
 
               li = `
-                        <li class="resultado ${item.tipo_resultado}">
-                            <a href="${link}">
-                                ${item.referencia}
-                                <span class="tipo">(${item.tipo_acao})</span>
-                            </a>
-                        </li>
-                    `;
+    <li class="resultado processo">
+      <a href="${link}" target='_blank'>
+        ${item.referencia}
+        <span class="tipo">(${item.tipo_acao})</span>
+      </a>
+    </li>
+  `;
             }
 
             ul.append(li);
@@ -94,5 +98,12 @@ $(".search-input").on("input", function () {
         }
       },
     });
+  }
+});
+
+$(".search-input").on("focusout", function () {
+  if ($(".search-input").val() == "") {
+    $(".container_resultados").hide();
+    $(".container_resultados ul").empty();
   }
 });
