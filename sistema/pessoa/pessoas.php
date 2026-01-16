@@ -326,7 +326,8 @@ include_once('../geral/topo.php');
                                     <td colspan="5">
 
                                         <div class="dados_pessoa <?php echo ($pessoa['tipo_parte'] === 'cliente' ? 'cliente' : 'contrario'); ?>"
-                                            onclick="window.location.href='./ficha_pessoa.php?tkn=<?php echo $pessoa['tk']; ?>'">
+                                            onclick="window.open('./ficha_pessoa.php?tkn=<?php echo $pessoa['tk']; ?>', '_blank')">
+
 
                                             <div class="conteudo_pessoa container_nome">
                                                 <div class="icone"><?php echo strtoupper(substr($pessoa['nome'], 0, 2)); ?>
@@ -403,9 +404,9 @@ include_once('../geral/topo.php');
                                                                 <li><i class="fa-regular fa-id-card"></i> Documentos</li>
                                                             </a>
 
-                                                            <a href="./docs_pessoa.php?tkn=<?php echo $pessoa['tk'] ?>">
+                                                            <!-- <a href="./docs_pessoa.php?tkn=">
                                                                 <li><i class="fa-regular fa-folder"></i> Criar Processo</li>
-                                                            </a>
+                                                            </a> -->
 
                                                             <a
                                                                 href="./cadastro_pessoa.php?acao=editar&tkn=<?php echo $pessoa['tk'] ?>">
@@ -552,9 +553,9 @@ include_once('../geral/topo.php');
                                     });
 
                                     setTimeout(() => {
-                                    Swal.close()
-                                    window.location.reload()
-                                }, 1000)
+                                        Swal.close()
+                                        window.location.reload()
+                                    }, 1000)
 
                                 } else {
                                     Swal.fire({
@@ -566,7 +567,7 @@ include_once('../geral/topo.php');
 
 
 
-                                
+
 
                             }
                         })

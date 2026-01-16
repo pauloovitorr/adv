@@ -129,6 +129,7 @@ $sql_honorarios_mensais = "SELECT
     DATE_FORMAT(dt_cadastro_processo, '%m-%Y') AS mes
 FROM processo
 WHERE dt_cadastro_processo >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+  AND resultado_processo = 'Sentença favorável'
   AND usuario_config_id_usuario_config = $id_user
 GROUP BY DATE_FORMAT(dt_cadastro_processo, '%Y-%m')
 ORDER BY mes";

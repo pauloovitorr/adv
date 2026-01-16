@@ -190,11 +190,11 @@ include_once('../geral/topo.php');
                             </button>
                         </a>
 
-                        <a href="./docs_pessoa.php?tkn=<?= urlencode($dados_pessoa['tk'] ?? '') ?>" style="text-decoration: none;">
+                        <!-- <a href="./docs_pessoa.php?tkn= ?>" style="text-decoration: none;">
                             <button class="btn-secondary">
                                 <i class="fas fa-plus"></i> Novo Processo
                             </button>
-                        </a>
+                        </a> -->
                     </div>
 
                 </div>
@@ -392,7 +392,7 @@ include_once('../geral/topo.php');
                                                 <div class="doc">
 
                                                     <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
-                                                        <img class="img_bg_doc" src="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
+                                                        <img class="img_bg_doc" src="..<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
                                                         <div class="nome_arquivo"><span><?= htmlspecialchars($doc["nome_original"]) ?></span></div>
                                                     <?php else: ?>
                                                         <i class="fa-regular fa-folder" style="font-size: 30px;"></i>

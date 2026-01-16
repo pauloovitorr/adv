@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
     doc.caminho_arquivo,
     doc.dt_criacao,
     doc.id_documento,
-    doc.id_processo AS doc_id_processo
+    doc.id_processo AS doc_id_processo 
 
 
 FROM processo p
@@ -396,7 +396,7 @@ include_once('../geral/topo.php');
 
                                                     <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
                                                         <img class="img_bg_doc"
-                                                            src="<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
+                                                            src="..<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
                                                         <div class="nome_arquivo">
                                                             <span><?= htmlspecialchars($doc["nome_original"]) ?></span>
                                                         </div>

@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['token']) && $_POST['
 
     $token = htmlspecialchars($conexao->real_escape_string($_POST['token']));
 
-    $sql_ativa_processo = "UPDATE processo SET status = 'ativo' 
+    $sql_ativa_processo = "UPDATE processo SET status = 'ativo', resultado_processo = NULL
     WHERE tk = '$token' 
     AND usuario_config_id_usuario_config = $id_user";
 
