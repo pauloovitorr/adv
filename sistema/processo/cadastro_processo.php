@@ -11,14 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_cliente'])) {
     $pessoa_localizadas = [];
 
     if ($nome !== 'padrao' &&  !empty($nome)) {
-        $sql_busca_cliente   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $sql_busca_cliente   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user AND status <> 'inativo' order by nome limit 15;";
         $res = $conexao->query($sql_busca_cliente);
 
         while ($pessoa = $res->fetch_assoc()) {
             array_push($pessoa_localizadas, $pessoa);
         }
     } else {
-        $sql_busca_cliente   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente'  AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $sql_busca_cliente   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'cliente'  AND usuario_config_id_usuario_config = $id_user AND status <> 'inativo' order by nome limit 15;";
         $res = $conexao->query($sql_busca_cliente);
 
         while ($pessoa = $res->fetch_assoc()) {
@@ -35,14 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['busca_cliente'])) {
     $pessoa_localizadas = [];
 
     if ($nome !== 'padrao' &&  !empty($nome)) {
-        $sql_busca_contrario   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'contrário' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $sql_busca_contrario   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'contrário' AND nome LIKE '%$nome%' AND usuario_config_id_usuario_config = $id_user AND status <> 'inativo' order by nome limit 15;";
         $res = $conexao->query($sql_busca_contrario);
 
         while ($pessoa = $res->fetch_assoc()) {
             array_push($pessoa_localizadas, $pessoa);
         }
     } else {
-        $sql_busca_contrario   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'contrário'  AND usuario_config_id_usuario_config = $id_user order by nome limit 15;";
+        $sql_busca_contrario   = "SELECT id_pessoa, nome FROM pessoas WHERE tipo_parte = 'contrário'  AND usuario_config_id_usuario_config = $id_user AND status <> 'inativo' order by nome limit 15;";
         $res = $conexao->query($sql_busca_contrario);
 
         while ($pessoa = $res->fetch_assoc()) {
@@ -453,7 +453,7 @@ include_once('../geral/topo.php');
                                             name="referencia"
                                             id="referencia"
                                             value="<?php echo htmlspecialchars($dados_processo['referencia'] ?? '') ?>"
-                                            maxlength="8"
+                                            maxlength="16"
                                             placeholder="Ex: PA_001 "
                                             required>
                                     </div>

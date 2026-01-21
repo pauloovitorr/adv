@@ -129,7 +129,7 @@ $sql_honorarios_mensais = "SELECT
     DATE_FORMAT(dt_cadastro_processo, '%m-%Y') AS mes
 FROM processo
 WHERE dt_cadastro_processo >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-  AND resultado_processo = 'Sentença favorável'
+  AND resultado_processo <> ''
   AND usuario_config_id_usuario_config = $id_user
 GROUP BY DATE_FORMAT(dt_cadastro_processo, '%Y-%m')
 ORDER BY mes";
@@ -184,6 +184,7 @@ $sql_tipos_casos = "SELECT
     COUNT(*) AS total
 FROM processo
 WHERE usuario_config_id_usuario_config = $id_user
+AND dt_cadastro_processo >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
 GROUP BY grupo_acao
 ORDER BY total DESC";
 
@@ -211,6 +212,7 @@ $sql_processos_etapa = "SELECT
 FROM processo p
 RIGHT JOIN etapas_crm e  ON p.etapa_kanban = e.id_etapas_crm
 WHERE p.usuario_config_id_usuario_config = $id_user
+AND p.dt_cadastro_processo >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
 AND p.status = 'ativo'
 GROUP BY p.etapa_kanban, e.nome
 ORDER BY total DESC";
@@ -238,6 +240,7 @@ $sql_resultados_processos = "SELECT
 FROM processo
 WHERE usuario_config_id_usuario_config = $id_user
 AND resultado_processo IS NOT NULL
+AND dt_cadastro_processo >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
 GROUP BY resultado_processo
 ORDER BY total DESC";
 $resultados_processos = $conexao->query($sql_resultados_processos);

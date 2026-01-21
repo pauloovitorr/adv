@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     COUNT( CASE WHEN contingenciamento = 'provável/chance alta' THEN 1 END ) AS chance_alta,
     COUNT( CASE WHEN contingenciamento = 'possível/talvez' THEN 1 END ) AS chance_media,
     COUNT( CASE WHEN contingenciamento = 'remota/difícil' THEN 1 END ) AS chance_baixa
-FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']}";
+FROM processo WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} AND status = 'ativo'";
     $res_qtd = $conexao->query($sql_quantidade_processos);
 
 
@@ -271,7 +271,7 @@ include_once('../geral/topo.php');
 
             <div class="infos_pagina">
                 <button> <i class="fa-regular fa-folder"></i>
-                    <?php echo $total <= 1 ? "$total Processo Cadastrado" : "$total Processos Cadastrados" ?> </button>
+                    <?php echo $total <= 1 ? "$total Processo Ativo" : "$total Processos Ativos" ?> </button>
                 <button> <i class="fa-regular fa-folder"></i> <?php echo "$chance_alta chance alta" ?> </button>
                 <button> <i class="fa-regular fa-folder"></i> <?php echo "$chance_media chance média" ?> </button>
                 <button> <i class="fa-regular fa-folder"></i> <?php echo "$chance_baixa chance baixa" ?> </button>

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     COUNT(*) AS total_pessoas,
     COUNT(CASE WHEN tipo_parte = 'cliente' THEN 1 END) AS total_clientes,
     COUNT(CASE WHEN tipo_parte = 'contrário' THEN 1 END) AS total_contrarias
-FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
+FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} AND status <> 'inativo';
 ";
     $res_qtd = $conexao->query($sql_quantidade_pessoas);
     if ($res_qtd->num_rows == 1) {
@@ -267,7 +267,7 @@ include_once('../geral/topo.php');
 
             <div class="infos_pagina">
                 <button> <i class="fa-regular fa-user"></i>
-                    <?php echo $total <= 1 ? "$total Pessoa Cadastrada" : "$total Pessoas Cadastradas" ?> </button>
+                    <?php echo $total <= 1 ? "$total Pessoa Ativa" : "$total Pessoas Ativas" ?> </button>
                 <button> <i class="fa-regular fa-user"></i>
                     <?php echo $cliente <= 1 ? "$cliente Cliente" : "$cliente Clientes " ?> </button>
                 <button> <i class="fa-regular fa-user"></i>

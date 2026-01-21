@@ -10,6 +10,7 @@ $link_modelo = "";
 
 <!-- Css Geral e topo das páginas internas como btn add, buscar, filtrar etc... -->
 <link rel="stylesheet" href="../css/geral.css">
+
 <!-- <link rel="stylesheet" href="../css/topo_funcoes.css"> -->
 
 <!-- Font awesome -->
