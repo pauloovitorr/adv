@@ -5,7 +5,7 @@ $id_user = $_SESSION['cod'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
 
-    $token_pessoa  = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
+    $token_pessoa = $conexao->escape_string(htmlspecialchars($_GET['tkn']));
 
     $sql_busca_pessoa_tkn = '
     SELECT pessoas.*, documento.* 
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
                     'id_pessoa' => $row['id_pessoa'],
                     'tk' => $row['tk'],
                     'nome' => $row['nome'],
+                    'status' => $row['status'],
                     'origem' => $row['origem'],
                     'dt_cadastro_pessoa' => $row['dt_cadastro_pessoa'],
                     'dt_atualizacao_pessoa' => $row['dt_atualizacao_pessoa'],
@@ -94,6 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pessoas/ficha_pessoa.css">
     <title>ADV Conectado</title>
+
+    <style>
+        .inativo {
+            color: #b51010 !important;
+        }
+    </style>
+
 </head>
 
 <?php
@@ -107,7 +115,7 @@ include_once('../geral/topo.php');
             <a href="./pessoas.php" class="breadcrumb-link">Pessoas</a>
             <span class="breadcrumb-separator">/</span>
             <span class="breadcrumb-current">Ficha Pessoa</span>
-            
+
         </div>
     </div>
 </div>
@@ -126,10 +134,11 @@ include_once('../geral/topo.php');
                     <div class="profile-title-section">
                         <div class="profile-photo-container">
                             <?php if (!empty($dados_pessoa["foto_pessoa"])): ?>
-                                <img src="../..<?php echo $dados_pessoa['foto_pessoa'] ?>" alt="Foto do cliente" class="profile-photo" id="clientPhoto">
-                            <?php else:  ?>
+                                <img src="../..<?php echo $dados_pessoa['foto_pessoa'] ?>" alt="Foto do cliente"
+                                    class="profile-photo" id="clientPhoto">
+                            <?php else: ?>
                                 <img src="../../img/user.png" alt="Foto do cliente" class="profile-photo" id="clientPhoto">
-                            <?php endif  ?>
+                            <?php endif ?>
                             <div class="profile-photo-placeholder" id="photoPlaceholder" style="display: none;">
                                 <i class="fas fa-user"></i>
                             </div>
@@ -141,16 +150,20 @@ include_once('../geral/topo.php');
 
                             <div class="profile-meta">
                                 <span class="profile-type">
-                                    <i class="fas fa-user-tie"></i><?php echo htmlspecialchars($dados_pessoa['tipo_parte'] ?? '') ?>
+                                    <i
+                                        class="fas fa-user-tie"></i><?php echo htmlspecialchars($dados_pessoa['tipo_parte'] ?? '') ?>
                                 </span>
 
                                 <span class="profile-origin">
                                     <i class="fas fa-tag"></i> <?= htmlspecialchars($dados_pessoa['origem'] ?? '') ?>
                                 </span>
 
-
-                                <span class="profile-status active">
-                                    <i class="fas fa-circle"></i> Ativo
+                                <?php
+                                $status = !empty($dados_pessoa['status']) ? strtolower($dados_pessoa['status']) : 'ativo';
+                                ?>
+                                <span class="profile-status <?= $status === 'ativo' ? 'active' : '' ?>">
+                                    <i class="fas fa-circle"></i>
+                                    <?= htmlspecialchars(ucfirst($status)) ?>
                                 </span>
                             </div>
 
@@ -184,7 +197,8 @@ include_once('../geral/topo.php');
                     </div>
 
                     <div class="profile-actions">
-                        <a href="./cadastro_pessoa.php?acao=editar&tkn=<?= urlencode($dados_pessoa['tk'] ?? '') ?>" style="text-decoration: none;">
+                        <a href="./cadastro_pessoa.php?acao=editar&tkn=<?= urlencode($dados_pessoa['tk'] ?? '') ?>"
+                            style="text-decoration: none;">
                             <button class="btn-secondary">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
@@ -243,7 +257,8 @@ include_once('../geral/topo.php');
                                 <div class="info-card">
                                     <div class="info-item">
                                         <label class="info-label">Nome Completo</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['nome'] ?? '') ?></div>
+                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['nome'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Data de Nascimento</label>
@@ -251,11 +266,14 @@ include_once('../geral/topo.php');
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Sexo</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['sexo'] ?? '') ?></div>
+                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['sexo'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">CPF/CNPJ</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['num_documento'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_pessoa['num_documento'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">RG</label>
@@ -263,23 +281,30 @@ include_once('../geral/topo.php');
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">PIS/PASEP</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['pis'] ?? '') ?></div>
+                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['pis'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">CTPS</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['ctps'] ?? '') ?></div>
+                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['ctps'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Estado Civil</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['estado_civil'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_pessoa['estado_civil'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Profissão</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['profissao'] ?? '') ?></div>
+                                        <div class="info-value">
+                                            <?= htmlspecialchars($dados_pessoa['profissao'] ?? '') ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Nome da Mãe</label>
-                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['nome_mae'] ?? '') ?></div>
+                                        <div class="info-value"><?= htmlspecialchars($dados_pessoa['nome_mae'] ?? '') ?>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -338,35 +363,51 @@ include_once('../geral/topo.php');
                                 <div class="info-card">
                                     <div class="info-item">
                                         <label class="info-label">CEP</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['cep']) ? htmlspecialchars($dados_pessoa['cep']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['cep']) ? htmlspecialchars($dados_pessoa['cep']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Estado</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['estado']) ? htmlspecialchars($dados_pessoa['estado']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['estado']) ? htmlspecialchars($dados_pessoa['estado']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Cidade</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['cidade']) ? htmlspecialchars($dados_pessoa['cidade']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['cidade']) ? htmlspecialchars($dados_pessoa['cidade']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Bairro</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['bairro']) ? htmlspecialchars($dados_pessoa['bairro']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['bairro']) ? htmlspecialchars($dados_pessoa['bairro']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Logradouro</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['logradouro']) ? htmlspecialchars($dados_pessoa['logradouro']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['logradouro']) ? htmlspecialchars($dados_pessoa['logradouro']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item">
                                         <label class="info-label">Número</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['numero_casa']) ? htmlspecialchars($dados_pessoa['numero_casa']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['numero_casa']) ? htmlspecialchars($dados_pessoa['numero_casa']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item full-width">
                                         <label class="info-label">Complemento</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['complemento']) ? htmlspecialchars($dados_pessoa['complemento']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['complemento']) ? htmlspecialchars($dados_pessoa['complemento']) : '' ?>
+                                        </div>
                                     </div>
                                     <div class="info-item full-width">
                                         <label class="info-label">Observações</label>
-                                        <div class="info-value"><?= !empty($dados_pessoa['observacao']) ? htmlspecialchars($dados_pessoa['observacao']) : '' ?></div>
+                                        <div class="info-value">
+                                            <?= !empty($dados_pessoa['observacao']) ? htmlspecialchars($dados_pessoa['observacao']) : '' ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -377,7 +418,8 @@ include_once('../geral/topo.php');
                             <div class="processes-section">
                                 <div class="section-header">
                                     <h3>Documentos do Cliente</h3>
-                                    <a href="./docs_pessoa.php?tkn=<?= urlencode($_GET['tkn']) ?>" style="text-decoration: none;">
+                                    <a href="./docs_pessoa.php?tkn=<?= urlencode($_GET['tkn']) ?>"
+                                        style="text-decoration: none;">
                                         <button class="btn-secondary">
                                             <i class="fas fa-plus"></i> Novo Documento
                                         </button>
@@ -392,11 +434,16 @@ include_once('../geral/topo.php');
                                                 <div class="doc">
 
                                                     <?php if (in_array($ext, ['png', 'jpg', 'jpeg'])): ?>
-                                                        <img class="img_bg_doc" src="..<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
-                                                        <div class="nome_arquivo"><span><?= htmlspecialchars($doc["nome_original"]) ?></span></div>
+                                                        <img class="img_bg_doc"
+                                                            src="..<?= htmlspecialchars($doc["caminho_arquivo"]) ?>" alt="">
+                                                        <div class="nome_arquivo">
+                                                            <span><?= htmlspecialchars($doc["nome_original"]) ?></span>
+                                                        </div>
                                                     <?php else: ?>
                                                         <i class="fa-regular fa-folder" style="font-size: 30px;"></i>
-                                                        <div class="nome_arquivo"><span><?= htmlspecialchars($doc["nome_original"]) ?></span></div>
+                                                        <div class="nome_arquivo">
+                                                            <span><?= htmlspecialchars($doc["nome_original"]) ?></span>
+                                                        </div>
                                                     <?php endif; ?>
                                                 </div>
                                             </a>
@@ -427,13 +474,13 @@ include_once('../geral/topo.php');
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Tab functionality
             const tabItems = document.querySelectorAll('.tab-item');
             const tabPanes = document.querySelectorAll('.tab-pane');
 
             tabItems.forEach(tab => {
-                tab.addEventListener('click', function() {
+                tab.addEventListener('click', function () {
                     const targetTab = this.getAttribute('data-tab');
 
                     // Remove active class from all tabs and panes

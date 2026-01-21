@@ -30,12 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
     -- Dados do cliente
     c.id_pessoa   AS cliente_id,
     c.tk          AS cliente_tk,
+    c.status      AS status_cliente,
     c.nome        AS cliente_nome,
     c.tipo_parte  AS cliente_tipo_parte,
 
     -- Dados do contrário
     ct.id_pessoa  AS contrario_id,
     ct.tk         AS contrario_tk,
+    ct.status     AS status_contrario,
     ct.nome       AS contrario_nome,
     ct.tipo_parte AS contrario_tipo_parte,
 
@@ -45,14 +47,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['tkn'])) {
     doc.caminho_arquivo,
     doc.dt_criacao,
     doc.id_documento,
-    doc.id_processo AS doc_id_processo 
+    doc.id_processo AS doc_id_processo, 
+
+    e.nome AS etapa_kanban_nome
 
 
 FROM processo p
 LEFT JOIN pessoas c  ON p.cliente_id   = c.id_pessoa
 LEFT JOIN pessoas ct ON p.contrario_id = ct.id_pessoa
+LEFT JOIN etapas_crm e ON p.etapa_kanban = e.id_etapas_crm
 LEFT JOIN documento_processo doc ON p.id_processo = doc.id_processo
-where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
+where p.tk = ? and p.usuario_config_id_usuario_config = ?';
 
     $stmt = $conexao->prepare($sql_busca_processo_tkn);
     $stmt->bind_param('si', $token_processo, $id_user);
@@ -74,6 +79,8 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
                     'tk' => $row['tk'],
                     'grupo_acao' => $row['grupo_acao'],
                     'status' => $row['status'],
+                    'status_cliente' => $row['status_cliente'],
+                    'status_contrario' => $row['status_contrario'],
                     'tipo_acao' => $row['tipo_acao'],
                     'referencia' => $row['referencia'],
                     'num_processo' => $row['num_processo'],
@@ -81,7 +88,7 @@ where p.tk = ? and p.usuario_config_id_usuario_config = ?;';
                     'processo_originario' => $row['processo_originario'],
                     'valor_causa' => $row['valor_causa'],
                     'valor_honorarios' => $row['valor_honorarios'],
-                    'etapa_kanban' => $row['etapa_kanban'],
+                    'etapa_kanban' => $row['etapa_kanban_nome'],
                     'contingenciamento' => $row['contingenciamento'],
                     'data_requerimento' => $row['data_requerimento'],
                     'resultado_processo' => $row['resultado_processo'],
@@ -190,6 +197,8 @@ include_once('../geral/topo.php');
                                     class="profile-status <?php echo $dados_processo["status"] == 'ativo' ? 'active' : 'inativo' ?>">
                                     <i class="fas fa-circle"></i> <?php echo ucfirst($dados_processo["status"]) ?>
                                 </span>
+
+
                             </div>
 
 
@@ -262,26 +271,42 @@ include_once('../geral/topo.php');
 
 
                                 <div class="info-card">
+
+
                                     <div class="info-item">
                                         <label class="info-label">Cliente</label>
-                                        <a class="pessoas_processo"
-                                            href="../pessoa/ficha_pessoa.php?tkn=<?php echo htmlspecialchars($dados_processo['cliente_tk'] ?? '') ?>"
-                                            target="__blank">
-                                            <div class="info-value">
+
+                                        <?php if (($dados_processo['status_cliente'] ?? '') === 'ativo'): ?>
+                                            <a class="pessoas_processo"
+                                                href="../pessoa/ficha_pessoa.php?tkn=<?= htmlspecialchars($dados_processo['cliente_tk'] ?? '') ?>"
+                                                target="_blank">
+                                                <div class="info-value">
+                                                    <?= htmlspecialchars($dados_processo['cliente_nome'] ?? '') ?>
+                                                </div>
+                                            </a>
+                                        <?php else: ?>
+                                            <div class="info-value text-muted">
                                                 <?= htmlspecialchars($dados_processo['cliente_nome'] ?? '') ?>
                                             </div>
-                                        </a>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div class="info-item">
                                         <label class="info-label">Contrário</label>
-                                        <a class="pessoas_processo"
-                                            href="../pessoa/ficha_pessoa.php?tkn=<?php echo htmlspecialchars($dados_processo['contrario_tk'] ?? '') ?>"
-                                            target="__blank">
-                                            <div class="info-value">
+
+                                        <?php if (strtolower($dados_processo['status_contrario'] ?? '') === 'ativo'): ?>
+                                            <a class="pessoas_processo"
+                                                href="../pessoa/ficha_pessoa.php?tkn=<?= htmlspecialchars($dados_processo['contrario_tk'] ?? '') ?>"
+                                                target="_blank">
+                                                <div class="info-value">
+                                                    <?= htmlspecialchars($dados_processo['contrario_nome'] ?? '') ?>
+                                                </div>
+                                            </a>
+                                        <?php else: ?>
+                                            <div class="info-value text-muted">
                                                 <?= htmlspecialchars($dados_processo['contrario_nome'] ?? '') ?>
                                             </div>
-                                        </a>
+                                        <?php endif; ?>
                                     </div>
 
 

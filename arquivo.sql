@@ -37,6 +37,7 @@ CREATE TABLE log (
 CREATE TABLE pessoas (
     id_pessoa INT NULL AUTO_INCREMENT,
     tk varchar(32) NOT NULL,
+    status VARCHAR(15) DEFAULT 'ativo',
     nome varchar(220) NOT NULL,
     origem varchar(100) NOT NULL,
     dt_cadastro_pessoa DATETIME NOT NULL,

@@ -30,7 +30,7 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
         $filtrar = isset($_GET['filtrar']) ? htmlspecialchars($conexao->real_escape_string($_GET['filtrar'])) : null;
         $ordenar = isset($_GET['ordenar']) ? htmlspecialchars($conexao->real_escape_string($_GET['ordenar'])) : null;
 
-        $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user";
+        $sql_filtros = "SELECT id_pessoa,tk,nome, tipo_parte,dt_cadastro_pessoa, telefone_principal,logradouro, bairro FROM pessoas where usuario_config_id_usuario_config = $id_user AND status <> 'inativo' ";
         $params = [];
         $types = "";
 
@@ -76,7 +76,7 @@ FROM pessoas WHERE usuario_config_id_usuario_config = {$_SESSION['cod']} ;
 
         $sql_busca_pessoas = "SELECT id_pessoa, tk, nome, tipo_parte, dt_cadastro_pessoa, telefone_principal, logradouro, bairro 
         FROM pessoas 
-        WHERE usuario_config_id_usuario_config = $id_user 
+        WHERE usuario_config_id_usuario_config = $id_user AND status <> 'inativo'
         ORDER BY dt_cadastro_pessoa DESC 
         LIMIT $limite OFFSET $offset";
 
@@ -106,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
             // Verifico primeiramente se a pessoa excluida se encontra vinculada a um processo
             if ($pessoa_parte == 'cliente') {
-                $sql_busca_processos = "SELECT referencia,tipo_acao FROM processo WHERE cliente_id = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
+                $sql_busca_processos = "SELECT referencia,tipo_acao, status FROM processo WHERE cliente_id = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
             } elseif ($pessoa_parte == 'contrário') {
-                $sql_busca_processos = "SELECT referencia,tipo_acao FROM processo WHERE contrario_id = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
+                $sql_busca_processos = "SELECT referencia,tipo_acao, status FROM processo WHERE contrario_id = $pessoa_id_exclusao AND usuario_config_id_usuario_config = $id_user";
             }
 
             $pessoa_processo = $conexao->query($sql_busca_processos);
@@ -116,30 +116,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
 
                 $ref_processos = [];
                 $tipo_acao = [];
+                $status_processo = [];
 
                 while ($processo = $pessoa_processo->fetch_assoc()) {
                     $ref_processos[] = $processo['referencia'];
                     $tipo_acao[] = $processo['tipo_acao'];
+                    $status_processo[] = $processo['status'];
                 }
 
-                // Transforma o array em string, separado por vírgulas
-                $refs = implode(', ', $ref_processos);
-                $tipos_acao = implode(', ', $tipo_acao);
+                if (in_array('ativo', $status_processo)) {
+                    // Transforma o array em string, separado por vírgulas
+                    $refs = implode(', ', $ref_processos);
+                    $tipos_acao = implode(', ', $tipo_acao);
 
-                $res = [
-                    'status' => 'erro',
-                    'message' => "A exclusão não pôde ser concluída. A pessoa está vinculada a um ou mais processos. 
+                    $res = [
+                        'status' => 'erro',
+                        'message' => "A exclusão não pôde ser concluída. A pessoa está vinculada a um ou mais processos. 
                     Remova o vínculo com esses processos antes de prosseguir. 
                     Processos vinculados: $refs.
                     Tipo de ação: $tipos_acao.
                     ",
-                ];
+                    ];
 
 
-                echo json_encode($res, JSON_UNESCAPED_UNICODE);
-                $conexao->rollback();
-                $conexao->close();
-                exit;
+                    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                    $conexao->rollback();
+                    $conexao->close();
+                    exit;
+                }
+
             }
 
 
@@ -162,12 +167,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET) && $_GET['acao'] == '
                 }
             }
 
-            $caminhoFoto = __DIR__ . '/../../..' . $pessoa_exclusao['foto_pessoa'];
+            $rootProjeto = dirname(__DIR__, 2);
+            // sobe de /sistema/pessoa para /adv
+
+            $caminhoFoto = $rootProjeto . $pessoa_exclusao['foto_pessoa'];
 
             if (!empty($pessoa_exclusao['foto_pessoa']) && is_file($caminhoFoto)) {
                 unlink($caminhoFoto);
             }
 
+            if (!empty($status_processo) && !in_array('ativo', $status_processo)) {
+                // Se houver processos vinculados, mas todos estiverem inativos, troco o status da pessoa para 'inativo'
+                $sql_update_pessoa_inativa = 'UPDATE pessoas SET status = ? where tk = ? and usuario_config_id_usuario_config = ? ';
+                $novo_status = 'inativo';
+                $stmt = $conexao->prepare($sql_update_pessoa_inativa);
+                $stmt->bind_param('ssi', $novo_status, $token, $id_user);
+                if ($stmt->execute()) {
+
+
+                    $ip = $_SERVER['REMOTE_ADDR'];
+
+                    if (cadastro_log('Excluiu Pessoa', $pessoa_nome_exclusao, $ip, $id_user)) {
+                        $res = [
+                            'status' => 'success',
+                            'message' => 'Pessoa excluída com sucesso!',
+                        ];
+                        echo json_encode($res, JSON_UNESCAPED_UNICODE);
+                        $conexao->commit();
+                        $conexao->close();
+                        exit;
+                    }
+                }
+            }
 
 
             $sql_delete_pessoa = 'DELETE from pessoas where tk = ? and usuario_config_id_usuario_config = ? ';
