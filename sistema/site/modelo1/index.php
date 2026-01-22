@@ -5,10 +5,7 @@ include_once('../config.php');
 
 
 if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
-    && !empty($_POST['name'])
-    && !empty($_POST['email'])
-    && !empty($_POST['phone'])
+    $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['phone'])
     && !empty($_POST['message'])
     && !empty($_POST['modelo'])
 ) {

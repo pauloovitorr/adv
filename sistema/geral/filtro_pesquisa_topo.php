@@ -2,7 +2,7 @@
 
 include_once('../../scripts.php');
 
-// Função que adiciona o link do modelo no "visualizar site"
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['valor']) && $_POST['acao'] === 'pesquisar_dados') {
 
     $pesquisa = $conexao->escape_string($_POST['valor']);

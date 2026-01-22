@@ -236,7 +236,7 @@ section {
   border-radius: 12px;
   text-align: center;
   border: 1px solid #333;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: .5s ease
 }
 
 .service-card:hover {

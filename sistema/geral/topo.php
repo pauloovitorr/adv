@@ -2,7 +2,21 @@
 
 $link_modelo = "";
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+    $sql_busca_modelo = "SELECT tk, modelo FROM usuario_config WHERE id_usuario_config = $id_user LIMIT 1";
+
+    $res_modelo = $conexao->query($sql_busca_modelo);
+    $row_modelo = $res_modelo->fetch_assoc();
+    $modelo = $row_modelo['modelo'];
+    $tk = $row_modelo['tk'];
+
+    if ($modelo == 1) {
+        $link_modelo = "/adv/sistema/site/modelo$modelo/index.php?modelo=$tk";
+    }
+
+
+}
 
 
 ?>
@@ -359,18 +373,18 @@ $link_modelo = "";
         border-top: none;
         transition: opacity 0.3s;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-         overflow: hidden;
-         display: none;
+        overflow: hidden;
+        display: none;
     }
 
     .container_resultados ul {
         list-style: none;
-        
+
     }
 
     .container_resultados ul li {
         font-size: 14px;
-         
+
     }
 
     .container_resultados ul li:hover {
@@ -387,7 +401,7 @@ $link_modelo = "";
         font-size: 12px;
     }
 
-    .sem_resultado{
+    .sem_resultado {
         padding: 8px;
         width: 100%;
         height: 100%;
@@ -439,7 +453,7 @@ $link_modelo = "";
                 </div>
                 <div class="container_resultados">
                     <ul>
-                        
+
                     </ul>
                 </div>
             </div>
