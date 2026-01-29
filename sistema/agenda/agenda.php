@@ -252,7 +252,7 @@ include_once('../geral/topo.php');
                 <input type="text" id="title" name="title" maxlength="40" required>
 
                 <label for="description">Descrição</label>
-                <textarea id="description" name="description" placeholder="Descreva o compromisso..."></textarea>
+                <textarea id="description" name="description" placeholder="Descreva o compromisso..." required></textarea>
 
                  <div class="checkbox-group">
                     <div>

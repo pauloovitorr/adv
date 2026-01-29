@@ -811,7 +811,7 @@ include_once('../geral/topo.php');
                                     </div>
 
                                     <div class="form-field form-field--wide" id="campo-estilizacao">
-                                        <label for="estilizacao">Estilização (JSON / CSS opcional)</label>
+                                        <label for="estilizacao">Estilização (JS / CSS opcional)</label>
                                         <textarea name="estilizacao" id="estilizacao" rows="3"
                                             placeholder='EX: {"cor_primaria":"#123456","layout":"modelo1"}'><?php echo htmlspecialchars($dados_modelo['estilizacao'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                                     </div>

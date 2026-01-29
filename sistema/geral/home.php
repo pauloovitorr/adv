@@ -93,14 +93,14 @@ include_once('../geral/topo.php');
 
             <section class="container_home">
                 <!-- Seção de Boas-vindas com Confetti -->
-                <div class="welcome-section" data-aos="fade-up">
+                <!-- <div class="welcome-section" data-aos="fade-up">
                     <div class="welcome-content">
                         <h1 class="welcome-title">Seja bem-vindo novamente!</h1>
                         <p class="welcome-subtitle">Aqui está um resumo das suas atividades</p>
 
                     </div>
 
-                </div>
+                </div> -->
 
                 <!-- Grid de Gráficos -->
                 <div class="charts-grid">
