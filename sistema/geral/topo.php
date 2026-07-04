@@ -330,8 +330,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         text-decoration: none;
         color: rgb(58, 58, 58);
         display: block;
-        padding: 8px;
-        font-size: 12px;
+         padding: 8px;
+        transition: 0.3s;
+        font-size: 14px;
     }
 
     .btn_add:hover .opcoes_add,

@@ -848,16 +848,9 @@ include_once('../geral/topo.php');
                                                 Llama-3.3-70b
                                             </div>
 
-                                            <div class="llm-item" data-model="Kimi K2" data-local="groq">
-                                                kimi-k2-instruct-0905
-                                            </div>
 
                                             <div class="llm-item" data-model="Gpt-oss-120b" data-local="groq">
                                                 Gpt-oss-120b (Reasoning)
-                                            </div>
-
-                                            <div class="llm-item" data-model="GPT-5-nano" data-local="openai">
-                                                Openai/GPT-5-nano (Acesso Web)
                                             </div>
 
 
@@ -865,9 +858,9 @@ include_once('../geral/topo.php');
                                                 Groq/Compound-mini (Acesso Web)
                                             </div>
 
-                                            <div class="llm-item" data-model="Sonar" data-local="perplexity">
+                                            <!-- <div class="llm-item" data-model="Sonar" data-local="perplexity">
                                                 Perplexity/Sonar (Pesquisa jurídica)
-                                            </div>
+                                            </div> -->
 
                                             <div class="llm-footer">
                                                 Modelos Para Testes
