@@ -10,46 +10,53 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-function dados_acesso($nome_cliente,$remetente, $usuario, $senha){
+function dados_acesso($nome_cliente, $remetente, $usuario, $senha) {
 
     $mail = new PHPMailer(true);
 
     try {
-        // Configuração do servidor SMTP
+        // Configuração do servidor SMTP da Umbler vindo do .env
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Servidor SMTP do Gmail
-        $mail->SMTPAuth = true; // Ativar autenticação SMTP
-        $mail->Username = 'paulov.pv50@gmail.com'; // Seu e-mail do Gmail
-        $mail->Password = 'okjw dhmk bbjv sjst'; // Sua senha ou senha de aplicativo
-        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Usar SSL
-        $mail->Port = 587; // Porta SMTP para SSL 
-    
+        $mail->Host       = $_ENV['MAIL_HOST'];
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $_ENV['MAIL_USER'];
+        $mail->Password   = $_ENV['MAIL_PASS'];
+        $mail->Port       = $_ENV['MAIL_PORT'];
+        $mail->SMTPSecure = 'tls'; // Padrão recomendado para a porta 587
+
         // Configuração do remetente e destinatário
-        $mail->setFrom('paulov.pv50@gmail.com'); // Remetente
-        $mail->addAddress("$remetente"); // Destinatário principal
-        $mail->addReplyTo('paulov.pv50@gmail.com'); // E-mail de resposta
+        $mail->setFrom($_ENV['MAIL_USER'], 'ADV'); // Remetente profissional
+        $mail->addAddress($remetente); // Destinatário principal
+        $mail->addReplyTo($_ENV['MAIL_USER']);
     
         // Conteúdo do e-mail
         $mail->CharSet = 'UTF-8';
-        $mail->isHTML(true); // Permitir HTML no e-mail
+        $mail->isHTML(true);
         $mail->Subject = 'Dados de acesso';
-        $mail->Body = "<h1>Olá, $nome_cliente!</h1><p>Segue os dados de acesso ao sistema: </p><br><p>Tela de login: <a href='http://localhost/advogado/login.php'>Clique aqui!</a></p> <p>Usuário: <strong>$usuario</strong> </p><p>Senha: <strong>$senha</strong> </p>";
-        $mail->AltBody = "Olá, $nome_cliente! 
-        Segue os dados de acesso ao sistema: Tela de login: http://localhost/adv/login.php 
-        Usuário: $usuario 
-        Senha: $senha";
+        
+        // Links atualizados para o seu domínio real na VPS em vez de localhost
+        $mail->Body = "<h1>Olá, $nome_cliente!</h1>
+                       <p>Segue os dados de acesso ao sistema:</p><br>
+                       <p>Tela de login: <a href='https://adv.paulovitordev.com.br/login.php'>Clique aqui!</a></p> 
+                       <p>Usuário: <strong>$usuario</strong></p>
+                       <p>Senha: <strong>$senha</strong></p>";
+                       
+        $mail->AltBody = "Olá, $nome_cliente!\n
+                          Segue os dados de acesso ao sistema:\n
+                          Tela de login: https://adv.paulovitordev.com.br/login.php\n
+                          Usuário: $usuario\n
+                          Senha: $senha";
     
         // Enviar o e-mail
-        if($mail->send()){
+        if ($mail->send()) {
            return 'E-mail enviado com sucesso!';
-        }else{
+        } else {
             return 'Erro';
         }
         
     } catch (Exception $e) {
         return "Erro ao enviar o e-mail: {$mail->ErrorInfo}";
     }
-
 }
 
 
