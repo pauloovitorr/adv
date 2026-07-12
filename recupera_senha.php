@@ -107,12 +107,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'  && !empty($_POST['email'])) {
     }
     catch (Exception $err){
         
-        $conexao->close();
+        
         $res = [
             'status' => 'erro',
             'message' => 'Tente novamente em alguns minutos!'
         ];
         $conexao->rollback();
+        $conexao->close();
         echo json_encode($res, JSON_UNESCAPED_UNICODE);
         exit;
     }

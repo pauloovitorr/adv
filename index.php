@@ -1,5 +1,7 @@
 <?php
 
+// Exibir erros de PHP
+ini_set('display_errors', 1);
 
 include_once('./scripts.php');
 
